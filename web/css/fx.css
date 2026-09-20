@@ -1,0 +1,197 @@
+/* ══════════════════════════════════════════════════════════════════════
+   fx.css — companion to js/fx.js.
+
+   Restraint is the brief. Hover states move a hairline and a border, not
+   a card in three dimensions. There are no gradient blooms, no blurs and
+   no glows: this product's visual argument is typographic, and light
+   effects sprayed over typography read as a template, not a design.
+
+   Every colour is a theme token. The block at the foot of this file
+   switches all motion off for prefers-reduced-motion.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ───────────── reading position ───────────── */
+#readProgress{position:fixed;left:0;top:0;height:2px;width:100%;z-index:80;
+  transform-origin:0 50%;transform:scaleX(0);pointer-events:none;
+  background:var(--accent);transition:opacity var(--t-med)}
+
+/* ───────────── entrances ─────────────
+   These are prefixed anim-, not fx-: pages.css already owns the fx-
+   namespace for the factor explorer (.fx-row there is a four-column
+   grid), and a collision silently re-lays-out whatever it touches. */
+.anim-rise{opacity:0;transform:translateY(16px);
+  transition:opacity .7s var(--ease-out),transform .7s var(--ease-out)}
+.anim-rise.anim-in{opacity:1;transform:none}
+
+.anim-word{display:inline-block;opacity:0;transform:translateY(.38em);
+  animation:animWord .7s var(--ease-out) forwards;
+  animation-delay:calc(var(--w) * 80ms + 100ms)}
+@keyframes animWord{to{opacity:1;transform:none}}
+
+.mast-copy .lede,.mast-cta,.mast-docket{animation:animUp .8s var(--ease-out) both}
+.mast-copy .lede{animation-delay:.42s}
+.mast-cta{animation-delay:.56s}
+@keyframes animUp{from{opacity:0;transform:translateY(12px)}}
+
+/* The statement is dealt row by row and totalled at the foot. */
+.statement{animation:animUp .8s var(--ease-out) .3s both}
+.anim-line{animation:animLine .5s var(--ease-out) both;
+  animation-delay:calc(var(--r) * 90ms + 700ms)}
+@keyframes animLine{from{opacity:0;transform:translateY(6px)}}
+
+/* Console panels settle in reading order. */
+.module .panel,.module .kpi{animation:animUp .6s var(--ease-out) both;
+  animation-delay:calc(var(--n,0) * 45ms)}
+
+/* ───────────── restrained hover ───────────── */
+.scope,.stp,.ref-stat,.eq-card,.grades .grade,.lim{
+  transition:transform var(--t-fast) var(--ease-out),border-color var(--t-fast)}
+.scope:hover,.stp:hover,.ref-stat:hover,.eq-card:hover,.grades .grade:hover{transform:translateY(-2px)}
+.nav-item{transition:background var(--t-fast),color var(--t-fast)}
+
+/* ───────────── the year on the ledger ───────────── */
+.band{border-block:1px solid var(--line-1);background:var(--surface-1);
+  padding-block:26px 20px;overflow:hidden}
+.band-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+  flex-wrap:wrap;padding-bottom:14px}
+.band-t{font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text-3)}
+.band-key{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);
+  font-size:var(--fs-micro);letter-spacing:.09em;text-transform:uppercase;color:var(--text-4)}
+.band-key i{width:9px;height:9px;border-radius:2px;margin-left:12px;flex:0 0 auto}
+.band-key i:first-child{margin-left:0}
+.band-key .k-g{background:var(--gross)}
+.band-key .k-a{background:var(--good)}
+.band-key .k-n{background:var(--accent);height:2px;border-radius:0;width:14px}
+.band-plot{width:100%}
+.band-plot svg{display:block}
+.bd-zero{stroke:var(--line-3);stroke-width:1}
+.bd-g{fill:var(--gross)}
+.bd-a{fill:var(--good);opacity:.85}
+.bd-n{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+.bd-dot{fill:var(--accent)}
+.bd-v{fill:var(--accent);font-family:var(--font-mono);font-size:11px;font-weight:600}
+.bd-m{fill:var(--text-4);font-family:var(--font-mono);font-size:9.5px;letter-spacing:.06em}
+.bd-m.on{fill:var(--text-2)}
+/* the month still being posted to, marked rather than drawn as fact */
+.bd-g.part,.bd-a.part{opacity:.38}
+.bd-m.part{fill:var(--text-4);font-style:italic}
+.bd-n.bd-part{stroke-dasharray:3 3;opacity:.7}
+.bd-dot.part{fill:none;stroke:var(--accent);stroke-width:1.5}
+.bd-v.part{fill:var(--text-3);font-weight:500}
+.band-t em{font-style:normal;color:var(--text-4);text-transform:none;letter-spacing:.04em}
+
+/* ───────────── the playground ───────────── */
+.play{border:1px solid var(--line-2);border-radius:var(--r-lg);
+  background:var(--surface-1);padding:22px}
+.play-hd{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);
+  font-size:var(--fs-micro);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-3);padding-bottom:14px;border-bottom:1px solid var(--line-1);margin-bottom:20px}
+.play-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,210px);gap:30px;align-items:center}
+.pl{display:block;margin-bottom:18px}
+.pl-t{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;
+  font-size:var(--fs-small);color:var(--text-2)}
+.pl-t b{font-weight:500;color:var(--text-1)}
+.pl-t output{font-family:var(--font-mono);color:var(--accent);font-variant-numeric:tabular-nums}
+.pl-presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.play-out{display:grid;gap:18px;justify-items:center}
+.ring{position:relative;width:144px;height:144px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.rg-bg,.rg-fg{fill:none;stroke-width:7;stroke-linecap:round}
+.rg-bg{stroke:var(--surface-4)}
+.rg-fg{stroke:var(--accent);stroke-dasharray:0 100;
+  transition:stroke-dasharray .6s var(--ease-out),stroke var(--t-med)}
+.rg-c{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.rg-c b{font-family:var(--font-mono);font-size:36px;font-weight:500;line-height:1;display:block}
+.rg-c span{font-family:var(--font-mono);font-size:var(--fs-micro);color:var(--text-3);
+  margin-top:5px;display:block;font-variant-numeric:tabular-nums}
+.rg-c b.struck{animation:animStruck .45s var(--ease-out)}
+@keyframes animStruck{35%{transform:translateY(-4px)}}
+.pl-stats{width:100%;display:grid;gap:2px}
+.pl-stats .l-v{font-variant-numeric:tabular-nums}
+
+/* Figures line up on the decimal wherever they are read as a column. */
+.leader .l-v,.st-fig,.fig-xl,.kpi .fig{font-variant-numeric:tabular-nums}
+
+@media (max-width:900px){
+  .play-body{grid-template-columns:minmax(0,1fr)}
+  .play-out{justify-items:start}
+}
+@media (max-width:780px){
+  .band-key{display:none}
+  /* twelve columns in ~340px leaves no clear space for it, and it lands
+     on top of the bars; the caption already names the open month */
+  .bd-v{display:none}
+  .play-out{justify-items:center}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .anim-word,.mast-copy .lede,.mast-cta,.mast-docket,.statement,
+  .anim-line,.module .panel,.module .kpi{animation:none;opacity:1;transform:none}
+  .anim-rise{opacity:1;transform:none;transition:none}
+  .scope:hover,.stp:hover,.ref-stat:hover,.eq-card:hover,.grades .grade:hover{transform:none}
+  .rg-fg{transition:none}
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   the bento — the position, said as cards
+   A grid of surfaces rather than a ruled page, because the reference
+   designs this product is being measured against read as modules. The
+   matrix is the anchor; the rest are single live figures.
+   ══════════════════════════════════════════════════════════════════════ */
+.bento{padding-block:88px 74px}
+.bento-hd{max-width:60ch;margin-bottom:32px}
+.bento-hd h2{font-size:var(--fs-h2);margin-top:15px}
+.bento-hd .lede{margin-top:15px;font-size:var(--fs-body)}
+.bento-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}
+
+.bcard{background:var(--surface-1);border:1px solid var(--line-2);border-radius:var(--r-xl);
+  padding:22px 24px 20px;display:flex;flex-direction:column;min-width:0;
+  transition:border-color var(--t-fast),transform var(--t-fast) var(--ease-out)}
+.bcard:hover{border-color:var(--line-3);transform:translateY(-2px)}
+.bc-hd{display:flex;align-items:baseline;gap:11px;font-family:var(--font-mono);
+  font-size:var(--fs-micro);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
+.bc-ft{margin:14px 0 0;font-family:var(--font-mono);font-size:var(--fs-micro);
+  letter-spacing:.05em;color:var(--text-4)}
+
+.b-matrix{grid-column:span 8}
+.mx{margin-top:18px;flex:1;display:flex;align-items:flex-end;min-height:0}
+.mx svg{display:block;width:100%}
+.mx-d{fill:var(--line-2);opacity:.45}
+.mx-d.on{fill:var(--accent);opacity:1}
+.mx-d.on.part{fill:none;stroke:var(--accent);stroke-width:1.3}
+.mx-m{fill:var(--text-4);font-family:var(--font-mono);font-size:9.5px;letter-spacing:.06em}
+.mx-m.part{fill:var(--text-3);font-style:italic}
+
+.b-accent{grid-column:span 4;background:var(--accent);border-color:var(--accent);
+  color:var(--on-accent);justify-content:center}
+.b-accent:hover{border-color:var(--accent);transform:translateY(-2px)}
+.b-accent .bc-k{font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.14em;
+  text-transform:uppercase;opacity:.75}
+.b-accent b{font-family:var(--font-mono);font-size:clamp(50px,7vw,74px);font-weight:600;
+  line-height:.92;letter-spacing:-.04em;margin-top:10px;font-variant-numeric:tabular-nums}
+.b-accent .bc-grade{font-family:var(--font-mono);font-size:22px;font-weight:600;
+  letter-spacing:.04em;opacity:.8;margin-top:2px}
+.b-accent p{margin:16px 0 0;font-size:var(--fs-small);line-height:1.6;opacity:.85;max-width:34ch}
+
+.b-stat{grid-column:span 3;justify-content:flex-start}
+.b-stat b{font-family:var(--font-mono);font-size:38px;font-weight:500;line-height:1;
+  letter-spacing:-.035em;color:var(--text-1);font-variant-numeric:tabular-nums}
+.b-stat>span{display:block;margin-top:9px;font-family:var(--font-mono);font-size:var(--fs-micro);
+  letter-spacing:.12em;text-transform:uppercase;color:var(--text-2)}
+.b-stat p{margin:10px 0 0;font-size:var(--fs-small);color:var(--text-3);line-height:1.55}
+
+@media (max-width:1040px){
+  .b-matrix{grid-column:span 12}
+  .b-accent{grid-column:span 12}
+  .b-accent b{font-size:56px}
+  .b-stat{grid-column:span 6}
+}
+@media (max-width:620px){
+  .bento{padding-block:58px 48px}
+  .b-stat{grid-column:span 12}
+}
+@media (prefers-reduced-motion:reduce){
+  .bcard:hover,.b-accent:hover{transform:none}
+}

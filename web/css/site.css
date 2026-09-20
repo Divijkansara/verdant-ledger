@@ -1,0 +1,329 @@
+/* ══════════════════════════════════════════════════════════════════════
+   site.css — the public website: navigation, landing page, methodology,
+   documentation, pricing and the authentication screens.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════ shell ═════════════════════════════════════ */
+.site{min-height:100vh;display:flex;flex-direction:column}
+.shell{max-width:1220px;margin:0 auto;width:100%;padding-inline:24px}
+
+/* ── top navigation ─────────────────────────────────────────────────── */
+.nav{
+  position:sticky;top:0;z-index:40;border-bottom:1px solid transparent;
+  background:color-mix(in srgb,var(--bg) 82%,transparent);
+  backdrop-filter:blur(14px) saturate(140%);
+  transition:border-color var(--t-med),background var(--t-med);
+}
+.nav.scrolled{border-bottom-color:var(--line-1);background:color-mix(in srgb,var(--bg) 94%,transparent)}
+.nav-in{display:flex;align-items:center;gap:26px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.brand .glyph{width:26px;height:26px;flex:0 0 auto}
+.brand b{font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:-.024em;
+  color:var(--text-1)}
+.brand b span{color:var(--accent)}
+.nav-links{display:flex;gap:4px;margin-left:8px}
+.nav-links a{padding:7px 12px;border-radius:var(--r-sm);color:var(--text-2);font-size:var(--fs-body);
+  font-weight:500;transition:color var(--t-fast),background var(--t-fast)}
+.nav-links a:hover{color:var(--text-1);background:var(--surface-2)}
+.nav-links a.on{color:var(--text-1);background:var(--surface-2)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-burger{display:none}
+.lbl-short{display:none}
+/* Sign in lives in the top-right button at desktop width; this row
+   exists only for the burger menu, where that button is hidden. */
+.nav-links a.signin-row{display:none}
+
+/* ══════════════════════════════════════════════════════════════════
+   THE DOCUMENT
+   ──────────────────────────────────────────────────────────────────
+   The public site is set as a ruled statement rather than as a stack
+   of cards. Three devices carry the whole thing:
+
+     · the RULE      — a hairline is the only container. Nothing is
+                       boxed, so the page reads as one continuous sheet
+                       instead of as a tray of tiles.
+     · the CLAUSE    — every section is numbered in the left margin and
+                       its body hangs in a single wide column, which is
+                       how a contract, a standard or a set of accounts
+                       is organised.
+     · the LEADER    — label · · · · · · figure. A dotted leader does
+                       the work of a table border without drawing one.
+
+   The point is not decoration. The product manages a ledger, so the
+   interface borrows the visual grammar of a ledger; form following
+   content is an argument the page makes before a word is read.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── masthead ─────────────────────────────────────────────────────── */
+/* The deck fans its back sheets to the right; past a certain width that
+   pushed the page into horizontal scroll. overflow-x:clip trims it
+   without creating a scroll container, so the sticky nav still works and
+   the 3-D scene inside the stage is untouched. */
+.mast{padding-block:34px 0;position:relative;overflow-x:clip;overflow-y:visible}
+.mast-docket{padding-bottom:12px}
+.mast-body{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,400px);
+  gap:0 56px;padding-block:78px 108px;align-items:start}
+
+.mast-copy h1{font-size:var(--fs-hero);line-height:.96;letter-spacing:-.024em;
+  font-variation-settings:"opsz" 144;text-wrap:initial}
+/* The accent appears once in the headline. Used twice in one glance it
+   is decoration; used once it is emphasis. */
+.mast-copy h1 em{font-style:italic;color:var(--accent)}
+.mast-copy .lede{margin-top:30px;max-width:50ch;font-size:var(--fs-lead)}
+.mast-cta{display:flex;align-items:center;gap:26px;margin-top:36px;flex-wrap:wrap}
+
+.mast-link{display:inline-flex;align-items:center;gap:7px;color:var(--text-1);
+  font-weight:500;padding-bottom:3px;border-bottom:1px solid var(--line-3);
+  transition:border-color var(--t-fast),color var(--t-fast)}
+.mast-link:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.mast-link svg{width:14px;height:14px}
+
+/* the statement of position — an account, not a product screenshot */
+.statement{border-top:2px solid var(--line-3);padding-top:14px;position:relative}
+.st-hd{display:flex;align-items:baseline;gap:12px;font-family:var(--font-mono);
+  font-size:var(--fs-micro);letter-spacing:.17em;text-transform:uppercase;
+  color:var(--text-2);padding-bottom:12px}
+.st-fig{display:flex;align-items:flex-end;gap:14px;padding-block:22px 6px}
+.st-fig u{text-decoration:none;font-family:var(--font-mono);font-size:var(--fs-micro);
+  letter-spacing:.13em;text-transform:uppercase;color:var(--text-3);line-height:1.6;
+  padding-bottom:12px;white-space:nowrap}
+.st-rows{display:flex;flex-direction:column;gap:9px;padding-top:20px;
+  border-top:1px solid var(--line-2)}
+.st-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  margin-top:22px;padding-top:12px;border-top:1px solid var(--line-2)}
+.st-spark{width:92px;height:24px}
+.st-seal{font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.11em;
+  text-transform:uppercase;color:var(--text-3)}
+
+/* a total closes with the accountant's double rule */
+.leader.total{padding-top:9px;margin-top:2px;border-top:1px solid var(--line-3)}
+.leader.total .l-k{color:var(--text-1);font-weight:600}
+.leader.total .l-v{color:var(--text-1);font-weight:600;
+  border-bottom:3px double var(--line-3);padding-bottom:2px}
+
+/* ── clauses ──────────────────────────────────────────────────────── */
+.clause{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr);gap:0 40px;
+  padding-block:76px;border-top:1px solid var(--line-2)}
+.clause-n{position:sticky;top:96px;align-self:start;display:flex;flex-direction:column;gap:8px}
+.clause-t{font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.15em;
+  text-transform:uppercase;color:var(--text-3)}
+.clause-b>h2{max-width:26ch;font-size:var(--fs-h2)}
+.clause-b>.lede{margin-top:20px;max-width:64ch}
+
+/* two unequal columns — deliberately not 50/50, because symmetry is
+   what makes a page feel machine-laid */
+.two{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:56px;margin-top:40px;
+  align-items:start}
+.marks{margin-top:22px;display:flex;flex-direction:column}
+.marks li{font-size:var(--fs-small);color:var(--text-2);line-height:1.66;
+  padding-block:13px;border-top:1px solid var(--line-1)}
+.marks li b{color:var(--text-1)}
+.marks+.mast-link{margin-top:26px}
+
+/* schedules — a small ruled account set beside the prose */
+.sched{border-top:2px solid var(--line-3);padding-top:14px}
+.sched-hd{display:flex;align-items:baseline;gap:12px;font-family:var(--font-mono);
+  font-size:var(--fs-micro);letter-spacing:.17em;text-transform:uppercase;
+  color:var(--text-2);padding-bottom:12px}
+.sched .leader{padding-block:9px;border-top:1px solid var(--line-1)}
+.sched .leader:first-of-type{border-top:0}
+.sched-note{margin-top:16px;font-size:var(--fs-small);color:var(--text-3);line-height:1.65}
+.sched .audit{margin-top:4px}
+
+/* ── schedule of notes — figure in the margin, text alongside ─────── */
+.notes{margin-top:40px;border-top:1px solid var(--line-2)}
+.note{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:0 40px;
+  padding-block:26px;border-bottom:1px solid var(--line-1);align-items:baseline}
+.note:last-child{border-bottom:0}
+.note-f{font-family:var(--font-mono);font-variant-numeric:tabular-nums;
+  display:flex;align-items:baseline;gap:5px;color:var(--accent)}
+.note-f span{font-size:clamp(34px,3.6vw,48px);letter-spacing:-.05em;line-height:1}
+.note-f u{text-decoration:none;font-size:var(--fs-small);letter-spacing:0;color:var(--text-3)}
+.note-b{font-size:var(--fs-body);color:var(--text-2);line-height:1.66;max-width:56ch}
+
+/* ── numbered entries ─────────────────────────────────────────────── */
+.entries{margin-top:40px;border-top:1px solid var(--line-2)}
+.entry{display:grid;grid-template-columns:minmax(0,72px) minmax(0,260px) minmax(0,1fr);
+  gap:0 36px;padding-block:28px;border-bottom:1px solid var(--line-1);align-items:baseline}
+.entry:last-child{border-bottom:0}
+.entry-n{font-family:var(--font-mono);font-size:var(--fs-lead);color:var(--accent);
+  font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.entry-h h3{font-size:var(--fs-h3);letter-spacing:-.016em}
+.entry-b{font-size:var(--fs-small);color:var(--text-2);line-height:1.7;max-width:58ch}
+
+/* ── the module index — a table, because that is what an index is ─── */
+.index{margin-top:36px;border:0;border-top:2px solid var(--line-3)}
+.index table{min-width:640px}
+.index thead th{background:var(--bg);border-bottom:1px solid var(--line-2);
+  border-top:0;padding-inline:0}
+.index tbody td{padding:15px 0;border-bottom:1px solid var(--line-1);vertical-align:top}
+.index tbody tr:hover{background:transparent}
+.index tbody tr:hover .m-name a{color:var(--accent)}
+.index .m-name{width:190px;padding-right:28px}
+.index .m-name a{font-size:var(--fs-body);font-weight:600;color:var(--text-1);
+  transition:color var(--t-fast)}
+.index .m-body{color:var(--text-2);line-height:1.66;padding-right:32px;max-width:62ch}
+.index .m-cls{width:150px;font-family:var(--font-mono);font-size:var(--fs-micro);
+  letter-spacing:.11em;text-transform:uppercase;color:var(--text-4);white-space:nowrap}
+
+/* ── specifications ───────────────────────────────────────────────── */
+.specs{margin-top:32px;gap:0 56px}
+.specs .leader{padding-block:11px;border-top:1px solid var(--line-1)}
+.specs>div>.leader:first-child{border-top:1px solid var(--line-2)}
+
+/* ── FAQ — rules only ─────────────────────────────────────────────── */
+.faq{margin-top:34px;border-top:1px solid var(--line-2);background:transparent;border-radius:0}
+.faq details{background:transparent;border-bottom:1px solid var(--line-1)}
+.faq summary{padding:17px 0;cursor:pointer;font-weight:600;font-size:var(--fs-body);
+  display:flex;align-items:center;gap:12px;list-style:none;
+  transition:color var(--t-fast)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:hover{background:transparent;color:var(--accent)}
+.faq summary::after{content:"+";margin-left:auto;font-family:var(--font-mono);color:var(--accent);
+  font-size:17px;transition:transform var(--t-fast)}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq .faq-body{padding:0 0 22px;color:var(--text-2);font-size:var(--fs-small);line-height:1.72;
+  max-width:74ch}
+
+/* ── closing band ─────────────────────────────────────────────────── */
+.closing{padding-block:0 84px}
+.closing-in{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;
+  flex-wrap:wrap;padding-top:40px}
+.closing h2{margin-top:14px;font-size:var(--fs-h1);line-height:1.02}
+.closing p{margin-top:16px;color:var(--text-2);max-width:48ch;font-size:var(--fs-small);
+  line-height:1.7}
+
+
+/* ── footer — the colophon at the foot of the document ───────────── */
+.foot .brand{display:block}
+.foot .brand b{white-space:nowrap}
+.foot{border-top:2px solid var(--line-3);background:transparent;margin-top:auto;
+  padding-block:44px 30px}
+.foot-grid{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,1fr));gap:36px}
+.foot-col h4{font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.15em;
+  text-transform:uppercase;color:var(--text-3);font-weight:500;margin-bottom:13px}
+.foot-col a,.foot-col span{display:block;color:var(--text-2);font-size:var(--fs-small);
+  padding-block:5px;transition:color var(--t-fast)}
+.foot-col a:hover{color:var(--accent)}
+.foot-bottom{margin-top:34px;padding-top:20px;border-top:1px solid var(--line-1);
+  display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;
+  font-size:var(--fs-micro);color:var(--text-4);font-family:var(--font-mono)}
+
+/* a row of actions, used on the interior pages */
+.hero-cta{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+
+/* the ruled backdrop, kept for the sign-in aside */
+.hero-grid{position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(var(--line-1) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--line-1) 1px,transparent 1px);
+  background-size:56px 56px;opacity:.55;
+  mask-image:linear-gradient(to bottom,#000 0%,transparent 78%)}
+
+/* ═══════════════════════ auth ══════════════════════════════════════ */
+.auth{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,480px);min-height:calc(100vh - 64px)}
+.auth-aside{position:relative;overflow:hidden;padding:56px;display:flex;flex-direction:column;
+  justify-content:center;border-right:1px solid var(--line-1);background:var(--surface-1)}
+.auth-aside .hero-grid{mask-image:linear-gradient(to bottom right,#000 0%,transparent 70%);opacity:.6}
+.auth-aside-in{position:relative;z-index:1;max-width:460px}
+.auth-aside h2{font-size:clamp(28px,2.8vw,38px);letter-spacing:-.02em;line-height:1.06}
+.auth-aside p{margin-top:16px;color:var(--text-2);line-height:1.7}
+.auth-points{margin-top:30px;display:flex;flex-direction:column;gap:16px}
+.auth-point{display:grid;grid-template-columns:28px 1fr;gap:13px}
+.auth-point .ap-ico{width:28px;height:28px;border-radius:var(--r-sm);display:grid;place-items:center;
+  background:var(--accent-wash);color:var(--accent)}
+.auth-point b{display:block;font-size:var(--fs-small);font-weight:600}
+.auth-point span{font-size:var(--fs-small);color:var(--text-3);line-height:1.55}
+.auth-form{display:flex;flex-direction:column;justify-content:center;padding:48px}
+.auth-form-in{width:100%;max-width:370px;margin:0 auto}
+.auth-form h1{font-size:26px;letter-spacing:-.03em}
+.auth-form>.auth-form-in>p{margin-top:9px;color:var(--text-2);font-size:var(--fs-small)}
+.auth-fields{display:flex;flex-direction:column;gap:15px;margin-top:28px}
+.auth-err{color:var(--bad);font-size:var(--fs-small);min-height:18px}
+.auth-alt{margin-top:22px;padding-top:18px;border-top:1px solid var(--line-1);
+  font-size:var(--fs-small);color:var(--text-3);text-align:center}
+.auth-demo{margin-top:16px;border:1px dashed var(--line-2);border-radius:var(--r-sm);
+  padding:12px 14px;font-size:var(--fs-small);color:var(--text-3);background:var(--surface-2)}
+.auth-demo b{color:var(--text-2);font-family:var(--font-mono);font-size:var(--fs-micro)}
+
+/* ═══════════════════════ doc pages ═════════════════════════════════ */
+.doc{display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;padding-block:44px}
+.doc-toc{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 120px);overflow-y:auto}
+.doc-toc h4{font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.15em;
+  text-transform:uppercase;color:var(--text-3);margin-bottom:12px;font-weight:500}
+.doc-toc a{display:block;padding:6px 11px;border-left:2px solid var(--line-1);color:var(--text-2);
+  font-size:var(--fs-small);transition:all var(--t-fast)}
+.doc-toc a:hover{color:var(--text-1);border-left-color:var(--line-3)}
+.doc-toc a.on{color:var(--accent);border-left-color:var(--accent);background:var(--surface-2)}
+.doc-body h1{font-size:34px;letter-spacing:-.032em}
+.doc-body h2{font-size:21px;margin-top:44px;padding-bottom:10px;border-bottom:1px solid var(--line-1)}
+.doc-body h3{font-size:var(--fs-lead);margin-top:26px}
+.doc-body p{margin-top:12px;color:var(--text-2);line-height:1.72;max-width:72ch}
+.doc-body ul{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.doc-body ul li{position:relative;padding-left:22px;color:var(--text-2);
+  font-size:var(--fs-small);line-height:1.65}
+.doc-body ul li::before{content:"▸";position:absolute;left:2px;top:0;color:var(--accent)}
+.doc-body h2{scroll-margin-top:96px}
+/* Wide reference tables scroll inside their own container — the page
+   body itself must never scroll sideways. */
+.tbl-wrap{overflow-x:auto;margin-top:16px;border:1px solid var(--line-1);border-radius:var(--r-sm)}
+.doc-body .tbl-wrap table{margin-top:0;border:0;min-width:520px}
+.doc-body table{margin-top:16px;border:1px solid var(--line-1);border-radius:var(--r-sm)}
+.code-block{font-family:var(--font-mono);font-size:var(--fs-small);background:var(--bg);
+  border:1px solid var(--line-1);border-left:2px solid var(--accent);border-radius:0 var(--r-sm) var(--r-sm) 0;
+  padding:15px 18px;overflow-x:auto;white-space:pre;color:var(--text-2);line-height:1.7;margin-top:16px}
+.endpoint{display:grid;grid-template-columns:62px 1fr;gap:12px;padding:10px 0;
+  border-bottom:1px solid var(--line-1);align-items:baseline}
+.endpoint:last-child{border-bottom:0}
+.endpoint .verb{font-family:var(--font-mono);font-size:var(--fs-micro);font-weight:600;
+  padding:2px 7px;border-radius:var(--r-xs);text-align:center;letter-spacing:.06em}
+.verb-get{background:var(--info-wash);color:var(--info)}
+.verb-post{background:var(--good-wash);color:var(--good)}
+.verb-patch{background:var(--warn-wash);color:var(--warn)}
+.verb-del{background:var(--bad-wash);color:var(--bad)}
+.endpoint .path{font-family:var(--font-mono);font-size:var(--fs-small);color:var(--text-1)}
+.endpoint .desc{grid-column:2;font-size:var(--fs-small);color:var(--text-3);margin-top:3px}
+
+/* ═══════════════════════ responsive ════════════════════════════════ */
+@media (max-width:1080px){
+  .mast-body{grid-template-columns:minmax(0,1fr);gap:48px}
+  .two,.specs{grid-template-columns:minmax(0,1fr);gap:40px}
+  .clause{grid-template-columns:minmax(0,1fr);gap:20px;padding-block:58px}
+  .clause-n{position:static;flex-direction:row;align-items:baseline;gap:14px}
+  .auth{grid-template-columns:minmax(0,1fr)}
+  .auth-aside{display:none}
+  .doc{grid-template-columns:minmax(0,1fr);gap:26px}
+  .doc-toc{position:static;max-height:none;display:flex;gap:6px;overflow-x:auto;
+    border-bottom:1px solid var(--line-1);padding-bottom:12px}
+  .doc-toc h4{display:none}
+  .doc-toc a{border-left:0;border-bottom:2px solid var(--line-1);white-space:nowrap}
+  .doc-toc a.on{border-left:0;border-bottom-color:var(--accent)}
+  .foot-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+}
+@media (max-width:760px){
+  /* The nav is the one row that cannot wrap, so at phone width the
+     secondary action moves into the menu and the primary one shortens. */
+  .nav-right .btn-ghost{display:none}
+  .lbl-long{display:none}
+  .lbl-short{display:inline}
+  .nav-right .btn-primary{padding:7px 12px;font-size:var(--fs-small)}
+  .nav-in{gap:12px}
+  .brand b{font-size:15px}
+  .nav-links a.signin-row{display:block}
+  .nav.open .nav-links a.signin-row{border-top:1px solid var(--line-1);margin-top:4px;padding-top:11px}
+  .nav-links{display:none}
+  .nav-burger{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line-2);
+    border-radius:var(--r-sm);color:var(--text-2)}
+  .nav.open .nav-links{display:flex;position:absolute;top:64px;left:0;right:0;flex-direction:column;
+    background:var(--surface-1);border-block:1px solid var(--line-1);padding:10px;gap:2px}
+  .clause{padding-block:44px}
+  .mast{padding-block:24px 0}
+  .mast-body{padding-block:38px 52px}
+  .note{grid-template-columns:minmax(0,1fr);gap:12px;padding-block:20px}
+  .note-b{max-width:none}
+  .entry{grid-template-columns:minmax(0,44px) minmax(0,1fr);gap:0 18px;padding-block:22px}
+  .entry-b{grid-column:2;margin-top:8px}
+  .closing-in{align-items:flex-start;gap:28px}
+  .closing{padding-block:0 56px}
+  .shell{padding-inline:18px}
+  .foot-grid{grid-template-columns:minmax(0,1fr);gap:22px}
+}

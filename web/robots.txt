@@ -1,0 +1,7 @@
+# Verdant Ledger
+User-agent: *
+Allow: /
+
+# The application is a single hash-routed page: every screen lives under
+# a #/ fragment of the URL below, which crawlers do not index separately.
+Sitemap: https://divijkansara.github.io/khatam/sitemap.xml

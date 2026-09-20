@@ -1,0 +1,193 @@
+/* ══════════════════════════════════════════════════════════════════════
+   deck.css — the masthead deck. Companion to js/deck.js.
+
+   One perspective, five sheets at different depths. The parallax between
+   them is the projection doing its job, not five elements animated at
+   five speeds. Sheets further back are smaller because they are further
+   back, dimmer because less light reaches them, and offset because a
+   stack of paper on a desk is never perfectly square.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.deck-stage{position:relative;width:100%;max-width:392px;margin-left:auto;
+  aspect-ratio:1.02;perspective:1500px;perspective-origin:52% 42%;
+  --rx:5;--ry:-13}
+.deck{position:absolute;inset:0;transform-style:preserve-3d;
+  transform:
+    translateY(calc(var(--sy,0) * 30px))
+    rotateX(calc((var(--rx) + var(--sy,0) * 9) * 1deg))
+    rotateY(calc(var(--ry) * 1deg))}
+
+.sheet{position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:21px 22px 17px;border-radius:var(--r-lg);
+  background:var(--surface-1);border:1px solid var(--line-2);
+  box-shadow:0 28px 64px -30px rgba(0,0,0,.9), 0 2px 0 0 var(--line-1) inset;
+  transform:
+    translate3d(calc(var(--o) * 17px), calc(var(--o) * -13px), calc(var(--o) * -76px))
+    rotateZ(calc(var(--o) * -1.25deg));
+  opacity:calc(1 - var(--o) * .13);
+  transition:transform .55s var(--ease-out), opacity .45s var(--ease-out),
+             filter .45s var(--ease-out), border-color var(--t-fast);
+  transition-delay:calc(var(--o) * 45ms);
+  cursor:pointer;will-change:transform}
+.sheet:not(.front){filter:brightness(.78)}
+/* Paper in a stack shows an edge, not a page. Without this the sheets
+   behind bleed fragments of type through the gap and read as artefacts
+   rather than as documents. */
+.sheet>*{transition:opacity .3s var(--ease-out)}
+.sheet:not(.front)>.sh-fig,.sheet:not(.front)>.sh-body,.sheet:not(.front)>.sh-ft{opacity:0}
+.sheet.front{cursor:default}
+.sheet:not(.front):hover{filter:brightness(.95);border-color:var(--line-3)}
+
+/* dealt in, back sheet first */
+.deck-stage.dealing .sheet{
+  transform:translate3d(0,90px,-340px) rotateZ(7deg);opacity:0;filter:brightness(.5)}
+
+/* ── the printed matter ───────────────────────────────────────────── */
+.sh-hd{display:flex;align-items:baseline;gap:11px;font-family:var(--font-mono);
+  font-size:var(--fs-micro);letter-spacing:.15em;text-transform:uppercase;
+  color:var(--text-3);padding-bottom:11px}
+.sheet .rule{flex:0 0 auto}
+.sh-body{flex:1;min-height:0;padding-top:16px;display:flex;flex-direction:column;gap:9px}
+.sh-ft{font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-4);padding-top:13px;margin-top:auto;
+  border-top:1px solid var(--line-1)}
+
+.sh-fig{display:flex;align-items:flex-end;gap:12px;padding-block:18px 2px;
+  font-family:var(--font-mono);font-size:52px;font-weight:500;line-height:.9;
+  letter-spacing:-.04em;color:var(--text-1);font-variant-numeric:tabular-nums}
+.sh-fig u{text-decoration:none;font-size:var(--fs-micro);line-height:1.45;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--text-3);
+  font-weight:400;padding-bottom:5px}
+
+/* B — sources */
+.sh-bars{display:flex;flex-direction:column;gap:13px}
+.sh-bar{display:grid;grid-template-columns:minmax(0,1fr) 78px 46px;gap:11px;align-items:center;
+  font-size:var(--fs-small)}
+.sb-k{color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-t{height:6px;border-radius:var(--r-pill);background:var(--surface-3);overflow:hidden}
+.sb-t i{display:block;height:100%;width:var(--w);background:var(--c);border-radius:inherit}
+.sb-v{font-family:var(--font-mono);text-align:right;color:var(--text-1);
+  font-variant-numeric:tabular-nums}
+
+/* C — the seal */
+.sh-seal{position:relative;display:flex;flex-direction:column;gap:14px;height:100%}
+.sh-big{font-family:var(--font-mono);font-size:44px;font-weight:500;line-height:1;
+  letter-spacing:-.03em;color:var(--text-1);font-variant-numeric:tabular-nums}
+.sh-big u{display:block;text-decoration:none;font-size:var(--fs-micro);letter-spacing:.12em;
+  text-transform:uppercase;color:var(--text-3);margin-top:7px;font-weight:400}
+.sh-hash{font-family:var(--font-mono);font-size:10.5px;line-height:1.75;color:var(--good);
+  margin:0;white-space:pre;letter-spacing:.06em}
+.sh-algo{font-family:var(--font-mono);font-size:var(--fs-micro);color:var(--text-4);
+  letter-spacing:.08em;text-transform:uppercase}
+.sh-stamp{position:absolute;right:-2px;bottom:4px;transform:rotate(-13deg);
+  border:2px solid var(--good);border-radius:var(--r-sm);padding:5px 13px;opacity:.62}
+.sh-stamp span{font-family:var(--font-mono);font-size:13px;font-weight:600;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--good)}
+
+/* D — scenario */
+.sh-move{display:flex;align-items:center;gap:15px;padding-bottom:6px}
+.sh-move b{font-family:var(--font-mono);font-size:40px;font-weight:500;line-height:1;
+  letter-spacing:-.03em}
+.sh-move i{font-style:normal;font-size:20px;color:var(--text-4)}
+
+/* E — postings */
+.sh-rows{display:flex;flex-direction:column;gap:11px}
+.sh-row{display:grid;grid-template-columns:70px minmax(0,1fr) 54px;gap:10px;align-items:baseline;
+  font-size:var(--fs-small)}
+.sr-d{font-family:var(--font-mono);font-size:var(--fs-micro);color:var(--text-4);white-space:nowrap}
+.sr-l{color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr-v{font-family:var(--font-mono);text-align:right;color:var(--text-1);
+  font-variant-numeric:tabular-nums}
+.sr-v.cr{color:var(--good)}
+.sh-note{color:var(--text-3);font-size:var(--fs-small)}
+
+/* ── the selector ─────────────────────────────────────────────────── */
+.deck-nav{position:absolute;left:0;right:0;bottom:-46px;display:flex;gap:7px;
+  justify-content:flex-end}
+.dk{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid var(--line-2);
+  background:transparent;color:var(--text-4);font-family:var(--font-mono);font-size:11px;
+  letter-spacing:.08em;transition:all var(--t-fast)}
+.dk:hover{border-color:var(--line-3);color:var(--text-2)}
+.dk[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:var(--accent-wash)}
+
+@media (max-width:1180px){
+  .deck-stage{margin-inline:0;max-width:392px}
+}
+@media (max-width:620px){
+  /* Flat on a phone: the depth reads as clutter at this size, and the
+     back sheets steal touch targets from the front one. */
+  .deck-stage{aspect-ratio:.92;max-width:none;perspective:none;--rx:0;--ry:0}
+  .deck{transform:none}
+  .sheet{transform:none;opacity:0;pointer-events:none;transition:opacity .35s}
+  .sheet.front{opacity:1;pointer-events:auto}
+  .sheet:not(.front){filter:none}
+  .deck-nav{justify-content:center;bottom:-44px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .deck{transform:rotateX(4deg) rotateY(-11deg)}
+  .sheet,.deck-stage.dealing .sheet{transition:none}
+  .deck-stage.dealing .sheet{transform:
+    translate3d(calc(var(--o) * 17px), calc(var(--o) * -13px), calc(var(--o) * -76px))
+    rotateZ(calc(var(--o) * -1.25deg));opacity:calc(1 - var(--o) * .13);filter:none}
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   the posting cycle, laid onto the page
+   Same paper, same light, same reason for the depth: these are sheets.
+   ══════════════════════════════════════════════════════════════════════ */
+.entries{perspective:1100px;perspective-origin:50% 18%}
+.entry{transform-origin:50% 100%;
+  transform:rotateX(-18deg) translateY(26px) scale(.985);opacity:0;
+  transition:transform .8s var(--ease-out),opacity .6s var(--ease-out);
+  transition-delay:calc(var(--s,0) * 130ms)}
+.entry.laid{transform:none;opacity:1}
+
+@media (prefers-reduced-motion:reduce){
+  .entry{transform:none;opacity:1;transition:none}
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   floating facts
+   The reference designs hang live readings around their hero object.
+   These are the same idea with figures that are actually true, and they
+   sit outside the rotating deck so they stay legible while it tilts.
+   ══════════════════════════════════════════════════════════════════════ */
+.deck-chips{position:absolute;inset:0;pointer-events:none;z-index:20}
+.dchip{position:absolute;display:inline-flex;align-items:center;gap:7px;
+  padding:8px 15px;border-radius:var(--r-pill);white-space:nowrap;
+  font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--text-1);
+  background:color-mix(in srgb,var(--surface-2) 82%,transparent);
+  border:1px solid var(--line-3);backdrop-filter:blur(10px);
+  box-shadow:0 10px 30px -14px rgba(0,0,0,.9);
+  animation:chipIn .7s var(--ease-out) both}
+.dchip svg{color:var(--accent)}
+/* The reference can drop these onto a photograph; ours sit over a
+   document, so they live in the margin above and below the stage. A chip
+   that covers a figure is worse than no chip. */
+.dchip.c1{top:-54px;left:0;animation-delay:.75s}
+.dchip.c2{top:-54px;right:0;animation-delay:.9s}
+.dstat{position:absolute;bottom:-62px;left:0;display:flex;align-items:center;gap:11px;
+  padding:11px 17px;border-radius:var(--r-pill);
+  background:var(--accent);color:var(--on-accent);
+  box-shadow:0 16px 40px -18px var(--accent);
+  animation:chipIn .7s var(--ease-out) 1.05s both}
+.dstat b{font-family:var(--font-mono);font-size:25px;font-weight:600;line-height:1;
+  letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.dstat span{font-family:var(--font-mono);font-size:9.5px;line-height:1.35;
+  letter-spacing:.11em;text-transform:uppercase;opacity:.85}
+@keyframes chipIn{from{opacity:0;transform:translateY(14px) scale(.94)}}
+
+@media (max-width:760px){
+  /* the two chips no longer fit side by side above the stage */
+  .dchip.c2{display:none}
+}
+@media (max-width:620px){
+  .deck-chips{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .dchip,.dstat{animation:none}
+}

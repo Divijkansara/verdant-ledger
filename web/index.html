@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verdant Ledger — the sustainability ledger that decides, not just reports</title>
+<meta name="description" content="A digital sustainability ledger. Electricity, water, waste, transport, paper, procurement, recycling and renewables posted as dated, sourced, tamper-evident entries — priced by published emission factors and rolled up into a footprint, resource intensity and a weighted score.">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#071e22">
+
+<!-- Sharing. NOTE: change these two absolute URLs if the site moves. -->
+<link rel="canonical" href="https://divijkansara.github.io/khatam/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Verdant Ledger">
+<meta property="og:url" content="https://divijkansara.github.io/khatam/">
+<meta property="og:title" content="Verdant Ledger — stop reporting carbon, start deciding with it">
+<meta property="og:description" content="A tamper-evident sustainability ledger. Eight activity categories priced against 39 cited emission factors, sealed with a SHA-256 chain, and rolled up into a weighted sustainability score.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Verdant Ledger — stop reporting carbon, start deciding with it">
+<meta name="twitter:description" content="A tamper-evident sustainability ledger: 39 cited emission factors, a SHA-256 sealed chain, and a scenario engine that re-runs the real scoring code.">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23071e22'/><path d='M6 24 L16 7 L26 24' stroke='%23c8f94b' stroke-width='2.8' fill='none' stroke-linejoin='round'/><path d='M10.5 24 h11' stroke='%2339ce93' stroke-width='2.8' stroke-linecap='round'/></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://divijkansara.github.io/khatam/#website",
+      "name": "Verdant Ledger",
+      "description": "A digital sustainability ledger for an organisation.",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Verdant Ledger",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any modern web browser",
+      "description": "Posts electricity, water, waste, transport, paper, procurement, recycling and renewable activity as dated, sourced, append-only ledger entries, prices them against published emission factors, seals them in a SHA-256 hash chain, and reports a GHG Protocol footprint with a weighted sustainability score.",
+      "featureList": [
+        "Append-only, tamper-evident ledger sealed with SHA-256",
+        "39 cited emission factors (DEFRA/BEIS 2024, CEA v20, spend-based EEIO)",
+        "GHG Protocol Scope 1, 2 and 3 classification",
+        "Weighted sustainability score across five intensity sub-scores",
+        "Scenario simulator with eight intervention levers",
+        "Anomaly detection ranked by carbon consequence"
+      ],
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" }
+    }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/deck.css">
+<link rel="stylesheet" href="css/fx.css">
+</head>
+<body>
+
+<a href="#root" class="skip">Skip to content</a>
+<style>
+  .skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--accent);
+    color:var(--on-accent);padding:10px 16px;border-radius:0 0 var(--r-sm) 0;font-weight:600}
+  .skip:focus{left:0}
+  #boot{position:fixed;inset:0;z-index:95;display:grid;place-items:center;background:var(--bg);
+    transition:opacity .4s ease}
+  #boot.gone{opacity:0;pointer-events:none}
+  #boot .b-in{text-align:center}
+  #boot .b-mark{width:42px;height:42px;margin:0 auto 16px;animation:bootPulse 1.6s ease-in-out infinite}
+  @keyframes bootPulse{0%,100%{opacity:.45;transform:scale(.96)}50%{opacity:1;transform:scale(1)}}
+  #boot .b-txt{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--text-3)}
+</style>
+
+<!-- First paint: the theme engine runs before this is removed, so the app
+     never flashes an unthemed frame. -->
+<div id="boot">
+  <div class="b-in">
+    <svg class="b-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <path d="M5 25 L16 7 L27 25" stroke="var(--accent)" stroke-width="2.8" stroke-linejoin="round"/>
+      <path d="M10 25 h12" stroke="var(--good)" stroke-width="2.8" stroke-linecap="round"/>
+    </svg>
+    <div class="b-txt">Verdant Ledger · sealing the ledger</div>
+  </div>
+</div>
+
+<div id="root"></div>
+
+<!-- ══════════════════════ overlays ══════════════════════ -->
+<div id="palette" role="dialog" aria-modal="true" aria-label="Command palette">
+  <div class="pal-box">
+    <input type="text" placeholder="Type a command — post an entry, change the theme, export…"
+      aria-label="Command" autocomplete="off">
+    <div class="pal-list" role="listbox"></div>
+  </div>
+</div>
+
+<div id="modal"></div>
+<div id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<noscript>
+  <div style="max-width:640px;margin:80px auto;padding:0 24px">
+    <h1>JavaScript is required</h1>
+    <p style="color:var(--text-2);margin-top:12px;line-height:1.7">
+      Verdant Ledger computes every figure in the browser — the emission engine, the SHA-256
+      ledger chain, the anomaly detector and the colour system all run client-side. The
+      methodology and the emission factor catalogue are documented in
+      <code>backend/docs/</code> if you need them without scripting.</p>
+  </div>
+</noscript>
+
+<!-- ══════════════════════ scripts ══════════════════════
+     Classic scripts in dependency order rather than ES modules: modules
+     are blocked over file://, and this application has to run from a
+     double-click with no server. -->
+<script defer src="js/theme.js"></script>
+<script defer src="js/data.js"></script>
+<script defer src="js/chain.js"></script>
+<script defer src="js/analytics.js"></script>
+<script defer src="js/simulate.js"></script>
+<script defer src="js/charts.js"></script>
+<script defer src="js/ui.js"></script>
+<script defer src="js/store.js"></script>
+<script defer src="js/views-site.js"></script>
+<script defer src="js/views-app.js"></script>
+<script defer src="js/tour.js"></script>
+<script defer src="js/deck.js"></script>
+<script defer src="js/fx.js"></script>
+<script defer src="js/app.js"></script>
+<script>
+  /* Clear the boot screen as soon as the app has painted. It must NOT
+     wait on window.load: one slow webfont request would leave a visitor
+     staring at an empty screen on a bad connection or a lab machine. */
+  (function () {
+    var cleared = false;
+    function clearBoot() {
+      if (cleared) return;
+      cleared = true;
+      var boot = document.getElementById("boot");
+      if (!boot) return;
+      boot.classList.add("gone");
+      setTimeout(function () { boot.remove(); }, 450);
+    }
+    document.addEventListener("DOMContentLoaded", function () { setTimeout(clearBoot, 150); });
+    window.addEventListener("load", clearBoot);
+    setTimeout(clearBoot, 2500);          // hard backstop
+  })();
+</script>
+</body>
+</html>

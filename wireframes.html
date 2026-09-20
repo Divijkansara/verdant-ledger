@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verdant Ledger — Wireframes &amp; Screen Specification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* ══ document shell ══════════════════════════════════════════════════ */
+:root{
+  --ink:#111;
+  --ink-2:#4a4a4a;
+  --ink-3:#7a7a7a;
+  --rule:#d4d4d4;
+  --rule-2:#b4b4b4;
+  --paper:#fff;
+  --wash:#f2f2f0;
+  --wash-2:#e6e6e3;
+  --mark:#1a1a1a;
+  --accent:#0e5f4d;
+}
+*{box-sizing:border-box}
+html{background:#e9e9e6}
+body{
+  margin:0; color:var(--ink); background:#e9e9e6;
+  font-family:"IBM Plex Sans", system-ui, sans-serif; font-size:14px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.sheet{
+  background:var(--paper); max-width:940px; margin:0 auto 20px;
+  padding:52px 56px 60px; box-shadow:0 2px 14px rgba(0,0,0,.09);
+}
+h1,h2,h3,h4{margin:0; text-wrap:balance}
+h1{font-family:"IBM Plex Serif",Georgia,serif; font-size:34px; font-weight:600; letter-spacing:-.02em; line-height:1.15}
+h2{font-size:19px; font-weight:600; letter-spacing:-.01em; margin-top:38px; padding-bottom:7px; border-bottom:2px solid var(--ink)}
+h2:first-of-type{margin-top:26px}
+h3{font-size:15px; font-weight:600; margin-top:24px}
+h4{font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.09em; color:var(--ink-3); margin-top:20px}
+p{margin:9px 0}
+a{color:var(--accent)}
+.lead{font-size:15.5px; color:var(--ink-2); max-width:68ch}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+code{font-family:"IBM Plex Mono",monospace; font-size:12.5px; background:var(--wash); padding:1px 5px; border-radius:3px}
+.muted{color:var(--ink-3)}
+hr{border:0; border-top:1px solid var(--rule); margin:26px 0}
+
+/* cover */
+.cover-meta{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px 26px; margin-top:26px; padding-top:18px; border-top:1px solid var(--rule)}
+.cover-meta div span{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.11em; color:var(--ink-3); font-weight:600}
+.cover-meta div b{font-weight:500; font-size:13.5px}
+.docnum{font-family:"IBM Plex Mono",monospace; font-size:11.5px; letter-spacing:.08em; color:var(--ink-3); text-transform:uppercase}
+
+/* tables */
+table{border-collapse:collapse; width:100%; margin-top:12px; font-size:12.5px}
+th,td{text-align:left; padding:7px 10px; border-bottom:1px solid var(--rule); vertical-align:top}
+th{font-size:10.5px; text-transform:uppercase; letter-spacing:.09em; color:var(--ink-3); border-bottom:1.5px solid var(--ink-2)}
+td.n{width:34px; font-family:"IBM Plex Mono",monospace; font-weight:600}
+td.ep{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-2); white-space:nowrap}
+tbody tr:last-child td{border-bottom:1px solid var(--rule-2)}
+
+/* ══ wireframe toolkit ═══════════════════════════════════════════════ */
+.wf{
+  position:relative; border:1.5px solid var(--ink-2); background:var(--paper);
+  margin-top:18px; overflow:hidden;
+}
+.wf-cap{
+  font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--ink-3); margin-top:8px;
+}
+.wf-browser{
+  display:flex; align-items:center; gap:6px; padding:7px 10px;
+  border-bottom:1px solid var(--rule-2); background:var(--wash);
+}
+.wf-browser i{width:8px; height:8px; border-radius:99px; border:1px solid var(--rule-2); display:block}
+.wf-url{
+  flex:1; margin-left:8px; height:16px; border:1px solid var(--rule-2); border-radius:3px;
+  background:var(--paper); font-family:"IBM Plex Mono",monospace; font-size:9.5px;
+  color:var(--ink-3); padding:0 6px; line-height:14px;
+}
+.wf-pad{padding:14px}
+
+/* structural blocks */
+.box{border:1px solid var(--rule-2); background:var(--paper)}
+.box.dash{border-style:dashed}
+.box.fill{background:var(--wash)}
+.row{display:flex; gap:10px}
+.col{display:flex; flex-direction:column; gap:10px}
+.grow{flex:1; min-width:0}
+.pad{padding:10px}
+
+/* placeholder text */
+.t{background:var(--wash-2); height:8px; border-radius:2px; display:block}
+.t.dark{background:#c2c2be}
+.t.h{height:13px; background:#b9b9b5}
+.t.w90{width:90%} .t.w80{width:80%} .t.w70{width:70%} .t.w60{width:60%}
+.t.w50{width:50%} .t.w40{width:40%} .t.w30{width:30%} .t.w25{width:25%} .t.w20{width:20%}
+.stack-t{display:flex; flex-direction:column; gap:6px}
+
+.label{font-size:9.5px; text-transform:uppercase; letter-spacing:.09em; color:var(--ink-3); font-family:"IBM Plex Mono",monospace}
+.ph{font-size:11px; color:var(--ink-3)}
+.val{font-family:"IBM Plex Mono",monospace; font-size:20px; font-weight:500; letter-spacing:-.02em}
+.val.sm{font-size:15px}
+
+.btn{
+  border:1.5px solid var(--ink); background:var(--ink); color:#fff; font-size:11px; font-weight:600;
+  padding:6px 14px; border-radius:4px; display:inline-block; text-align:center;
+}
+.btn.ghost{background:var(--paper); color:var(--ink)}
+.input{
+  border:1px solid var(--rule-2); background:var(--paper); height:30px; border-radius:4px;
+  display:flex; align-items:center; padding:0 9px; font-size:11px; color:var(--ink-3);
+  font-family:"IBM Plex Mono",monospace;
+}
+.input.sel::after{content:"▾"; margin-left:auto; color:var(--ink-3)}
+.tabbar{display:flex; gap:2px; border-bottom:1px solid var(--rule-2)}
+.tabbar span{
+  font-size:11.5px; padding:8px 12px; color:var(--ink-3); border-bottom:2px solid transparent;
+}
+.tabbar span.on{color:var(--ink); font-weight:600; border-bottom-color:var(--ink)}
+
+/* chart placeholders — hatched so they never read as real data */
+.chart{
+  border:1px solid var(--rule-2); position:relative; overflow:hidden;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 5px, rgba(0,0,0,.05) 5px 6px),
+    var(--paper);
+}
+.chart .chart-label{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--ink-3); text-align:center; padding:6px;
+}
+.bars{display:flex; align-items:flex-end; gap:4px; height:100%; padding:10px 8px}
+.bars i{flex:1; background:var(--wash-2); border:1px solid var(--rule-2); display:block}
+/* zero-baseline chart: gross above the axis, avoided below it */
+.split{height:100%; display:flex; flex-direction:column; padding:8px}
+.split-top{flex:1; display:flex; align-items:flex-end; gap:4px}
+.split-bot{height:22px; display:flex; align-items:flex-start; gap:4px}
+.split-top i,.split-bot i{flex:1; background:var(--wash-2); border:1px solid var(--rule-2); display:block}
+.split-bot i{background:#c8c8c4}
+.axis{height:0; border-top:1.5px solid var(--ink-2)}
+.hbars{display:flex; flex-direction:column; gap:7px; padding:10px}
+.hbars i{height:11px; background:var(--wash-2); border:1px solid var(--rule-2); display:block}
+.gauge{
+  width:110px; height:60px; border:1.5px solid var(--rule-2); border-bottom:0;
+  border-radius:110px 110px 0 0; position:relative; margin:0 auto;
+}
+.gauge::after{
+  content:"B"; position:absolute; left:0; right:0; bottom:4px; text-align:center;
+  font-family:"IBM Plex Serif",serif; font-size:22px; font-weight:600;
+}
+
+/* numbered callouts */
+.cal{
+  position:absolute; width:19px; height:19px; border-radius:99px;
+  background:var(--mark); color:#fff; font-family:"IBM Plex Mono",monospace;
+  font-size:11px; font-weight:600; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 0 2.5px #fff; z-index:4;
+}
+
+/* flow + sitemap diagrams */
+.flow{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:14px}
+.node{
+  border:1.5px solid var(--ink-2); border-radius:5px; padding:8px 12px; font-size:11.5px;
+  background:var(--paper); text-align:center; min-width:104px;
+}
+.node.start{border-radius:99px; background:var(--wash)}
+.node.dec{border-style:dashed}
+.arrow{color:var(--ink-3); font-size:15px; font-family:"IBM Plex Mono",monospace}
+.tree{font-family:"IBM Plex Mono",monospace; font-size:12px; line-height:1.85; white-space:pre; overflow-x:auto; background:var(--wash); padding:14px 16px; border-left:2.5px solid var(--ink-2); margin-top:14px}
+
+.note{
+  border-left:2.5px solid var(--ink); background:var(--wash); padding:11px 14px;
+  font-size:12.5px; margin-top:14px;
+}
+.note b{font-weight:600}
+.pill{
+  display:inline-block; border:1px solid var(--rule-2); border-radius:99px;
+  padding:2px 9px; font-size:10.5px; font-family:"IBM Plex Mono",monospace; color:var(--ink-2);
+  margin:3px 4px 0 0;
+}
+.two{display:grid; grid-template-columns:1fr 1fr; gap:22px}
+.three{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+
+@media print{
+  html,body{background:#fff}
+  .sheet{box-shadow:none; margin:0; max-width:none; padding:0 0 12mm; page-break-after:always}
+  .sheet:last-child{page-break-after:auto}
+  h2{page-break-after:avoid}
+  .wf, table, .tree{page-break-inside:avoid}
+  @page{size:A4; margin:14mm}
+}
+@media (max-width:760px){
+  .sheet{padding:30px 20px}
+  .two,.three{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ COVER ════════════════════ -->
+<section class="sheet">
+  <div class="docnum">Document 01 · UI/UX Design Specification</div>
+  <h1 style="margin-top:10px">Verdant Ledger</h1>
+  <h1 style="font-size:19px; font-weight:400; color:var(--ink-2); margin-top:6px; font-style:italic">Wireframes &amp; screen specification</h1>
+
+  <p class="lead" style="margin-top:22px">
+    A web application that maintains an organisation's <b>digital sustainability
+    ledger</b>. Activity across eight categories — electricity, water, waste,
+    transportation, paper, procurement, recycling and renewable energy — is
+    posted as dated entries, priced against published emission factors, and
+    continuously rolled up into a carbon footprint, resource-consumption totals
+    and a composite sustainability score.
+  </p>
+
+  <div class="note">
+    <b>Reading this document.</b> Each screen is drawn as a low-fidelity
+    wireframe: greyscale blocks, no colour, no final copy. That is deliberate —
+    a wireframe specifies <i>structure, hierarchy and behaviour</i>. Numbered
+    markers on each drawing correspond to the annotation table beneath it, which
+    names the component, what it does, and the API endpoint that supplies its
+    data.
+  </div>
+
+  <div class="cover-meta">
+    <div><span>Screens specified</span><b>7</b></div>
+    <div><span>Primary user</span><b>Facilities / EHS officer</b></div>
+    <div><span>Layout grid</span><b>12 column, 1180 px max</b></div>
+    <div><span>Breakpoints</span><b>1180 / 900 / 560 px</b></div>
+    <div><span>Backend</span><b>FastAPI REST · JSON</b></div>
+    <div><span>Auth model</span><b>JWT, 3 roles</b></div>
+  </div>
+
+  <h2>Who uses it, and what for</h2>
+  <table>
+    <thead><tr><th style="width:150px">Role</th><th>Goal</th><th style="width:180px">Screens they live in</th></tr></thead>
+    <tbody>
+      <tr><td><b>Facilities / EHS officer</b><br><span class="muted">contributor</span></td>
+          <td>Post the month's meter readings, waste pickups, fuel and travel logs. Wants the fewest possible clicks per entry and instant confirmation that the number is right.</td>
+          <td>Log Activity, Ledger</td></tr>
+      <tr><td><b>Sustainability manager</b><br><span class="muted">admin</span></td>
+          <td>Understand where emissions come from, what is improving, and what to do next. Reports upward.</td>
+          <td>Dashboard, Reports</td></tr>
+      <tr><td><b>Auditor / management</b><br><span class="muted">viewer</span></td>
+          <td>Verify a figure back to its source entry and its factor citation. Read-only by design.</td>
+          <td>Ledger, Methodology</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Design principles applied</h2>
+  <table>
+    <thead><tr><th style="width:210px">Principle</th><th>How it shows up in these screens</th></tr></thead>
+    <tbody>
+      <tr><td><b>Visibility of system status</b><br><span class="muted">Nielsen #1</span></td><td>The Log Activity screen prices the entry <i>live</i> as the user types, before submitting. No one posts a number blind.</td></tr>
+      <tr><td><b>Recognition over recall</b><br><span class="muted">Nielsen #6</span></td><td>Activities are chosen from a labelled catalogue with units and factors shown — the user never has to remember that grid power is 0.716 kg/kWh.</td></tr>
+      <tr><td><b>Error prevention</b><br><span class="muted">Nielsen #5</span></td><td>Future dates and non-positive quantities are blocked in the form and again at the API. Destructive edits do not exist: entries are voided with a reason, never deleted.</td></tr>
+      <tr><td><b>Aggregation before detail</b></td><td>Dashboard opens with one score and four figures; the 300-row ledger is one tab away, not on the landing screen.</td></tr>
+      <tr><td><b>Progressive disclosure</b></td><td>The full 39-factor methodology lives on its own tab, reachable but never in the way.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ════════════════════ SITE MAP + FLOW ════════════════════ -->
+<section class="sheet">
+  <h2>1 · Site map</h2>
+  <p class="lead">Four authenticated screens behind one auth gate. Deliberately
+  flat — every working screen is one click from every other, so a user posting
+  entries never navigates more than once to check a figure.</p>
+
+  <div class="tree">/  ──  Landing / Login            [public]
+│
+├── /register                   [public]   create organisation + admin user
+│
+└── /app                        [auth required]
+    │
+    ├── /app/dashboard          ● default landing after login
+    │     ├─ sustainability score + 5 sub-scores
+    │     ├─ 4 KPI tiles
+    │     ├─ 12-month emissions trend
+    │     ├─ emissions by category
+    │     ├─ resource intensity meters
+    │     └─ generated insights
+    │
+    ├── /app/log                 post an entry
+    ├── /app/ledger              browse · filter · void · export
+    ├── /app/methodology         factor catalogue + score formula
+    │
+    └── /app/settings           [admin only]
+          ├─ organisation profile (headcount)
+          ├─ emission factor management
+          └─ users &amp; roles</div>
+
+  <h2>2 · Primary user flow — posting an entry</h2>
+  <p class="lead">The task the application exists for. Five steps, one screen,
+  no page reload.</p>
+
+  <div class="flow">
+    <div class="node start">Log Activity</div><span class="arrow">→</span>
+    <div class="node">Pick category<br><span class="muted">8 tiles</span></div><span class="arrow">→</span>
+    <div class="node">Pick activity<br><span class="muted">filtered list</span></div><span class="arrow">→</span>
+    <div class="node">Enter quantity<br>+ date</div><span class="arrow">→</span>
+    <div class="node dec">Live preview<br><span class="muted">POST /preview</span></div>
+  </div>
+  <div class="flow" style="margin-top:10px">
+    <span class="arrow" style="margin-left:6px">↳</span>
+    <div class="node dec">Number looks right?</div><span class="arrow">→</span>
+    <div class="node">Post entry<br><span class="muted">POST /entries</span></div><span class="arrow">→</span>
+    <div class="node">Confirmation<br>+ form resets</div><span class="arrow">→</span>
+    <div class="node start">Dashboard updates</div>
+  </div>
+
+  <div class="note">
+    <b>Why the preview step exists.</b> The preview endpoint runs the same
+    calculation engine as the real posting, so the figure shown before
+    submitting is exactly the figure that will be stored. This turns the riskiest
+    moment in the app — committing a number to an auditable ledger — into a
+    reversible, visible one.
+  </div>
+
+  <h2>3 · Correction flow — a wrong entry</h2>
+  <div class="flow">
+    <div class="node start">Ledger</div><span class="arrow">→</span>
+    <div class="node">Find entry<br><span class="muted">filter / search</span></div><span class="arrow">→</span>
+    <div class="node">Void</div><span class="arrow">→</span>
+    <div class="node dec">Reason required<br><span class="muted">modal, min 3 chars</span></div><span class="arrow">→</span>
+    <div class="node">Row struck through,<br>excluded from totals</div><span class="arrow">→</span>
+    <div class="node">Repost correctly</div>
+  </div>
+  <p class="muted" style="font-size:12.5px">There is no delete. The row survives for audit; only its
+  contribution to the totals is removed. The API returns <code>405 Method Not Allowed</code> for
+  <code>DELETE /api/entries/{id}</code> — the constraint is enforced in the backend, not just hidden in the UI.</p>
+</section>
+
+<!-- ════════════════════ SCREEN 1: AUTH ════════════════════ -->
+<section class="sheet">
+  <h2>4 · Screen 01 — Login &amp; Registration</h2>
+  <p class="lead">Split screen. The left panel carries the product's one-sentence
+  proposition so the page is not a naked form; the right is the task.</p>
+
+  <div class="wf">
+    <div class="wf-browser"><i></i><i></i><i></i><div class="wf-url">verdantledger.app/login</div></div>
+    <div class="row" style="min-height:330px">
+      <!-- left proposition panel -->
+      <div class="grow pad fill" style="background:var(--wash); position:relative; display:flex; flex-direction:column; justify-content:center; gap:14px; padding:26px">
+        <div class="cal" style="top:10px; left:10px">1</div>
+        <span class="t h w40"></span>
+        <div class="stack-t" style="margin-top:4px">
+          <span class="t w90"></span><span class="t w80"></span><span class="t w60"></span>
+        </div>
+        <div style="margin-top:14px" class="col">
+          <div class="row" style="align-items:center; gap:8px"><span class="box" style="width:13px;height:13px"></span><span class="t w50"></span></div>
+          <div class="row" style="align-items:center; gap:8px"><span class="box" style="width:13px;height:13px"></span><span class="t w60"></span></div>
+          <div class="row" style="align-items:center; gap:8px"><span class="box" style="width:13px;height:13px"></span><span class="t w40"></span></div>
+        </div>
+      </div>
+      <!-- right form -->
+      <div style="width:330px; padding:26px; position:relative; border-left:1px solid var(--rule-2)" class="col">
+        <div class="cal" style="top:10px; right:10px">2</div>
+        <span class="t h w60"></span>
+        <div style="margin-top:12px">
+          <div class="label">Email</div>
+          <div class="input" style="margin-top:4px">you@company.com</div>
+        </div>
+        <div>
+          <div class="label">Password</div>
+          <div class="input" style="margin-top:4px">••••••••</div>
+        </div>
+        <div class="box dash pad" style="border-color:#c66; position:relative">
+          <div class="cal" style="top:-9px; left:-9px">3</div>
+          <span class="ph" style="color:#a33">Incorrect email or password</span>
+        </div>
+        <div class="btn" style="margin-top:4px">Sign in</div>
+        <div style="text-align:center; position:relative"><span class="ph">No account? Register your organisation</span>
+          <div class="cal" style="top:-6px; right:-9px">4</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-cap">WF-01 · Login · 1180 × 720</div>
+
+  <table>
+    <thead><tr><th class="n">#</th><th style="width:190px">Component</th><th>Behaviour</th><th style="width:170px">API</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td>Proposition panel</td><td>Product name, one-sentence description, three capability bullets. Collapses away entirely below 900 px.</td><td class="ep">—</td></tr>
+      <tr><td class="n">2</td><td>Credential form</td><td>Email + password. Submit disabled until both are non-empty. Button shows a spinner and is disabled while in flight, so a double click cannot fire two requests.</td><td class="ep">POST /api/auth/login</td></tr>
+      <tr><td class="n">3</td><td>Error region</td><td>Single message for both unknown-email and wrong-password — the API deliberately does not reveal which, so the form cannot be used to discover who has an account. Region is <code>aria-live="polite"</code>.</td><td class="ep">401 response</td></tr>
+      <tr><td class="n">4</td><td>Register link</td><td>Routes to a four-field form: organisation name, headcount, user name, email, password. The first user of an organisation becomes its admin.</td><td class="ep">POST /api/auth/register</td></tr>
+    </tbody>
+  </table>
+
+  <h4>States</h4>
+  <span class="pill">idle</span><span class="pill">validating</span><span class="pill">submitting — button disabled</span>
+  <span class="pill">401 error</span><span class="pill">network error — retry offered</span><span class="pill">success → /app/dashboard</span>
+</section>
+
+<!-- ════════════════════ SCREEN 2: DASHBOARD ════════════════════ -->
+<section class="sheet">
+  <h2>5 · Screen 02 — Dashboard</h2>
+  <p class="lead">The landing screen. Answers three questions in descending order
+  of importance: <i>how are we doing</i> (score), <i>how much</i> (KPIs and
+  trend), <i>where from</i> (category split and intensity). Everything above is
+  summary; the detail lives in the Ledger tab.</p>
+
+  <div class="wf">
+    <div class="wf-browser"><i></i><i></i><i></i><div class="wf-url">verdantledger.app/app/dashboard</div></div>
+
+    <!-- masthead -->
+    <div style="border-bottom:1px solid var(--rule-2); padding:12px 14px 0; position:relative">
+      <div class="cal" style="top:8px; left:8px">1</div>
+      <div class="row" style="justify-content:space-between; align-items:flex-start">
+        <div class="col" style="gap:4px; margin-left:24px"><span class="t h w80" style="width:130px"></span><span class="t w60" style="width:180px"></span></div>
+        <div class="row" style="gap:8px; align-items:flex-end; position:relative">
+          <div class="cal" style="top:-6px; right:-6px">2</div>
+          <div><div class="label">Organisation</div><div class="input" style="width:150px; margin-top:3px">Suryanagar Tech…</div></div>
+          <div><div class="label">Headcount</div><div class="input" style="width:64px; margin-top:3px">120</div></div>
+          <div><div class="label">Period</div><div class="input sel" style="width:120px; margin-top:3px">Last 6 months</div></div>
+        </div>
+      </div>
+      <div class="tabbar" style="margin-top:10px; border-bottom:0">
+        <span class="on">Dashboard</span><span>Log activity</span><span>Ledger</span><span>Methodology</span>
+      </div>
+    </div>
+
+    <div class="wf-pad col" style="gap:12px; background:var(--wash)">
+      <!-- score + KPIs -->
+      <div class="row">
+        <div class="box grow pad" style="position:relative">
+          <div class="cal" style="top:-9px; left:-9px">3</div>
+          <div class="label">Sustainability score</div>
+          <div class="row" style="gap:16px; margin-top:10px; align-items:flex-start">
+            <div style="width:130px"><div class="gauge"></div><div style="text-align:center" class="label">57.4 / 100</div></div>
+            <div class="grow col" style="gap:7px; position:relative">
+              <div class="cal" style="top:-10px; right:-6px">4</div>
+              <div><div class="row" style="justify-content:space-between"><span class="t w50" style="width:110px"></span><span class="t w20" style="width:24px"></span></div><span class="t dark" style="margin-top:4px; width:61%"></span></div>
+              <div><div class="row" style="justify-content:space-between"><span class="t w50" style="width:124px"></span><span class="t w20" style="width:24px"></span></div><span class="t dark" style="margin-top:4px; width:25%"></span></div>
+              <div><div class="row" style="justify-content:space-between"><span class="t w50" style="width:98px"></span><span class="t w20" style="width:24px"></span></div><span class="t dark" style="margin-top:4px; width:81%"></span></div>
+              <div><div class="row" style="justify-content:space-between"><span class="t w50" style="width:116px"></span><span class="t w20" style="width:24px"></span></div><span class="t dark" style="margin-top:4px; width:20%"></span></div>
+              <div><div class="row" style="justify-content:space-between"><span class="t w50" style="width:106px"></span><span class="t w20" style="width:24px"></span></div><span class="t dark" style="margin-top:4px; width:95%"></span></div>
+            </div>
+          </div>
+        </div>
+        <div style="width:300px; display:grid; grid-template-columns:1fr 1fr; gap:12px; position:relative">
+          <div class="cal" style="top:-9px; right:-9px">5</div>
+          <div class="box pad col" style="gap:3px"><span class="label">Net emissions</span><span class="val">101.3</span><span class="ph">t CO₂e</span></div>
+          <div class="box pad col" style="gap:3px"><span class="label">Per emp / month</span><span class="val">140.7</span><span class="ph">kg · target ≤ 40</span></div>
+          <div class="box pad col" style="gap:3px"><span class="label">Renewable</span><span class="val">14.8%</span><span class="ph">of electricity</span></div>
+          <div class="box pad col" style="gap:3px"><span class="label">Diverted</span><span class="val">60.6%</span><span class="ph">of waste</span></div>
+        </div>
+      </div>
+
+      <!-- trend -->
+      <div class="box pad" style="position:relative">
+        <div class="cal" style="top:-9px; left:-9px">6</div>
+        <div class="row" style="justify-content:space-between"><span class="label">Emissions issued and avoided, by month</span><span class="ph">t CO₂e · last 12 months</span></div>
+        <div class="chart" style="height:136px; margin-top:8px">
+          <div class="split">
+            <div class="split-top">
+              <i style="height:72%"></i><i style="height:83%"></i><i style="height:76%"></i><i style="height:80%"></i>
+              <i style="height:74%"></i><i style="height:75%"></i><i style="height:88%"></i><i style="height:64%"></i>
+              <i style="height:79%"></i><i style="height:66%"></i><i style="height:81%"></i><i style="height:30%"></i>
+            </div>
+            <div class="axis"></div>
+            <div class="split-bot">
+              <i style="height:38%"></i><i style="height:44%"></i><i style="height:41%"></i><i style="height:48%"></i>
+              <i style="height:52%"></i><i style="height:55%"></i><i style="height:61%"></i><i style="height:66%"></i>
+              <i style="height:72%"></i><i style="height:78%"></i><i style="height:88%"></i><i style="height:30%"></i>
+            </div>
+          </div>
+        </div>
+        <div class="row" style="gap:14px; margin-top:7px"><span class="ph">▪ gross issued</span><span class="ph">▪ avoided (below axis)</span><span class="ph">— net position</span></div>
+      </div>
+
+      <!-- split row -->
+      <div class="row">
+        <div class="box grow pad" style="position:relative">
+          <div class="cal" style="top:-9px; left:-9px">7</div>
+          <span class="label">Where the carbon comes from</span>
+          <div class="chart" style="height:132px; margin-top:8px">
+            <div class="hbars">
+              <i style="width:88%"></i><i style="width:41%"></i><i style="width:27%"></i>
+              <i style="width:9%"></i><i style="width:6%"></i><i style="width:3%"></i>
+            </div>
+          </div>
+        </div>
+        <div class="box pad" style="width:300px; position:relative">
+          <div class="cal" style="top:-9px; right:-9px">8</div>
+          <span class="label">Resource intensity · per emp / month</span>
+          <div class="col" style="gap:10px; margin-top:10px">
+            <div><div class="row" style="justify-content:space-between"><span class="t w40" style="width:64px"></span><span class="t w20" style="width:40px"></span></div>
+              <div style="position:relative; margin-top:4px"><span class="t dark" style="width:68%; height:9px"></span><span style="position:absolute; left:27%; top:-2px; width:2px; height:13px; background:var(--ink-2)"></span></div></div>
+            <div><div class="row" style="justify-content:space-between"><span class="t w40" style="width:46px"></span><span class="t w20" style="width:40px"></span></div>
+              <div style="position:relative; margin-top:4px"><span class="t dark" style="width:87%; height:9px"></span><span style="position:absolute; left:22%; top:-2px; width:2px; height:13px; background:var(--ink-2)"></span></div></div>
+            <div><div class="row" style="justify-content:space-between"><span class="t w40" style="width:52px"></span><span class="t w20" style="width:40px"></span></div>
+              <div style="position:relative; margin-top:4px"><span class="t dark" style="width:79%; height:9px"></span><span style="position:absolute; left:17%; top:-2px; width:2px; height:13px; background:var(--ink-2)"></span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- insights -->
+      <div class="box pad" style="position:relative">
+        <div class="cal" style="top:-9px; left:-9px">9</div>
+        <span class="label">What to fix first</span>
+        <div class="two" style="gap:14px; margin-top:9px">
+          <div class="col" style="gap:5px"><span class="t h w60" style="width:190px"></span><span class="t w90"></span><span class="t w70"></span></div>
+          <div class="col" style="gap:5px"><span class="t h w60" style="width:210px"></span><span class="t w80"></span><span class="t w60"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-cap">WF-02 · Dashboard · 1180 × 1240 (scrolls)</div>
+
+  <table>
+    <thead><tr><th class="n">#</th><th style="width:180px">Component</th><th>Behaviour</th><th style="width:200px">API</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td>Masthead + tabs</td><td>Persistent across all four screens. Current tab marked with <code>aria-selected</code>, not colour alone.</td><td class="ep">—</td></tr>
+      <tr><td class="n">2</td><td>Org controls</td><td>Headcount is editable inline because every intensity metric divides by it; changing it re-fetches the whole dashboard. Period selector: 1 / 3 / 6 / 12 months.</td><td class="ep">PATCH /api/auth/organization</td></tr>
+      <tr><td class="n">3</td><td>Score gauge</td><td>Semicircular arc, 0–100, with the letter grade at centre. Arc colour follows the band (good / warning / critical); the numeral is always shown so colour is never the only signal.</td><td class="ep">GET /api/dashboard/summary</td></tr>
+      <tr><td class="n">4</td><td>Sub-score meters</td><td>Five rows: carbon intensity, renewable share, waste diversion, resource efficiency, low-carbon mobility. Each shows the observed value, the 0–100 score and a bar. Weights come from the API, not hardcoded in the UI.</td><td class="ep">GET /api/dashboard/score</td></tr>
+      <tr><td class="n">5</td><td>KPI tiles</td><td>Four figures with a comparison line and a status chip. Numbers use tabular figures so digits align down the column.</td><td class="ep">GET /api/dashboard/summary</td></tr>
+      <tr><td class="n">6</td><td>Trend chart</td><td>Twelve columns. Gross emissions rise above the zero line, avoided emissions hang below it, a tick marks the net position — one shared vertical scale, never two axes. Hover gives gross / avoided / net for that month. Current month is partial and labelled as such.</td><td class="ep">GET /api/dashboard/trend?months=12</td></tr>
+      <tr><td class="n">7</td><td>Category bars</td><td>Horizontal bars sorted largest first, each directly labelled with name, tonnage and share. Colour is fixed per category, so filtering never repaints the survivors.</td><td class="ep">GET /api/dashboard/by-category</td></tr>
+      <tr><td class="n">8</td><td>Resource meters</td><td>Electricity, water, paper, waste per employee per month. A tick mark on each bar shows the good-practice target, so the bar is readable as "past target" without reading the number.</td><td class="ep">GET /api/dashboard/resources</td></tr>
+      <tr><td class="n">9</td><td>Insight cards</td><td>Rule-generated and quantified — largest source, weakest sub-score, renewable gap, landfill diversion. Each names a number and an action.</td><td class="ep">GET /api/dashboard/insights</td></tr>
+    </tbody>
+  </table>
+
+  <h4>States</h4>
+  <span class="pill">loading — skeleton blocks, layout does not shift</span>
+  <span class="pill">empty ledger — "post your first entry" CTA replaces the charts</span>
+  <span class="pill">partial month flagged on the trend</span>
+  <span class="pill">API error — inline retry, other panels keep their data</span>
+</section>
+
+<!-- ════════════════════ SCREEN 3: LOG ════════════════════ -->
+<section class="sheet">
+  <h2>6 · Screen 03 — Log Activity</h2>
+  <p class="lead">The highest-frequency screen. A single form, three decisions
+  deep, with the computed impact visible before anything is committed.</p>
+
+  <div class="wf">
+    <div class="wf-browser"><i></i><i></i><i></i><div class="wf-url">verdantledger.app/app/log</div></div>
+    <div style="border-bottom:1px solid var(--rule-2); padding:10px 14px 0">
+      <div class="tabbar" style="border-bottom:0"><span>Dashboard</span><span class="on">Log activity</span><span>Ledger</span><span>Methodology</span></div>
+    </div>
+    <div class="wf-pad" style="background:var(--wash)">
+      <div class="box pad" style="position:relative">
+        <span class="label">Post an entry to the ledger</span>
+
+        <!-- category tiles -->
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; position:relative">
+          <div class="cal" style="top:-9px; left:-9px">1</div>
+          <div class="box pad col" style="gap:3px"><span class="t w60" style="width:56px"></span><span class="ph">charge</span></div>
+          <div class="box pad col" style="gap:3px; border-color:var(--ink); border-width:1.5px; background:var(--wash)"><span class="t dark w60" style="width:64px"></span><span class="ph">charge</span></div>
+          <div class="box pad col" style="gap:3px"><span class="t w60" style="width:76px"></span><span class="ph">charge</span></div>
+          <div class="box pad col" style="gap:3px"><span class="t w60" style="width:48px"></span><span class="ph">charge</span></div>
+          <div class="box pad col" style="gap:3px"><span class="t w60" style="width:80px"></span><span class="ph">charge</span></div>
+          <div class="box pad col" style="gap:3px"><span class="t w60" style="width:70px"></span><span class="ph">credit</span></div>
+          <div class="box pad col" style="gap:3px"><span class="t w60" style="width:60px"></span><span class="ph">credit</span></div>
+          <div class="box pad col" style="gap:3px"><span class="t w60" style="width:52px"></span><span class="ph">charge</span></div>
+        </div>
+
+        <!-- fields -->
+        <div class="row" style="margin-top:26px; position:relative">
+          <div class="cal" style="top:-22px; left:-9px">2</div>
+          <div class="grow"><div class="label">Activity</div><div class="input sel" style="margin-top:4px">Grid electricity (CEA India)</div></div>
+          <div style="width:150px; position:relative"><div class="label">Quantity</div>
+            <div class="input" style="margin-top:4px; justify-content:flex-end">17,800&nbsp;&nbsp;<span class="ph">kWh</span></div>
+            <div class="cal" style="top:-22px; right:-9px">3</div></div>
+          <div style="width:150px"><div class="label">Date</div><div class="input" style="margin-top:4px">04 / 09 / 2026</div></div>
+        </div>
+        <div style="margin-top:10px"><div class="label">Reference / note (optional)</div>
+          <div class="input" style="margin-top:4px">Invoice no., meter reading, department…</div></div>
+
+        <!-- live preview -->
+        <div class="box dash pad" style="margin-top:14px; background:var(--wash); position:relative">
+          <div class="cal" style="top:-9px; left:-9px">4</div>
+          <div class="row" style="align-items:baseline; gap:14px; flex-wrap:wrap">
+            <span class="label">Computed impact</span>
+            <span class="mono" style="font-size:11.5px; color:var(--ink-2)">17,800 kWh × 0.716 kg/kWh =</span>
+            <span class="val sm">12,744.8 kg CO₂e</span>
+            <span class="ph">Scope 2 · charge to the ledger</span>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:14px; align-items:center; gap:12px; position:relative">
+          <div class="btn">Post entry</div>
+          <span class="ph">✓ Posted to the ledger</span>
+          <div class="cal" style="top:-9px; left:-9px">5</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-cap">WF-03 · Log Activity · 1180 × 720</div>
+
+  <table>
+    <thead><tr><th class="n">#</th><th style="width:180px">Component</th><th>Behaviour</th><th style="width:200px">API</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td>Category tiles</td><td>Eight tiles, each marked <i>charge</i> or <i>credit</i> so the user understands before selecting that recycling reduces the total. Selection is a toggle group: <code>role="radiogroup"</code>, arrow-key navigable, selected state carries a border and a label — not colour alone.</td><td class="ep">GET /api/factors</td></tr>
+      <tr><td class="n">2</td><td>Activity select</td><td>Repopulates from the chosen category. Shows the human label; the unit follows automatically from the factor.</td><td class="ep">GET /api/factors?category=…</td></tr>
+      <tr><td class="n">3</td><td>Quantity + unit suffix</td><td>The unit is displayed inside the field, read from the selected factor, so the user cannot enter litres where kilolitres are expected. Numeric, right-aligned, positive only.</td><td class="ep">—</td></tr>
+      <tr><td class="n">4</td><td><b>Live impact preview</b></td><td>The signature interaction. Debounced 250 ms after typing stops, calls the preview endpoint and shows the full working: quantity × factor = result, plus the GHG scope and whether this is a charge or a credit. Nothing is saved. The same engine prices the real posting, so the preview cannot disagree with the stored value.</td><td class="ep">POST /api/entries/preview</td></tr>
+      <tr><td class="n">5</td><td>Submit + confirmation</td><td>On success: an inline confirmation, the quantity and note clear, the category and date persist (users post several entries of the same kind in a row). Failures show a field-level message rather than a generic alert.</td><td class="ep">POST /api/entries</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Validation rules — enforced in the form and again at the API</h4>
+  <table>
+    <thead><tr><th style="width:190px">Rule</th><th>Message</th><th style="width:110px">Server</th></tr></thead>
+    <tbody>
+      <tr><td>Quantity &gt; 0</td><td>"Enter a quantity greater than zero."</td><td class="ep">422</td></tr>
+      <tr><td>Date not in the future</td><td>"You cannot log activity that has not happened yet."</td><td class="ep">422</td></tr>
+      <tr><td>Factor must be active</td><td>"That activity has been retired. Pick its replacement."</td><td class="ep">422</td></tr>
+      <tr><td>Role must be writer</td><td>"Your account has read-only access."</td><td class="ep">403</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ════════════════════ SCREEN 4+5: LEDGER, METHODOLOGY ════════════════════ -->
+<section class="sheet">
+  <h2>7 · Screen 04 — Ledger</h2>
+  <p class="lead">The audit surface. Every posted number, filterable, with its
+  factor and scope visible on the row so a figure can be traced without leaving
+  the table.</p>
+
+  <div class="wf">
+    <div class="wf-browser"><i></i><i></i><i></i><div class="wf-url">verdantledger.app/app/ledger</div></div>
+    <div style="border-bottom:1px solid var(--rule-2); padding:10px 14px 0">
+      <div class="tabbar" style="border-bottom:0"><span>Dashboard</span><span>Log activity</span><span class="on">Ledger</span><span>Methodology</span></div>
+    </div>
+    <div class="wf-pad" style="background:var(--wash)">
+      <div class="box pad">
+        <!-- filters -->
+        <div class="row" style="align-items:flex-end; gap:10px; position:relative">
+          <div class="cal" style="top:-9px; left:-9px">1</div>
+          <div><div class="label">Category</div><div class="input sel" style="width:132px; margin-top:3px">All</div></div>
+          <div><div class="label">Month</div><div class="input sel" style="width:118px; margin-top:3px">All</div></div>
+          <div><div class="label">Scope</div><div class="input sel" style="width:92px; margin-top:3px">All</div></div>
+          <div class="grow"><div class="label">Search</div><div class="input" style="margin-top:3px">Activity or reference</div></div>
+          <div class="btn ghost">Export CSV</div>
+        </div>
+
+        <!-- table -->
+        <div class="box" style="margin-top:12px; position:relative">
+          <div class="cal" style="top:-9px; right:-9px">2</div>
+          <div class="row fill" style="padding:7px 10px; gap:10px; border-bottom:1px solid var(--rule-2)">
+            <span class="label" style="width:74px">Date</span><span class="label" style="width:92px">Category</span>
+            <span class="label grow">Activity</span><span class="label" style="width:84px; text-align:right">Quantity</span>
+            <span class="label" style="width:78px; text-align:right">kg CO₂e</span><span class="label" style="width:46px">Scope</span><span class="label" style="width:30px"></span>
+          </div>
+          <div class="row" style="padding:8px 10px; gap:10px; border-bottom:1px solid var(--rule)"><span class="t" style="width:74px"></span><span class="t" style="width:92px"></span><span class="t grow w70"></span><span class="t" style="width:84px"></span><span class="t dark" style="width:78px"></span><span class="t" style="width:46px"></span><span class="ph" style="width:30px">×</span></div>
+          <div class="row" style="padding:8px 10px; gap:10px; border-bottom:1px solid var(--rule)"><span class="t" style="width:74px"></span><span class="t" style="width:92px"></span><span class="t grow w60"></span><span class="t" style="width:84px"></span><span class="t dark" style="width:78px"></span><span class="t" style="width:46px"></span><span class="ph" style="width:30px">×</span></div>
+          <div class="row" style="padding:8px 10px; gap:10px; border-bottom:1px solid var(--rule); position:relative">
+            <div class="cal" style="top:2px; left:-9px">3</div>
+            <span class="t" style="width:74px"></span><span class="t" style="width:92px"></span><span class="t grow w80"></span><span class="t" style="width:84px"></span><span class="t dark" style="width:78px"></span><span class="t" style="width:46px"></span><span class="ph" style="width:30px">×</span></div>
+          <div class="row" style="padding:8px 10px; gap:10px; border-bottom:1px solid var(--rule); opacity:.5; text-decoration:line-through; position:relative">
+            <div class="cal" style="top:2px; right:-9px">4</div>
+            <span class="t" style="width:74px"></span><span class="t" style="width:92px"></span><span class="t grow w50"></span><span class="t" style="width:84px"></span><span class="t" style="width:78px"></span><span class="t" style="width:46px"></span><span class="ph" style="width:30px">—</span></div>
+          <div class="row" style="padding:8px 10px; gap:10px"><span class="t" style="width:74px"></span><span class="t" style="width:92px"></span><span class="t grow w70"></span><span class="t" style="width:84px"></span><span class="t dark" style="width:78px"></span><span class="t" style="width:46px"></span><span class="ph" style="width:30px">×</span></div>
+        </div>
+
+        <div class="row" style="justify-content:space-between; margin-top:10px; position:relative">
+          <div class="cal" style="bottom:-4px; left:-9px">5</div>
+          <span class="ph">50 of 308 entries · issued 121,027 kg · net 101,320 kg</span>
+          <div class="row" style="gap:5px"><span class="btn ghost" style="padding:3px 9px">‹</span><span class="btn ghost" style="padding:3px 9px">1</span><span class="btn ghost" style="padding:3px 9px">2</span><span class="btn ghost" style="padding:3px 9px">›</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-cap">WF-04 · Ledger · 1180 × 760</div>
+
+  <table>
+    <thead><tr><th class="n">#</th><th style="width:170px">Component</th><th>Behaviour</th><th style="width:200px">API</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td>Filter bar</td><td>Category, month, scope, free-text search. Filters combine and are reflected in the URL query string, so a filtered view can be bookmarked and shared with an auditor.</td><td class="ep">GET /api/entries?…</td></tr>
+      <tr><td class="n">2</td><td>Data table</td><td>Sortable by date, tonnage or posting time. Horizontally scrollable in its own container below 900 px — the page itself never scrolls sideways. Header row is sticky.</td><td class="ep">GET /api/entries</td></tr>
+      <tr><td class="n">3</td><td>Credit row</td><td>Recycling and renewable entries show a negative figure, distinguished by a minus sign and a leading marker, not by colour alone.</td><td class="ep">—</td></tr>
+      <tr><td class="n">4</td><td><b>Voided row</b></td><td>Struck through and dimmed, still listed, excluded from the totals. Hidden by default behind a "show voided" toggle; a reason tooltip explains why it was reversed.</td><td class="ep">POST /api/entries/{id}/void</td></tr>
+      <tr><td class="n">5</td><td>Footer totals + paging</td><td>Totals are computed over the <b>entire filtered set</b>, not just the visible page — a per-page sum would be a lie. Page size 50, max 500.</td><td class="ep">response <code>meta</code> + <code>totals</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>8 · Screen 05 — Methodology</h2>
+  <p class="lead">The screen that makes the app defensible: every factor, its
+  unit, its GHG scope and its published source, plus the score formula in full.</p>
+
+  <div class="wf">
+    <div class="wf-browser"><i></i><i></i><i></i><div class="wf-url">verdantledger.app/app/methodology</div></div>
+    <div style="border-bottom:1px solid var(--rule-2); padding:10px 14px 0">
+      <div class="tabbar" style="border-bottom:0"><span>Dashboard</span><span>Log activity</span><span>Ledger</span><span class="on">Methodology</span></div>
+    </div>
+    <div class="wf-pad" style="background:var(--wash)">
+      <div class="box pad">
+        <div class="col" style="gap:5px; max-width:64ch; position:relative">
+          <div class="cal" style="top:-3px; left:-22px">1</div>
+          <span class="t w90"></span><span class="t w80"></span><span class="t w60"></span>
+        </div>
+        <div class="three" style="margin-top:14px; position:relative">
+          <div class="cal" style="top:-9px; left:-9px">2</div>
+          <div class="box pad col" style="gap:6px"><span class="t h" style="width:74px"></span>
+            <div class="row" style="justify-content:space-between"><span class="t w50" style="width:80px"></span><span class="t" style="width:44px"></span></div>
+            <div class="row" style="justify-content:space-between"><span class="t w50" style="width:66px"></span><span class="t" style="width:44px"></span></div>
+            <div class="row" style="justify-content:space-between"><span class="t w50" style="width:88px"></span><span class="t" style="width:44px"></span></div></div>
+          <div class="box pad col" style="gap:6px"><span class="t h" style="width:58px"></span>
+            <div class="row" style="justify-content:space-between"><span class="t w50" style="width:72px"></span><span class="t" style="width:44px"></span></div>
+            <div class="row" style="justify-content:space-between"><span class="t w50" style="width:84px"></span><span class="t" style="width:44px"></span></div>
+            <div class="row" style="justify-content:space-between"><span class="t w50" style="width:60px"></span><span class="t" style="width:44px"></span></div></div>
+          <div class="box pad col" style="gap:6px"><span class="t h" style="width:80px"></span>
+            <div class="row" style="justify-content:space-between"><span class="t w50" style="width:78px"></span><span class="t" style="width:44px"></span></div>
+            <div class="row" style="justify-content:space-between"><span class="t w50" style="width:64px"></span><span class="t" style="width:44px"></span></div>
+            <div class="row" style="justify-content:space-between"><span class="t w50" style="width:86px"></span><span class="t" style="width:44px"></span></div></div>
+        </div>
+        <div class="box fill pad" style="margin-top:14px; border-left:2.5px solid var(--ink); position:relative">
+          <div class="cal" style="top:-9px; left:-9px">3</div>
+          <div class="col" style="gap:5px"><span class="t w70"></span><span class="t w50"></span><span class="t w60"></span><span class="t w40"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-cap">WF-05 · Methodology · 1180 × 700</div>
+
+  <table>
+    <thead><tr><th class="n">#</th><th style="width:170px">Component</th><th>Behaviour</th><th style="width:200px">API</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td>Basis of preparation</td><td>Two short paragraphs: the GHG Protocol scope split, and the statement that recycling and renewables are posted as credits.</td><td class="ep">static copy</td></tr>
+      <tr><td class="n">2</td><td>Factor cards</td><td>One card per category listing each activity, its factor value with unit, and its scope. Rendered from the API, so it is impossible for the published methodology to drift from the factors actually in use.</td><td class="ep">GET /api/factors</td></tr>
+      <tr><td class="n">3</td><td>Score formula</td><td>The normalisation formula, the five bands with their targets and ceilings, and the weights — printed in full, in a monospaced block.</td><td class="ep">GET /api/dashboard/score</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ════════════════════ RESPONSIVE + SPEC ════════════════════ -->
+<section class="sheet">
+  <h2>9 · Screen 06 — Responsive behaviour</h2>
+  <p class="lead">Meter readings get logged standing in a plant room, not at a
+  desk. The mobile layout is a real requirement, not a courtesy.</p>
+
+  <div class="row" style="gap:24px; align-items:flex-start; flex-wrap:wrap">
+    <div>
+      <div class="wf" style="width:250px">
+        <div class="wf-browser" style="padding:5px 8px"><div class="wf-url" style="margin-left:0">/app/dashboard</div></div>
+        <div style="padding:9px; background:var(--wash)">
+          <div class="col" style="gap:8px">
+            <div class="row" style="justify-content:space-between; align-items:center"><span class="t h" style="width:80px"></span><span class="box" style="width:22px;height:16px"></span></div>
+            <div class="input sel" style="height:26px">Last 6 months</div>
+            <div class="box pad" style="text-align:center"><div class="gauge" style="width:88px;height:48px"></div><span class="ph">57.4 / 100</span></div>
+            <div class="box pad col" style="gap:2px"><span class="label">Net emissions</span><span class="val sm">101.3 t</span></div>
+            <div class="box pad col" style="gap:2px"><span class="label">Per emp / month</span><span class="val sm">140.7 kg</span></div>
+            <div class="box pad"><span class="label">Trend</span><div class="chart" style="height:64px; margin-top:5px"><div class="bars" style="padding:5px 4px"><i style="height:70%"></i><i style="height:84%"></i><i style="height:76%"></i><i style="height:80%"></i><i style="height:72%"></i><i style="height:30%"></i></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-cap">WF-06a · Dashboard · 390 px</div>
+    </div>
+
+    <div>
+      <div class="wf" style="width:250px">
+        <div class="wf-browser" style="padding:5px 8px"><div class="wf-url" style="margin-left:0">/app/log</div></div>
+        <div style="padding:9px; background:var(--wash)">
+          <div class="box pad col" style="gap:8px">
+            <span class="label">Post an entry</span>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px">
+              <div class="box pad" style="padding:6px"><span class="t" style="width:40px"></span></div>
+              <div class="box pad" style="padding:6px; border-color:var(--ink); border-width:1.5px"><span class="t dark" style="width:48px"></span></div>
+              <div class="box pad" style="padding:6px"><span class="t" style="width:52px"></span></div>
+              <div class="box pad" style="padding:6px"><span class="t" style="width:36px"></span></div>
+            </div>
+            <div class="input sel" style="height:28px">Grid electricity</div>
+            <div class="input" style="height:28px; justify-content:flex-end">17,800 <span class="ph">&nbsp;kWh</span></div>
+            <div class="input" style="height:28px">04 / 09 / 2026</div>
+            <div class="box dash pad" style="background:var(--wash); text-align:center"><span class="label">Computed impact</span><div class="val sm" style="margin-top:2px">12,744.8 kg</div></div>
+            <div class="btn" style="text-align:center">Post entry</div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-cap">WF-06b · Log Activity · 390 px</div>
+    </div>
+
+    <div class="grow" style="min-width:240px">
+      <h4 style="margin-top:0">Breakpoint rules</h4>
+      <table>
+        <thead><tr><th style="width:92px">Width</th><th>Layout change</th></tr></thead>
+        <tbody>
+          <tr><td class="ep">≥ 1180</td><td>Full 12-column grid. Score panel and KPI tiles side by side; charts two-up.</td></tr>
+          <tr><td class="ep">900–1179</td><td>Container fluid. KPI grid stays 2 × 2; chart row stays two-up but narrows.</td></tr>
+          <tr><td class="ep">560–899</td><td>Everything stacks to one column. Score gauge moves above its sub-scores. Ledger table scrolls horizontally inside its own container.</td></tr>
+          <tr><td class="ep">&lt; 560</td><td>Tabs become a horizontally scrolling strip. Category tiles go 2-up. KPI tiles 2-up. Login proposition panel is dropped entirely.</td></tr>
+        </tbody>
+      </table>
+      <div class="note" style="font-size:12px">
+        <b>Never:</b> a horizontally scrolling page body. Only tables, wide
+        charts and code blocks may exceed the viewport, each inside its own
+        <code>overflow-x:auto</code> container.
+      </div>
+    </div>
+  </div>
+
+  <h2>10 · Component inventory</h2>
+  <p class="lead">Sixteen reusable components cover every screen above. Built
+  once, composed everywhere — which is what keeps five screens looking like one
+  product.</p>
+  <div class="three" style="gap:10px 22px; margin-top:12px">
+    <div>
+      <h4 style="margin-top:0">Layout</h4>
+      <span class="pill">AppShell</span><span class="pill">TabBar</span><span class="pill">Panel</span><span class="pill">PanelHeader</span>
+    </div>
+    <div>
+      <h4 style="margin-top:0">Data display</h4>
+      <span class="pill">ScoreGauge</span><span class="pill">SubScoreMeter</span><span class="pill">KpiTile</span><span class="pill">StatusChip</span>
+      <span class="pill">TrendChart</span><span class="pill">CategoryBars</span><span class="pill">ResourceMeter</span><span class="pill">InsightCard</span>
+      <span class="pill">DataTable</span>
+    </div>
+    <div>
+      <h4 style="margin-top:0">Input</h4>
+      <span class="pill">CategoryPicker</span><span class="pill">QuantityField</span><span class="pill">ImpactPreview</span>
+      <span class="pill">FilterBar</span><span class="pill">ConfirmDialog</span>
+    </div>
+  </div>
+
+  <h2>11 · Global states every screen must handle</h2>
+  <table>
+    <thead><tr><th style="width:130px">State</th><th>Treatment</th></tr></thead>
+    <tbody>
+      <tr><td><b>Loading</b></td><td>Skeleton blocks at the final dimensions, so nothing jumps when data arrives. Never a full-page spinner — the shell and tabs stay usable.</td></tr>
+      <tr><td><b>Empty</b></td><td>A new organisation has no entries. Charts are replaced by one card explaining what to do, with a button straight to Log Activity. Never an empty axis with no bars.</td></tr>
+      <tr><td><b>Error</b></td><td>Panel-level, not page-level: if the insights call fails, the score and charts still render. Each failed panel offers its own retry.</td></tr>
+      <tr><td><b>Read-only</b></td><td>Viewer role: writing controls are hidden <i>and</i> the API refuses them with 403. Permission is enforced on the server; the UI only reflects it.</td></tr>
+      <tr><td><b>Offline / expired token</b></td><td>A 401 on any call clears the session and routes to login with a "your session expired" message, preserving the intended destination.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>12 · Accessibility checklist</h2>
+  <table>
+    <thead><tr><th style="width:190px">Requirement</th><th>Implementation</th></tr></thead>
+    <tbody>
+      <tr><td>Colour is never the only signal</td><td>Every chart series is directly labelled; status chips carry text ("On track") as well as colour; voided rows are struck through, not just dimmed.</td></tr>
+      <tr><td>Contrast ≥ 4.5:1 for text</td><td>Body and label colours checked against both the light and dark surfaces.</td></tr>
+      <tr><td>Keyboard operable</td><td>Tab order follows reading order; category tiles are an arrow-key radiogroup; dialogs trap focus and close on Escape.</td></tr>
+      <tr><td>Visible focus</td><td>A 2 px outline on every interactive element — never <code>outline:none</code> without a replacement.</td></tr>
+      <tr><td>Semantic structure</td><td>One <code>h1</code> per screen, real <code>&lt;table&gt;</code> markup for the ledger, <code>role="tablist"</code> with <code>aria-selected</code> on the nav.</td></tr>
+      <tr><td>Announced updates</td><td>Form errors and the post confirmation sit in <code>aria-live</code> regions so a screen reader hears them.</td></tr>
+      <tr><td>Reduced motion</td><td>All transitions disabled under <code>prefers-reduced-motion</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <hr>
+  <p class="muted" style="font-size:11.5px">
+    Verdant Ledger · Document 01 of 02 — UI/UX design specification.
+    Document 02 is the backend API specification (<code>backend/README.md</code>,
+    <code>backend/docs/api.md</code>, <code>backend/docs/er-diagram.md</code>).
+    Wireframes are low-fidelity by intent: structure and behaviour are fixed here,
+    visual design is specified separately.
+  </p>
+</section>
+
+</body>
+</html>

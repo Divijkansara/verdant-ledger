@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- One entry, deliberately. Routes are hash fragments (#/methodology,
+     #/docs, #/app/...), and a fragment is not a separate URL to a crawler,
+     so listing them here would claim pages that do not exist. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://divijkansara.github.io/khatam/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

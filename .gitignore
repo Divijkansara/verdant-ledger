@@ -1,0 +1,32 @@
+# ── Python / backend ────────────────────────────────────────────────
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# the seeded SQLite database is regenerated with `python -m app.seed`
+*.db
+*.sqlite
+*.sqlite3
+
+# secrets — .env.example is committed, .env is not
+.env
+.env.local
+
+# ── Node / web-react ────────────────────────────────────────────────
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# ── Editors / OS ────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+
+# ── Superseded by version control ───────────────────────────────────
+web-backup-*.zip
