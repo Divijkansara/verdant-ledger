@@ -140,14 +140,36 @@ window.VL = window.VL || {};
                 <a class="btn btn-primary btn-lg" href="#/app/overview">Open the console</a>
                 <a class="btn btn-lg" href="#/app/overview" data-tour-start>${icon("play", 14)} Take the 90-second tour</a>
               </div>
+
+              <div class="planet-ui">
+                <button class="btn planet-act" id="planetAct">
+                  ${icon("leaf", 15)}<span>Clean it up</span>
+                </button>
+                <div class="pl-state">
+                  <span class="pl-k">Atmosphere reflects</span>
+                  <b id="plScoreV">—</b>
+                  <span class="pl-g" id="plGradeV">—</span>
+                </div>
+                <p class="pl-note" id="plNote">The haze is this organisation's real score.</p>
+              </div>
             </div>
 
-            <div class="deck-stage" id="deck" aria-label="Ledger documents"></div>
+            <div class="planet" id="planet" aria-hidden="true"></div>
           </div>
         </div>
       </header>
 
       <section class="band" id="band" aria-label="Net position by month"></section>
+
+      <section class="deck-section" aria-label="Ledger documents">
+        <div class="shell">
+          <div class="ds-hd">
+            <span class="eyebrow">[ The record ]</span>
+            <h2>Five documents, one ledger.</h2>
+          </div>
+          <div class="deck-stage" id="deck"></div>
+        </div>
+      </section>
 
       <section class="bento" aria-labelledby="bentoH">
         <div class="shell">

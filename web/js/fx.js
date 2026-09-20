@@ -459,10 +459,60 @@ window.VL = window.VL || {};
     sync(); run();
   }
 
+  /* ═════════════ 6b · the planet ═════════════
+     The haze is the organisation's real score. The control runs the real
+     1.5 °C playbook through the scenario engine and tweens the atmosphere
+     to whatever score that engine returns — so the picture and the number
+     cannot disagree.                                                    */
+
+  function planet(host) {
+    if (!host || !V.Shader) return;
+    const sh = V.Shader.mount(host);
+    const S = V.Store;
+    const base = S.summary(12).score;
+    const scoreEl = $("#plScoreV"), gradeEl = $("#plGradeV");
+    const btn = $("#planetAct"), note = $("#plNote");
+
+    let cleaned = false, target = null;
+    try {
+      const pb = V.Simulate.PLAYBOOKS.find(p => p.id === "sbti");
+      const r = V.Simulate.run(S.entries, pb.positions, S.months(), S.org.headcount);
+      target = { score: r.simScore, cut: Math.abs(r.savingPct), tonnes: r.annualisedSaving / 1000 };
+    } catch (_) { /* control simply stays inert */ }
+
+    const paint = (sc, msg) => {
+      if (scoreEl) scoreEl.textContent = V.UI.nf(sc.composite, 1);
+      if (gradeEl) { gradeEl.textContent = sc.grade; gradeEl.style.color = V.bandVar(sc.composite); }
+      if (note) note.innerHTML = msg;
+      if (sh) sh.set(V.Shader.fromScore(sc.composite));
+    };
+
+    paint(base, "The haze is this organisation's real score.");
+    if (sh) sh.jump(V.Shader.fromScore(base.composite));
+
+    if (!btn) return;
+    if (!target) { btn.disabled = true; return; }
+
+    btn.addEventListener("click", () => {
+      cleaned = !cleaned;
+      document.body.classList.toggle("cleaning", cleaned);
+      if (cleaned) {
+        paint(target.score,
+          `Eight levers, <b>−${V.UI.nf(target.cut, 0)}%</b>, ` +
+          `<b>${V.UI.nf(target.tonnes, 1)} t</b> avoided a year.`);
+        btn.querySelector("span").textContent = "Put it back";
+      } else {
+        paint(base, "The haze is this organisation's real score.");
+        btn.querySelector("span").textContent = "Clean it up";
+      }
+    });
+  }
+
   /* ═════════════ 7 · page hooks ═════════════ */
 
   function home() {
     headline($(".mast-copy h1"));
+    planet($("#planet"));
     V.Deck.build($("#deck"));
     band($("#band"));
     bento(document);

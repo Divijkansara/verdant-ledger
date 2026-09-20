@@ -61,8 +61,11 @@
    the 3-D scene inside the stage is untouched. */
 .mast{padding-block:34px 0;position:relative;overflow-x:clip;overflow-y:visible}
 .mast-docket{padding-bottom:12px}
-.mast-body{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,400px);
-  gap:0 56px;padding-block:78px 108px;align-items:start}
+/* The planet is positioned against this box, so the masthead is a stage:
+   full-height, copy held to the left half, planet bleeding off the right. */
+.mast-body{position:relative;display:block;padding-block:64px 92px;
+  min-height:min(82vh,760px);display:flex;flex-direction:column;justify-content:center}
+.mast-copy{position:relative;z-index:2;max-width:min(620px,56%)}
 
 .mast-copy h1{font-size:var(--fs-hero);line-height:.96;letter-spacing:-.024em;
   font-variation-settings:"opsz" 144;text-wrap:initial}
