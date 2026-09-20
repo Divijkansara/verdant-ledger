@@ -364,12 +364,12 @@ window.VL = window.VL || {};
   /* ═══════════════════════ 3 · PRESETS ═══════════════════════════════ */
 
   const PRESETS = [
-    { id: "midnight", name: "Midnight Teal", note: "Slate-navy ground, teal signal",
-      seed: { mode: "dark",  baseHue: 254, baseChroma: 0.028, accentHue: 183, accentChroma: 0.123,
-              accentContrast: 7,   baseLevel: 0.04,  contrast: 1 } },
     { id: "ledger",   name: "Ledger",      note: "Tinted teal-black, acid lime",
       seed: { mode: "dark",  baseHue: 208, baseChroma: 0.030, accentHue: 124, accentChroma: 0.20,
               accentContrast: 12,  baseLevel: 0.075, contrast: 1 } },
+    { id: "midnight", name: "Midnight Teal", note: "Slate-navy ground, teal signal",
+      seed: { mode: "dark",  baseHue: 254, baseChroma: 0.028, accentHue: 183, accentChroma: 0.123,
+              accentContrast: 7,   baseLevel: 0.04,  contrast: 1 } },
     { id: "nebula",   name: "Nebula",      note: "Deep space, cyan signal",
       seed: { mode: "dark",  baseHue: 262, baseChroma: 0.022, accentHue: 208, accentChroma: 0.15,
               accentContrast: 6.5, baseLevel: 0,     contrast: 1 } },
