@@ -269,7 +269,7 @@
 .doc-body .tbl-wrap table{margin-top:0;border:0;min-width:520px}
 .doc-body table{margin-top:16px;border:1px solid var(--line-1);border-radius:var(--r-sm)}
 .code-block{font-family:var(--font-mono);font-size:var(--fs-small);background:var(--bg);
-  border:1px solid var(--line-1);border-left:2px solid var(--accent);border-radius:0 var(--r-sm) var(--r-sm) 0;
+  border:1px solid var(--line-1);border-left:2px solid var(--accent);border-radius:var(--r-md);
   padding:15px 18px;overflow-x:auto;white-space:pre;color:var(--text-2);line-height:1.7;margin-top:16px}
 .endpoint{display:grid;grid-template-columns:62px 1fr;gap:12px;padding:10px 0;
   border-bottom:1px solid var(--line-1);align-items:baseline}

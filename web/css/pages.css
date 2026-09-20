@@ -71,13 +71,15 @@
 .weightbar.in .w{width:var(--w)}
 .weightbar .w:hover,.weightbar .w.on{filter:brightness(1.18) saturate(1.1)}
 .weightbar .w+.w{border-left:2px solid var(--bg)}
-.subs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:12px}
-.sub{border:1px solid var(--line-2);border-radius:var(--r-md);padding:14px 13px;background:var(--surface-1);
+/* scoped to the reference pages: the console uses .subs for its own
+   sub-score rows, and an unscoped grid here re-laid them out. */
+.doc-body .subs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:12px}
+.doc-body .sub{border:1px solid var(--line-2);border-radius:var(--r-md);padding:14px 13px;background:var(--surface-1);
   text-align:left;color:inherit;transition:all var(--t-fast);position:relative}
-.sub:hover,.sub.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 9%,var(--surface-1))}
-.sub i{display:block;width:8px;height:8px;border-radius:2px;background:var(--c);margin-bottom:9px}
-.sub b{display:block;font-size:var(--fs-small);color:var(--text-1);line-height:1.3}
-.sub em{display:block;font-style:normal;font-family:var(--font-mono);font-size:var(--fs-micro);
+.doc-body .sub:hover,.doc-body .sub.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 9%,var(--surface-1))}
+.doc-body .sub i{display:block;width:8px;height:8px;border-radius:2px;background:var(--c);margin-bottom:9px}
+.doc-body .sub b{display:block;font-size:var(--fs-small);color:var(--text-1);line-height:1.3}
+.doc-body .sub em{display:block;font-style:normal;font-family:var(--font-mono);font-size:var(--fs-micro);
   color:var(--text-3);margin-top:4px}
 .subdetail{margin-top:12px;border:1px solid var(--line-2);border-radius:var(--r-lg);padding:20px;
   background:var(--surface-1);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center}
@@ -179,7 +181,7 @@
 
 /* ───────────── responsive ───────────── */
 @media (max-width:1000px){
-  .subs{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .doc-body .subs{grid-template-columns:repeat(3,minmax(0,1fr))}
   .subdetail{grid-template-columns:minmax(0,1fr)}
   .chain{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:22px}
   .blk{margin-right:0}
@@ -190,7 +192,7 @@
   .equation{grid-template-columns:minmax(0,1fr)}
   .eq-op{text-align:center;line-height:1}
   .scopes,.steps,.lims{grid-template-columns:minmax(0,1fr)}
-  .subs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .doc-body .subs{grid-template-columns:repeat(2,minmax(0,1fr))}
   .fx-row{grid-template-columns:minmax(0,1fr) 78px;row-gap:8px}
   .fx-row .fx-meter,.fx-row .fx-src{display:none}
   .weightbar .w{font-size:var(--fs-micro)}

@@ -275,7 +275,8 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:var(--r
 .meter-row .meter{grid-column:1/-1}
 
 /* tables */
-.tbl-scroll{overflow-x:auto;border-top:1px solid var(--line-1)}
+.tbl-scroll{overflow-x:auto;border:1px solid var(--line-2);border-radius:var(--r-lg);
+  background:var(--surface-1)}
 /* A column head sits UNDER a rule and OVER a heavier one — the double
    rule is how printed accounts separate the head from the body. */
 thead th{position:sticky;top:0;z-index:2;background:var(--bg);text-align:left;
