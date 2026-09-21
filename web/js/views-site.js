@@ -137,20 +137,28 @@ window.VL = window.VL || {};
                 next year.
               </p>
               <div class="mast-cta">
-                <a class="btn btn-primary btn-lg" href="#/app/overview">Open the console</a>
+                <button class="btn btn-primary btn-lg planet-act" id="planetAct">
+                  ${icon("leaf", 15)}<span>Clean it up</span>
+                </button>
                 <a class="btn btn-lg" href="#/app/overview" data-tour-start>${icon("play", 14)} Take the 90-second tour</a>
               </div>
 
               <div class="planet-ui">
-                <button class="btn planet-act" id="planetAct">
-                  ${icon("leaf", 15)}<span>Clean it up</span>
-                </button>
                 <div class="pl-state">
                   <span class="pl-k">Atmosphere reflects</span>
                   <b id="plScoreV">—</b>
                   <span class="pl-g" id="plGradeV">—</span>
                 </div>
                 <p class="pl-note" id="plNote">The haze is this organisation's real score.</p>
+              </div>
+
+              <div class="mast-next" id="mastNext" hidden>
+                <div class="rule"></div>
+                <p><b>That was the engine, not an animation.</b> Every lever, factor and
+                   tonne above is computed from the ledger. The console is where you post
+                   the entries, run the scenarios and seal the chain.</p>
+                <a class="btn btn-primary btn-lg" href="#/app/overview">
+                  Open the console ${icon("arrow", 15)}</a>
               </div>
             </div>
 

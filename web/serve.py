@@ -26,7 +26,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
     def log_message(self, fmt, *args):
-        print(f"  {self.address_string()} — {fmt % args}")
+        print(f"  {self.address_string()} - {fmt % args}")
 
 
 if __name__ == "__main__":
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     http.server.ThreadingHTTPServer.allow_reuse_address = True
     with http.server.ThreadingHTTPServer(("", PORT), Handler) as httpd:
         url = f"http://localhost:{PORT}/"
-        print(f"Verdant Ledger → {url}")
+        print(f"Verdant Ledger -> {url}")
         print("Ctrl-C to stop.\n")
         try:
             webbrowser.open(url)

@@ -74,11 +74,17 @@ window.VL = window.VL || {};
     wireSite() {
       const nav = $("#siteNav");
       if (!nav) return;
-      const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 8);
+      const onScroll = () => {
+        const down = window.scrollY > 8;
+        nav.classList.toggle("scrolled", down);
+        // only the landing page has a hero big enough to be worth clearing
+        nav.classList.toggle("at-top", !down && location.hash.replace("#", "") === "/");
+      };
       onScroll();
       window.removeEventListener("scroll", this._scroll);
       this._scroll = onScroll;
       window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("hashchange", onScroll);
 
       $$("[data-tour-start]").forEach(a => a.addEventListener("click", () => {
         setTimeout(() => V.Tour.start(), 700);

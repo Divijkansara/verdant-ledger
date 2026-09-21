@@ -225,15 +225,28 @@
   transition:color var(--t-slow)}
 .pl-g{font-family:var(--font-mono);font-size:15px;font-weight:600;
   transition:color var(--t-slow)}
-.planet-act{border-color:var(--accent);color:var(--accent);background:var(--accent-wash);
-  transition:transform var(--t-fast) var(--ease-out),background var(--t-fast),
-             color var(--t-fast),box-shadow var(--t-med)}
-.planet-act:hover{transform:translateY(-1px);background:var(--accent);color:var(--on-accent);
-  box-shadow:0 12px 30px -12px var(--accent)}
-body.cleaning .planet-act{border-color:var(--line-3);color:var(--text-2);background:transparent}
+/* the hero's primary action, so it carries the solid accent until the
+   point has been made and it becomes a way back */
+.planet-act{transition:transform var(--t-fast) var(--ease-out),background var(--t-fast),
+  border-color var(--t-fast),color var(--t-fast),box-shadow var(--t-med)}
+.planet-act:hover{transform:translateY(-1px);box-shadow:0 14px 34px -14px var(--accent)}
+body.cleaning .planet-act{background:transparent;border-color:var(--line-3);
+  color:var(--text-2);box-shadow:none}
 .pl-note{flex:1 0 100%;margin:0;font-size:var(--fs-small);line-height:1.5;
   color:var(--text-3);max-width:44ch}
 .pl-note b{color:var(--accent);font-weight:600}
+
+/* the way on, revealed only after the planet has been cleaned */
+.mast-next{margin-top:26px;max-width:52ch;opacity:0;transform:translateY(10px);
+  transition:opacity .55s var(--ease-out),transform .55s var(--ease-out)}
+.mast-next.in{opacity:1;transform:none}
+.mast-next .rule{margin-bottom:18px}
+.mast-next p{margin:0 0 18px;font-size:var(--fs-small);line-height:1.62;color:var(--text-2)}
+.mast-next p b{color:var(--text-1);font-weight:600}
+
+@media (prefers-reduced-motion:reduce){
+  .mast-next{transition:none;opacity:1;transform:none}
+}
 
 /* the deck, now its own section below the fold */
 .deck-section{padding-block:76px 26px}

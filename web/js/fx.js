@@ -496,14 +496,31 @@ window.VL = window.VL || {};
     btn.addEventListener("click", () => {
       cleaned = !cleaned;
       document.body.classList.toggle("cleaning", cleaned);
+      const next = $("#mastNext");
       if (cleaned) {
         paint(target.score,
           `Eight levers, <b>−${V.UI.nf(target.cut, 0)}%</b>, ` +
           `<b>${V.UI.nf(target.tonnes, 1)} t</b> avoided a year.`);
         btn.querySelector("span").textContent = "Put it back";
+        // the way on only opens once the point has been made
+        if (next) {
+          next.hidden = false;
+          requestAnimationFrame(() => next.classList.add("in"));
+          clearTimeout(planet._t);
+          planet._t = setTimeout(() => {
+            if (!next.hidden && !still()) {
+              next.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+          }, 1500);
+        }
       } else {
         paint(base, "The haze is this organisation's real score.");
         btn.querySelector("span").textContent = "Clean it up";
+        clearTimeout(planet._t);
+        if (next) {
+          next.classList.remove("in");
+          setTimeout(() => { if (!host.ownerDocument.body.classList.contains("cleaning")) next.hidden = true; }, 320);
+        }
       }
     });
   }

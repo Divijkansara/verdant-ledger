@@ -235,7 +235,17 @@ void main() {
   }
 
   function mount(host) {
-    if (!host || api) return api;
+    if (!host) return api;
+    // The router rebuilds the page on every visit, so a cached instance can
+    // be bound to a canvas that is no longer in the document. Reuse it only
+    // if it is still live; otherwise release its GPU context and start over
+    // (browsers cap live WebGL contexts, so leaking them eventually fails).
+    if (api) {
+      if (api._cv.isConnected && host.contains(api._cv)) return api;
+      const lose = api._gl.getExtension("WEBGL_lose_context");
+      if (lose) lose.loseContext();
+      api = null;
+    }
 
     const cv = document.createElement("canvas");
     cv.className = "planet-cv";
@@ -323,7 +333,9 @@ void main() {
       set(v) { target = Math.min(1, Math.max(0, v)); kick(); return api; },
       jump(v) { target = current = Math.min(1, Math.max(0, v)); kick(); return api; },
       get() { return current; },
-      ok: true
+      ok: true,
+      _cv: cv,
+      _gl: gl
     };
     return api;
   }
