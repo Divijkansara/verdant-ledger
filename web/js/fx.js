@@ -504,11 +504,10 @@ window.VL = window.VL || {};
         btn.querySelector("span").textContent = "Put it back";
         // the way on only opens once the point has been made
         if (next) {
-          next.hidden = false;
-          requestAnimationFrame(() => next.classList.add("in"));
+          next.classList.add("in");
           clearTimeout(planet._t);
           planet._t = setTimeout(() => {
-            if (!next.hidden && !still()) {
+            if (next.classList.contains("in") && !still()) {
               next.scrollIntoView({ behavior: "smooth", block: "nearest" });
             }
           }, 1500);
@@ -517,10 +516,7 @@ window.VL = window.VL || {};
         paint(base, "The haze is this organisation's real score.");
         btn.querySelector("span").textContent = "Clean it up";
         clearTimeout(planet._t);
-        if (next) {
-          next.classList.remove("in");
-          setTimeout(() => { if (!host.ownerDocument.body.classList.contains("cleaning")) next.hidden = true; }, 320);
-        }
+        if (next) next.classList.remove("in");
       }
     });
   }

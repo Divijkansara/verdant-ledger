@@ -77,7 +77,7 @@
     color-mix(in srgb,#03050a 45%,transparent) 34%,transparent 58%)}
 .mast::after{content:"";position:absolute;left:0;right:0;bottom:0;height:18%;z-index:1;
   pointer-events:none;background:linear-gradient(to bottom,transparent,var(--bg))}
-.mast-stage{position:relative;z-index:2;width:100%;padding-block:clamp(64px,11vh,120px)}
+.mast-stage{position:relative;z-index:2;width:100%;padding-block:clamp(48px,8vh,110px)}
 .mast-copy{max-width:min(600px,46%)}
 .mast-docket{padding-bottom:0;width:max-content;max-width:min(92vw,900px)}
 .mast-rule{height:1px;margin:16px 0 40px;

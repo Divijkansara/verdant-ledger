@@ -273,11 +273,22 @@ void main() {
     /* Where the globe sits in the stage. Wide screens: large, right of
        centre, with the copy over its left limb. Narrow screens: top and
        centre, with the copy beneath it. CSS pixels, origin top-left. */
+    /* The globe is sized and placed from the SCREEN, never from the hero's
+       height: the hero can grow (reveals, long copy) and the globe must not
+       move or rescale when it does. On touch devices the height is only
+       re-read when the width changes, so the address bar sliding away on
+       scroll does not resize it either. */
+    let vpW = window.innerWidth, vpH = window.innerHeight;
+    const coarse = matchMedia("(pointer: coarse)").matches;
+    addEventListener("resize", () => {
+      if (!coarse || window.innerWidth !== vpW) { vpW = window.innerWidth; vpH = window.innerHeight; }
+    });
+
     const layout = (W, H) => {
-      const vw = window.innerWidth, vh = window.innerHeight;
+      const vw = vpW, vh = vpH;
       if (vw >= 820 && vw / vh > 1.05) {
-        const r = Math.min(H * 0.44, W * 0.31);
-        return { x: W * 0.64, y: H * 0.5, r };
+        const r = Math.min(vh * 0.44, vw * 0.31);
+        return { x: W * 0.64, y: vh * 0.5, r };
       }
       // must match the padding-top in site.css for the same media query
       const r = Math.min(vw * 0.44, vh * 0.26);

@@ -231,15 +231,18 @@ body.cleaning .planet-act{background:transparent;border-color:var(--line-3);
 .pl-note b{color:var(--accent);font-weight:600}
 
 /* the way on, revealed only after the planet has been cleaned */
-.mast-next{margin-top:26px;max-width:52ch;opacity:0;transform:translateY(10px);
-  transition:opacity .55s var(--ease-out),transform .55s var(--ease-out)}
-.mast-next.in{opacity:1;transform:none}
-.mast-next .rule{margin-bottom:18px}
-.mast-next p{margin:0 0 18px;font-size:var(--fs-small);line-height:1.62;color:var(--text-2)}
+/* Its space is reserved from the first frame (visibility, not display),
+   so revealing it never reflows the hero or re-centres the copy. */
+.mast-next{margin-top:24px;opacity:0;transform:translateY(10px);visibility:hidden;
+  transition:opacity .55s var(--ease-out),transform .55s var(--ease-out),visibility 0s linear .55s}
+.mast-next.in{opacity:1;transform:none;visibility:visible;
+  transition:opacity .55s var(--ease-out),transform .55s var(--ease-out),visibility 0s}
+.mast-next{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;max-width:none}
+.mast-next p{margin:0;font-size:var(--fs-small);line-height:1.5;color:var(--text-2)}
 .mast-next p b{color:var(--text-1);font-weight:600}
 
 @media (prefers-reduced-motion:reduce){
-  .mast-next{transition:none;opacity:1;transform:none}
+  .mast-next,.mast-next.in{transition:none;transform:none}
 }
 
 /* the deck, now its own section below the fold */

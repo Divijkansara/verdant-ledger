@@ -152,10 +152,8 @@ window.VL = window.VL || {};
               <p class="pl-note" id="plNote">The haze is this organisation's real score.</p>
             </div>
 
-            <div class="mast-next" id="mastNext" hidden>
-              <p><b>That was the engine, not an animation.</b> Every lever, factor and
-                 tonne above is computed from the ledger. The console is where you post
-                 the entries, run the scenarios and seal the chain.</p>
+            <div class="mast-next" id="mastNext">
+              <p><b>That was the engine, not an animation.</b></p>
               <a class="btn btn-primary btn-lg" href="#/app/overview">
                 Open the console ${icon("arrow", 15)}</a>
             </div>
