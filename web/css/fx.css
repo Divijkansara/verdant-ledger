@@ -249,7 +249,13 @@ body.cleaning .planet-act{background:transparent;border-color:var(--line-3);
 .deck-section{padding-block:76px 26px}
 .ds-hd{margin-bottom:30px}
 .ds-hd h2{font-size:var(--fs-h2);margin-top:14px}
-.deck-section .deck-stage{margin-inline:0}
+/* the chips hang 54px above the stage and the score pill 62px below it;
+   reserve that margin so neither covers the heading or the next section */
+.deck-section .deck-stage{margin-inline:0;margin-block:72px 104px}
+/* the tilted sheets dip ~25px below the stage; keep the selector clear of them */
+.deck-section .deck-nav{bottom:-78px}
+.deck-section .dstat{bottom:-74px}
+@media (max-width:620px){.deck-section .deck-stage{margin-block:0 64px}.deck-section .deck-nav{bottom:-44px}}
 
 
 @media (prefers-reduced-motion:reduce){
