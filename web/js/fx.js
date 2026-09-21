@@ -480,11 +480,31 @@ window.VL = window.VL || {};
       target = { score: r.simScore, cut: Math.abs(r.savingPct), tonnes: r.annualisedSaving / 1000 };
     } catch (_) { /* control simply stays inert */ }
 
-    const paint = (sc, msg) => {
-      if (scoreEl) scoreEl.textContent = V.UI.nf(sc.composite, 1);
-      if (gradeEl) { gradeEl.textContent = sc.grade; gradeEl.style.color = V.bandVar(sc.composite); }
-      if (note) note.innerHTML = msg;
+    /* The readout counts to its new value alongside the planet rather than
+       jumping: the score rolls, the grade steps through each band it passes
+       (C+ → B → B+ → A → A+), and the colour warms or cools with it. */
+    let shown = base.composite, roll = 0;
+    const show = v => {
+      shown = v;
+      if (scoreEl) scoreEl.textContent = V.UI.nf(v, 1);
+      if (gradeEl) { gradeEl.textContent = V.gradeFor(v); gradeEl.style.color = V.bandVar(v); }
+    };
+    // msg is a string, or a function of eased progress for numbers that count too
+    const paint = (sc, msg, animate) => {
       if (sh) sh.set(V.Shader.fromScore(sc.composite));
+      cancelAnimationFrame(roll);
+      const to = sc.composite, from = shown;
+      const text = e => { if (note) note.innerHTML = typeof msg === "function" ? msg(e) : msg; };
+      // a background tab never fires animation frames, so land the value directly
+      if (!animate || still() || document.hidden) { show(to); text(1); return; }
+      const t0 = performance.now(), DUR = 1500;
+      const step = now => {
+        const p = Math.min(1, (now - t0) / DUR), e = 1 - Math.pow(1 - p, 3);
+        show(from + (to - from) * e);
+        text(e);
+        if (p < 1) roll = requestAnimationFrame(step);
+      };
+      roll = requestAnimationFrame(step);
     };
 
     paint(base, "The haze is this organisation's real score.");
@@ -498,9 +518,9 @@ window.VL = window.VL || {};
       document.body.classList.toggle("cleaning", cleaned);
       const next = $("#mastNext");
       if (cleaned) {
-        paint(target.score,
-          `Eight levers, <b>−${V.UI.nf(target.cut, 0)}%</b>, ` +
-          `<b>${V.UI.nf(target.tonnes, 1)} t</b> avoided a year.`);
+        paint(target.score, e =>
+          `Eight levers, <b>−${V.UI.nf(target.cut * e, 0)}%</b>, ` +
+          `<b>${V.UI.nf(target.tonnes * e, 1)} t</b> avoided a year.`, true);
         btn.querySelector("span").textContent = "Put it back";
         // the way on only opens once the point has been made
         if (next) {
@@ -513,7 +533,7 @@ window.VL = window.VL || {};
           }, 1500);
         }
       } else {
-        paint(base, "The haze is this organisation's real score.");
+        paint(base, "The haze is this organisation's real score.", true);
         btn.querySelector("span").textContent = "Clean it up";
         clearTimeout(planet._t);
         if (next) next.classList.remove("in");
