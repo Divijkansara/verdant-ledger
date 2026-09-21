@@ -75,10 +75,12 @@ window.VL = window.VL || {};
       const nav = $("#siteNav");
       if (!nav) return;
       const onScroll = () => {
-        const down = window.scrollY > 8;
-        nav.classList.toggle("scrolled", down);
-        // only the landing page has a hero big enough to be worth clearing
-        nav.classList.toggle("at-top", !down && location.hash.replace("#", "") === "/");
+        nav.classList.toggle("scrolled", window.scrollY > 8);
+        // "", "#" and "#/" are all the landing page — checking only "#/"
+        // left the bar showing whenever the site was opened at its bare URL.
+        const home = ["", "#", "#/"].includes(location.hash);
+        // the bar stays away until most of the full-screen hero has scrolled off
+        nav.classList.toggle("at-top", home && window.scrollY < window.innerHeight * 0.6);
       };
       onScroll();
       window.removeEventListener("scroll", this._scroll);

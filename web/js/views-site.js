@@ -25,7 +25,7 @@ window.VL = window.VL || {};
     const link = (href, label) =>
       `<a href="#${href}" class="${active === href ? "on" : ""}">${label}</a>`;
     return `
-      <header class="nav" id="siteNav">
+      <header class="nav${active === "/" ? " nav-overlay at-top" : ""}" id="siteNav">
         <div class="shell nav-in">
           <a class="brand" href="#/">${GLYPH}<b>Verdant<span> Ledger</span></b></a>
           <nav class="nav-links">
@@ -118,51 +118,47 @@ window.VL = window.VL || {};
 
     return page("/", `
       <!-- ═════════ masthead ═════════ -->
-      <header class="mast">
-        <div class="shell">
-          <div class="docket mast-docket">
-            <span><b>Verdant Ledger</b></span><i>/</i>
-            <span>Statement of sustainability position</span><i>/</i>
-            <span id="mastPeriod">12 months</span>
-          </div>
-          <div class="rule-strong"></div>
+      <header class="mast" id="mast">
+        <div class="planet" id="planet" aria-hidden="true"></div>
+        <div class="shell mast-stage">
+          <div class="mast-copy">
+            <div class="docket mast-docket">
+              <span><b>Verdant Ledger</b></span><i>/</i>
+              <span>Statement of sustainability position</span><i>/</i>
+              <span id="mastPeriod">12 months</span>
+            </div>
+            <div class="mast-rule"></div>
 
-          <div class="mast-body">
-            <div class="mast-copy">
-              <h1>Stop reporting<br>carbon. Start<br><em>deciding</em> with it.</h1>
-              <p class="lede">
-                Electricity, water, waste, transport, paper, procurement, recycling and
-                renewables, posted as dated and sourced entries against published emission
-                factors — and sealed so that last year's figure can still be reproduced
-                next year.
-              </p>
-              <div class="mast-cta">
-                <button class="btn btn-primary btn-lg planet-act" id="planetAct">
-                  ${icon("leaf", 15)}<span>Clean it up</span>
-                </button>
-                <a class="btn btn-lg" href="#/app/overview" data-tour-start>${icon("play", 14)} Take the 90-second tour</a>
-              </div>
-
-              <div class="planet-ui">
-                <div class="pl-state">
-                  <span class="pl-k">Atmosphere reflects</span>
-                  <b id="plScoreV">—</b>
-                  <span class="pl-g" id="plGradeV">—</span>
-                </div>
-                <p class="pl-note" id="plNote">The haze is this organisation's real score.</p>
-              </div>
-
-              <div class="mast-next" id="mastNext" hidden>
-                <div class="rule"></div>
-                <p><b>That was the engine, not an animation.</b> Every lever, factor and
-                   tonne above is computed from the ledger. The console is where you post
-                   the entries, run the scenarios and seal the chain.</p>
-                <a class="btn btn-primary btn-lg" href="#/app/overview">
-                  Open the console ${icon("arrow", 15)}</a>
-              </div>
+            <h1>Stop reporting<br>carbon. Start<br><em>deciding</em> with it.</h1>
+            <p class="lede">
+              Electricity, water, waste, transport, paper, procurement, recycling and
+              renewables, posted as dated and sourced entries against published emission
+              factors — and sealed so that last year's figure can still be reproduced
+              next year.
+            </p>
+            <div class="mast-cta">
+              <button class="btn btn-primary btn-lg planet-act" id="planetAct">
+                ${icon("leaf", 15)}<span>Clean it up</span>
+              </button>
+              <a class="btn btn-lg" href="#/app/overview" data-tour-start>${icon("play", 14)} Take the 90-second tour</a>
             </div>
 
-            <div class="planet" id="planet" aria-hidden="true"></div>
+            <div class="planet-ui">
+              <div class="pl-state">
+                <span class="pl-k">Atmosphere reflects</span>
+                <b id="plScoreV">—</b>
+                <span class="pl-g" id="plGradeV">—</span>
+              </div>
+              <p class="pl-note" id="plNote">The haze is this organisation's real score.</p>
+            </div>
+
+            <div class="mast-next" id="mastNext" hidden>
+              <p><b>That was the engine, not an animation.</b> Every lever, factor and
+                 tonne above is computed from the ledger. The console is where you post
+                 the entries, run the scenarios and seal the chain.</p>
+              <a class="btn btn-primary btn-lg" href="#/app/overview">
+                Open the console ${icon("arrow", 15)}</a>
+            </div>
           </div>
         </div>
       </header>

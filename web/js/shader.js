@@ -18,8 +18,9 @@
    · Clean means clean. The bright halo that ringed the revived planet is
      gone; outside the disc there is only a smog halo, and only while the
      planet is polluted.
-   · A direct sphere render costs a few noise lookups per pixel instead of
-     80 scattering samples, so it runs at full resolution.
+   · It renders at the display's full native resolution, every frame.
+   · The canvas fills the whole masthead and the shader places the globe
+     within it, so the planet can be large and sit behind the copy.
 
    Degrades: no WebGL, or prefers-reduced-motion (a still frame), and the
    masthead reads without it.
@@ -36,13 +37,14 @@ window.VL = window.VL || {};
 
   const FRAG = `precision highp float;
 
-uniform vec2 u_res;
+uniform vec2 u_center;         // globe centre, device pixels, origin bottom-left
+uniform float u_radius;        // globe radius, device pixels
+uniform float u_dpr;           // device pixels per CSS pixel, so stars stay crisp
 uniform float u_time;
 uniform float u_pollution;
 uniform sampler2D u_land;      // r = land, g = desert, b = permanent ice
 
 const float PI = 3.14159265;
-const float R = 0.47;          // planet radius, fraction of the shorter side
 const float PITCH = -0.26;     // lean the north toward us: most land is there
 const float ROLL = 0.41;       // 23.4 degree axial tilt
 
@@ -70,26 +72,45 @@ float fbm5(vec3 p) {
   return f / 0.96875;
 }
 
+float h21(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+vec3 starLayer(vec2 q, float size, float keep, float t, float seed) {
+  vec2 cell = floor(q / size), f = fract(q / size);
+  float h = h21(cell + seed);
+  if (h < keep) return vec3(0.0);
+  vec2 pos = vec2(h21(cell + seed + 3.1), h21(cell + seed + 7.7)) * 0.8 + 0.1;
+  float dist = length((f - pos) * size);
+  float b = (h - keep) / (1.0 - keep);
+  float tw = 0.72 + 0.28 * sin(t * (0.5 + 2.0 * h21(cell + seed + 11.0)) + h * 40.0);
+  vec3 tint = mix(vec3(0.74, 0.83, 1.0), vec3(1.0, 0.92, 0.80), h21(cell + seed + 5.0));
+  return tint * smoothstep(1.35, 0.0, dist) * (0.35 + 0.65 * b) * tw;
+}
+vec3 stars(vec2 q, float t) {
+  return starLayer(q, 34.0, 0.90, t, 0.0) * 0.9 + starLayer(q, 17.0, 0.965, t, 19.0) * 0.55;
+}
+
 vec3 rotX(vec3 v, float a) { float c = cos(a), s = sin(a); return vec3(v.x, c*v.y - s*v.z, s*v.y + c*v.z); }
 vec3 rotY(vec3 v, float a) { float c = cos(a), s = sin(a); return vec3(c*v.x + s*v.z, v.y, -s*v.x + c*v.z); }
 vec3 rotZ(vec3 v, float a) { float c = cos(a), s = sin(a); return vec3(c*v.x - s*v.y, s*v.x + c*v.y, v.z); }
 
 void main() {
-  vec2 uv = (gl_FragCoord.xy - 0.5 * u_res) / min(u_res.x, u_res.y);
+  vec2 uv = (gl_FragCoord.xy - u_center) / u_radius;
   float P = clamp(u_pollution, 0.0, 1.0);
-  float d = length(uv) / R;
-  float px = 1.0 / (R * min(u_res.x, u_res.y));
+  float d = length(uv);
+  float px = 1.0 / u_radius;
   vec3 sun = normalize(vec3(-0.62, 0.34, 0.71));
 
-  // ── outside the disc: a smog halo, and only while polluted ──────────
+  // ── outside the disc: stars, and a smog halo only while polluted ──
   if (d > 1.0) {
     float sunSide = 0.5 + 0.5 * dot(normalize(uv), normalize(sun.xy));
-    float h = exp(-(d - 1.0) * 15.0) * P * (0.35 + 0.65 * sunSide);
-    gl_FragColor = vec4(vec3(0.46, 0.33, 0.17), h * 0.8);
+    float h = clamp(exp(-(d - 1.0) * 15.0) * P * (0.35 + 0.65 * sunSide) * 0.8, 0.0, 1.0);
+    vec3 st = stars(gl_FragCoord.xy / u_dpr, u_time) * (1.0 - h);
+    float sa = clamp(max(st.r, max(st.g, st.b)), 0.0, 1.0);
+    float a = 1.0 - (1.0 - sa) * (1.0 - h);
+    gl_FragColor = vec4((st + vec3(0.46, 0.33, 0.17) * h * (1.0 - sa)) / max(a, 1e-4), a);
     return;
   }
 
-  vec3 n = vec3(uv / R, sqrt(max(0.0, 1.0 - d * d)));
+  vec3 n = vec3(uv, sqrt(max(0.0, 1.0 - d * d)));
   float t = u_time;
   // longitude at the centre starts over Europe/Africa and drifts eastward
   vec3 w = rotY(rotZ(rotX(n, PITCH), ROLL), 0.26 - t * 0.07);
@@ -236,7 +257,9 @@ void main() {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-    const uRes = gl.getUniformLocation(prog, "u_res");
+    const uCenter = gl.getUniformLocation(prog, "u_center");
+    const uRadius = gl.getUniformLocation(prog, "u_radius");
+    const uDpr = gl.getUniformLocation(prog, "u_dpr");
     const uTime = gl.getUniformLocation(prog, "u_time");
     const uPol = gl.getUniformLocation(prog, "u_pollution");
     gl.uniform1i(gl.getUniformLocation(prog, "u_land"), 0);
@@ -244,12 +267,25 @@ void main() {
     let target = 0.5, current = 0.5, visible = true, running = false;
     let t0 = performance.now(), lastW = 0, lastH = 0;
 
-    /* Start at up to 1.5x device pixels; if the first frames are slow on
-       this GPU, step down once rather than stutter for the whole visit. */
-    let scale = Math.min(window.devicePixelRatio || 1, 1.5);
-    let probe = [], lastT = 0, tuned = false;
+    /* Full native resolution, every frame — no cap and no downscaling. */
+    let scale = window.devicePixelRatio || 1;
+
+    /* Where the globe sits in the stage. Wide screens: large, right of
+       centre, with the copy over its left limb. Narrow screens: top and
+       centre, with the copy beneath it. CSS pixels, origin top-left. */
+    const layout = (W, H) => {
+      const vw = window.innerWidth, vh = window.innerHeight;
+      if (vw >= 820 && vw / vh > 1.05) {
+        const r = Math.min(H * 0.44, W * 0.31);
+        return { x: W * 0.64, y: H * 0.5, r };
+      }
+      // must match the padding-top in site.css for the same media query
+      const r = Math.min(vw * 0.44, vh * 0.26);
+      return { x: W * 0.5, y: 64 + r, r };
+    };
 
     const size = () => {
+      scale = window.devicePixelRatio || 1;
       const r = host.getBoundingClientRect();
       const w = Math.max(1, Math.round(r.width * scale));
       const h = Math.max(1, Math.round(r.height * scale));
@@ -259,12 +295,19 @@ void main() {
       gl.viewport(0, 0, w, h);
     };
 
+    const place = () => {
+      const g = layout(cv.width / scale, cv.height / scale);
+      gl.uniform2f(uCenter, g.x * scale, (cv.height / scale - g.y) * scale);
+      gl.uniform1f(uRadius, g.r * scale);
+      gl.uniform1f(uDpr, scale);
+    };
+
     const draw = now => {
       size();
       if (!still()) current += (target - current) * 0.04;
       else current = target;
       gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.uniform2f(uRes, cv.width, cv.height);
+      place();
       gl.uniform1f(uTime, still() ? 6.0 : (now - t0) / 1000);
       gl.uniform1f(uPol, current);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -273,17 +316,10 @@ void main() {
     const loop = now => {
       if (!cv.isConnected) { running = false; return; }
       draw(now);
-      if (!tuned) {
-        if (lastT) probe.push(now - lastT);
-        lastT = now;
-        if (probe.length >= 40) {
-          probe.sort((a, b) => a - b);
-          if (probe[20] > 24 && scale > 0.6) { scale = Math.max(0.6, scale * 0.66); lastW = 0; }
-          tuned = true;
-        }
-      }
+      // pausing off-screen or in a background tab is not a quality cut —
+      // nothing is visible then, so there is nothing to draw
       if (visible && !document.hidden && !still()) requestAnimationFrame(loop);
-      else { running = false; lastT = 0; }
+      else running = false;
     };
     const kick = () => {
       if (running || !cv.isConnected) return;
@@ -312,7 +348,9 @@ void main() {
         const keep = [current, lastW, lastH, cv.width, cv.height];
         current = v; cv.width = cv.height = size; gl.viewport(0, 0, size, size);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.uniform2f(uRes, size, size);
+        gl.uniform2f(uCenter, size / 2, size / 2);
+        gl.uniform1f(uRadius, size * 0.47);
+        gl.uniform1f(uDpr, 1);
         gl.uniform1f(uTime, time);
         gl.uniform1f(uPol, v);
         gl.drawArrays(gl.TRIANGLES, 0, 3);

@@ -18,6 +18,9 @@
   transition:border-color var(--t-med),background var(--t-med),
              transform var(--t-med) var(--ease-out),opacity var(--t-med);
 }
+/* On the landing page the bar floats over the hero rather than sitting in
+   flow — a hidden sticky bar still reserves its 64px at the top. */
+.nav.nav-overlay{position:fixed;left:0;right:0;top:0}
 .nav.at-top{transform:translateY(-100%);opacity:0;pointer-events:none}
 .nav.at-top:focus-within{transform:none;opacity:1;pointer-events:auto}
 .nav.scrolled{border-bottom-color:var(--line-1);background:color-mix(in srgb,var(--bg) 94%,transparent)}
@@ -61,17 +64,24 @@
    ══════════════════════════════════════════════════════════════════ */
 
 /* ── masthead ─────────────────────────────────────────────────────── */
-/* The deck fans its back sheets to the right; past a certain width that
-   pushed the page into horizontal scroll. overflow-x:clip trims it
-   without creating a scroll container, so the sticky nav still works and
-   the 3-D scene inside the stage is untouched. */
-.mast{padding-block:34px 0;position:relative;overflow-x:clip;overflow-y:visible}
-.mast-docket{padding-bottom:12px}
-/* The planet is positioned against this box, so the masthead is a stage:
-   full-height, copy held to the left half, planet bleeding off the right. */
-.mast-body{position:relative;display:block;padding-block:64px 92px;
-  min-height:min(82vh,760px);display:flex;flex-direction:column;justify-content:center}
-.mast-copy{position:relative;z-index:2;max-width:min(620px,56%)}
+/* A full-screen stage in deep space. The planet canvas fills it; the copy
+   sits over the left, where a scrim keeps it legible against the globe.
+   The foot fades into the page ground so the next section follows on. */
+.mast{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;
+  overflow:hidden;isolation:isolate;
+  background:
+    radial-gradient(70% 90% at 64% 50%, color-mix(in srgb,var(--bg) 35%,#0a1220) 0%, transparent 70%),
+    color-mix(in srgb,var(--bg) 22%,#03050a)}
+.mast::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,color-mix(in srgb,#03050a 82%,transparent) 0%,
+    color-mix(in srgb,#03050a 45%,transparent) 34%,transparent 58%)}
+.mast::after{content:"";position:absolute;left:0;right:0;bottom:0;height:18%;z-index:1;
+  pointer-events:none;background:linear-gradient(to bottom,transparent,var(--bg))}
+.mast-stage{position:relative;z-index:2;width:100%;padding-block:clamp(64px,11vh,120px)}
+.mast-copy{max-width:min(600px,46%)}
+.mast-docket{padding-bottom:0;width:max-content;max-width:min(92vw,900px)}
+.mast-rule{height:1px;margin:16px 0 40px;
+  background:linear-gradient(90deg,var(--line-3),transparent)}
 
 .mast-copy h1{font-size:var(--fs-hero);line-height:.96;letter-spacing:-.024em;
   font-variation-settings:"opsz" 144;text-wrap:initial}
@@ -294,7 +304,6 @@
 
 /* ═══════════════════════ responsive ════════════════════════════════ */
 @media (max-width:1080px){
-  .mast-body{grid-template-columns:minmax(0,1fr);gap:48px}
   .two,.specs{grid-template-columns:minmax(0,1fr);gap:40px}
   .clause{grid-template-columns:minmax(0,1fr);gap:20px;padding-block:58px}
   .clause-n{position:static;flex-direction:row;align-items:baseline;gap:14px}
@@ -325,8 +334,6 @@
   .nav.open .nav-links{display:flex;position:absolute;top:64px;left:0;right:0;flex-direction:column;
     background:var(--surface-1);border-block:1px solid var(--line-1);padding:10px;gap:2px}
   .clause{padding-block:44px}
-  .mast{padding-block:24px 0}
-  .mast-body{padding-block:38px 52px}
   .note{grid-template-columns:minmax(0,1fr);gap:12px;padding-block:20px}
   .note-b{max-width:none}
   .entry{grid-template-columns:minmax(0,44px) minmax(0,1fr);gap:0 18px;padding-block:22px}
@@ -336,3 +343,21 @@
   .shell{padding-inline:18px}
   .foot-grid{grid-template-columns:minmax(0,1fr);gap:22px}
 }
+
+
+/* ── masthead on phones and portrait screens ──────────────────────────
+   The globe sits at the top and the copy reads beneath it. The top pad
+   reserves exactly the globe's box (shader.js uses the same formula:
+   radius = min(44vw, 26svh), centred 64px + radius from the top). */
+@media (max-width:819px), (max-aspect-ratio:21/20){
+  .mast{align-items:flex-start}
+  .mast::before{display:none}
+  .mast-stage{padding-top:calc(2 * min(44vw, 26svh) + 92px);padding-bottom:64px}
+  .mast-copy{max-width:none}
+}
+@media (max-width:420px){
+  .nav-in{gap:12px}
+  .nav-right .btn-primary{padding-inline:14px}
+}
+/* the deck's sheets are a few pixels wider than a phone's content box */
+.deck-section{overflow-x:clip}
