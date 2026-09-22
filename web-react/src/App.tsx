@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import { DefaultDemo, CustomColorDemo } from "@/components/demo";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <CustomColorDemo />
         </section>
       </div>
+      <Analytics />
     </main>
   );
 }
