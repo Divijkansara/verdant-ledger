@@ -554,7 +554,10 @@ window.VL = window.VL || {};
     playground($("#play"));
     laySheets($(".site"));
     reveals($(".site"));
+    // ScrollFX first: its teardown clears the globe's inline styles, and
+    // the camera sets them.
     if (V.ScrollFX) V.ScrollFX.home();
+    if (V.Cinema) V.Cinema.home();
   }
 
   /** Console panels settle in reading order when a module opens. */

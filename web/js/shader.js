@@ -43,6 +43,7 @@ uniform float u_dpr;           // device pixels per CSS pixel, so stars stay cri
 uniform float u_time;
 uniform float u_pollution;
 uniform sampler2D u_land;      // r = land, g = desert, b = permanent ice
+uniform float u_spin;          // extra longitude, driven by the scroll camera
 
 const float PI = 3.14159265;
 const float PITCH = -0.26;     // lean the north toward us: most land is there
@@ -113,7 +114,7 @@ void main() {
   vec3 n = vec3(uv, sqrt(max(0.0, 1.0 - d * d)));
   float t = u_time;
   // longitude at the centre starts over Europe/Africa and drifts eastward
-  vec3 w = rotY(rotZ(rotX(n, PITCH), ROLL), 0.26 - t * 0.07);
+  vec3 w = rotY(rotZ(rotX(n, PITCH), ROLL), 0.26 - t * 0.07 + u_spin);
 
   float lat = asin(clamp(w.y, -1.0, 1.0));
   float lon = atan(w.x, w.z);
@@ -172,6 +173,16 @@ void main() {
   float cities = smoothstep(0.66, 0.84, noise(w * 150.0)) * smoothstep(0.48, 0.72, noise(w * 22.0));
   float people = land * (1.0 - desert * 0.85) * (1.0 - snow) * (1.0 - smoothstep(55.0, 64.0, latD));
   col += vec3(1.0, 0.68, 0.32) * cities * people * night * (1.0 - cover * 0.8) * mix(0.12, 1.0, P);
+
+  // ── aurora: the reward for cleaning the place up ───────────────────
+  // Two drifting curtains over the polar night, folded by noise so they
+  // ripple rather than pulse. Smog drowns them out entirely.
+  float oval = exp(-pow((latD - 67.0) / 7.5, 2.0));
+  float curtain = fbm3(vec3(lon * 2.4, lat * 7.0, t * 0.09)) ;
+  float ripple = smoothstep(0.42, 0.86, curtain) * smoothstep(0.0, 0.35, night);
+  float aurora = oval * ripple * (1.0 - P) * (1.0 - cover * 0.6);
+  col += mix(vec3(0.18, 0.95, 0.62), vec3(0.35, 0.55, 1.0), smoothstep(0.3, 0.9, curtain))
+       * aurora * 0.42;
 
   // ── the air: a faint blue limb when clean, brown smog when not ─────
   float fres = pow(1.0 - n.z, 2.5);
@@ -260,6 +271,7 @@ void main() {
     const uCenter = gl.getUniformLocation(prog, "u_center");
     const uRadius = gl.getUniformLocation(prog, "u_radius");
     const uDpr = gl.getUniformLocation(prog, "u_dpr");
+    const uSpin = gl.getUniformLocation(prog, "u_spin");
     const uTime = gl.getUniformLocation(prog, "u_time");
     const uPol = gl.getUniformLocation(prog, "u_pollution");
     gl.uniform1i(gl.getUniformLocation(prog, "u_land"), 0);
@@ -312,11 +324,23 @@ void main() {
       gl.viewport(0, 0, w, h);
     };
 
+    /* The scroll camera. The page says where the globe sits; this says
+       where the camera is relative to that, so scrolling can fly away
+       from the planet without the layout knowing anything about it.
+       Eased every frame, so a jump in scroll still arrives as a move. */
+    const cam = { zoom: 1, dx: 0, dy: 0, spin: 0 };
+    const camTo = { zoom: 1, dx: 0, dy: 0, spin: 0 };
+
     const place = () => {
       const g = layout(cv.width / scale, cv.height / scale);
-      gl.uniform2f(uCenter, g.x * scale, (cv.height / scale - g.y) * scale);
-      gl.uniform1f(uRadius, g.r * scale);
+      const k = still() ? 1 : 0.14;
+      for (const key in cam) cam[key] += (camTo[key] - cam[key]) * k;
+      const x = g.x + cam.dx * (cv.width / scale);
+      const y = g.y + cam.dy * (cv.height / scale);
+      gl.uniform2f(uCenter, x * scale, (cv.height / scale - y) * scale);
+      gl.uniform1f(uRadius, g.r * cam.zoom * scale);
       gl.uniform1f(uDpr, scale);
+      gl.uniform1f(uSpin, cam.spin);
     };
 
     const draw = now => {
@@ -359,6 +383,16 @@ void main() {
       set(v) { target = Math.min(1, Math.max(0, v)); kick(); return api; },
       jump(v) { target = current = Math.min(1, Math.max(0, v)); kick(); return api; },
       get() { return current; },
+      /** Fly the camera: zoom is a multiple of the laid-out radius, dx/dy
+          are fractions of the canvas, spin is extra longitude in radians. */
+      camera(c) {
+        if (c.zoom != null) camTo.zoom = c.zoom;
+        if (c.dx != null) camTo.dx = c.dx;
+        if (c.dy != null) camTo.dy = c.dy;
+        if (c.spin != null) camTo.spin = c.spin;
+        kick();
+        return api;
+      },
       /** Draw one frame at pollution `v` and return it as a data URL —
           used to check the render when the tab cannot animate. */
       snapshot(v, size = 360, time = 6) {

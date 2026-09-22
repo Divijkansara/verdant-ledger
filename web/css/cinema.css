@@ -1,0 +1,59 @@
+/* ══════════════════════════════════════════════════════════════════════
+   cinema.css — companion to js/cinema.js.
+
+   Only what the camera move and the pointer depth need. Everything here
+   is inert until cinema.js adds .cinema-on to the body, which it only
+   does on a wide window with a real pointer and motion allowed.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── the globe leaves the hero and becomes the shot ─────────────────── */
+.planet.cine{position:fixed;inset:0;height:auto;z-index:0;
+  transition:opacity .5s var(--ease-out)}
+
+/* The masthead's own scrim would sit over a fixed globe and mute it. */
+.cinema-on .mast::after{opacity:.5}
+
+/* The year sits over the tail of the flight, so it keeps a hint of the
+   planet while the globe is still fading and is solid by the time the
+   chart is what you are reading. --cine runs 1 → 0 with the fade. */
+.cinema-on .band{background:color-mix(in srgb,var(--bg) calc(100% - var(--cine,0) * 10%),transparent);
+  position:relative;z-index:2}
+.cinema-on .band .shell{position:relative;z-index:1}
+
+/* Everything after the flight is opaque and above the canvas: without a
+   background of their own these sections would let a fixed globe show
+   through the whole page, and no text survives being set on a planet. */
+.cinema-on .deck-section,.cinema-on .bento,.cinema-on .closing,
+.cinema-on .foot,.cinema-on main > .shell{
+  position:relative;z-index:2;background:var(--bg)}
+
+/* ── the light that follows the pointer ─────────────────────────────── */
+.cine-spot{position:fixed;left:0;top:0;width:620px;height:620px;margin:-310px 0 0 -310px;
+  border-radius:50%;pointer-events:none;z-index:1;opacity:.5;
+  background:radial-gradient(closest-side,
+    color-mix(in srgb,var(--accent) 16%,transparent), transparent 72%);
+  mix-blend-mode:screen;will-change:transform}
+
+/* ── cards lean ─────────────────────────────────────────────────────── */
+.cine-tilt{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transform-style:preserve-3d;
+  transition:transform .45s var(--ease-out),box-shadow .45s var(--ease-out)}
+.cine-tilt:hover{box-shadow:0 30px 60px -34px rgba(0,0,0,.9)}
+/* a highlight tracking the pointer across the card's face */
+.cine-tilt::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  opacity:0;transition:opacity .4s var(--ease-out);
+  background:radial-gradient(240px circle at var(--lx,50%) var(--ly,50%),
+    color-mix(in srgb,var(--accent) 13%,transparent), transparent 70%)}
+.cine-tilt:hover::after{opacity:1}
+.bcard,.note,.entry,.closing-in{position:relative}
+
+/* ── the buttons pull, then settle ──────────────────────────────────── */
+.cinema-on .mast-cta .btn,.cinema-on .closing .btn,.cinema-on .mast-next .btn{
+  transition:transform .5s var(--ease-out),background var(--t-fast),
+    border-color var(--t-fast),color var(--t-fast),box-shadow var(--t-med)}
+
+@media (prefers-reduced-motion:reduce){
+  .planet.cine{position:absolute}
+  .cine-spot{display:none}
+  .cine-tilt{transform:none;transition:none}
+}

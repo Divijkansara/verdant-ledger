@@ -46,6 +46,14 @@
   function heroDeparture() {
     const mast = $(".mast"), planet = $("#planet"), copy = $(".mast-copy");
     if (!mast || !planet) return null;
+    // When the camera is flying, it owns the globe; two hands on the same
+    // element would fight every frame.
+    if (V.Cinema && V.Cinema.enabled()) {
+      return () => {
+        const p = clamp(scrollY / (mast.offsetHeight || 1));
+        if (copy) copy.style.transform = `translate3d(0, ${p * -60}px, 0)`;
+      };
+    }
     // A phone shows the globe above the copy, so a big parallax would pull
     // it into the text; it gets a gentler one.
     const narrow = innerWidth < 820;
@@ -164,7 +172,10 @@
     if (rail) { rail.remove(); rail = null; }
     if (cue) { cue.remove(); cue = null; }
     const planet = $("#planet"), copy = $(".mast-copy");
-    if (planet) { planet.style.transform = ""; planet.style.opacity = ""; }
+    // Not while the camera has it: clearing these would undo the flight.
+    if (planet && !(V.Cinema && V.Cinema.on)) {
+      planet.style.transform = ""; planet.style.opacity = "";
+    }
     if (copy) copy.style.transform = "";
   }
 

@@ -73,6 +73,7 @@ window.VL = window.VL || {};
 
       // The landing page's scroll behaviour belongs to the landing page.
       if (V.ScrollFX && path !== "/") V.ScrollFX.teardown();
+      if (V.Cinema && path !== "/") V.Cinema.teardown();
 
       if (path.startsWith("/app")) {
         // The console is for signed-in users only.
