@@ -13,19 +13,13 @@
 /* The masthead's own scrim would sit over a fixed globe and mute it. */
 .cinema-on .mast::after{opacity:.5}
 
-/* The year sits over the tail of the flight, so it keeps a hint of the
-   planet while the globe is still fading and is solid by the time the
-   chart is what you are reading. --cine runs 1 → 0 with the fade. */
-.cinema-on .band{background:color-mix(in srgb,var(--bg) calc(100% - var(--cine,0) * 10%),transparent);
+/* The year keeps its own surface; it only needs to sit above the canvas.
+   Nothing else is painted over: the globe hides itself once it has faded,
+   so the sections stay transparent and the cursor light reads through the
+   whole width of the page rather than stopping at the text column. */
+.cinema-on .band,.cinema-on .deck-section,.cinema-on .bento,
+.cinema-on .closing,.cinema-on .foot,.cinema-on main > .shell{
   position:relative;z-index:2}
-.cinema-on .band .shell{position:relative;z-index:1}
-
-/* Everything after the flight is opaque and above the canvas: without a
-   background of their own these sections would let a fixed globe show
-   through the whole page, and no text survives being set on a planet. */
-.cinema-on .deck-section,.cinema-on .bento,.cinema-on .closing,
-.cinema-on .foot,.cinema-on main > .shell{
-  position:relative;z-index:2;background:var(--bg)}
 
 /* ── the light that follows the pointer ─────────────────────────────── */
 .cine-spot{position:fixed;left:0;top:0;width:620px;height:620px;margin:-310px 0 0 -310px;

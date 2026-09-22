@@ -39,7 +39,7 @@
 
   /* ── the camera move ─────────────────────────────────────────────── */
   function flight() {
-    const mast = $(".mast"), planet = $("#planet"), band = $(".band"), deck = $(".deck-section");
+    const mast = $(".mast"), planet = $("#planet"), deck = $(".deck-section");
     const shader = V.Shader.instance;
     if (!mast || !planet || !shader) return null;
 
@@ -80,7 +80,6 @@
       // Once it is gone it must stop drawing, or a fixed canvas would
       // render behind the whole page for nothing.
       planet.style.visibility = fade < 0.02 ? "hidden" : "visible";
-      if (band) band.style.setProperty("--cine", String(fade));
     };
   }
 
