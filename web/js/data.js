@@ -292,8 +292,8 @@ window.VL = window.VL || {};
    * fleet displacing petrol. One deliberate September anomaly is planted
    * so the anomaly detector has something true to find.
    */
-  function generateLedger(today = new Date()) {
-    const rnd = mulberry(20260920);
+  function generateLedger(today = new Date(), seed = 20260920) {
+    const rnd = mulberry(seed);
     seq = 0;
     const out = [];
 

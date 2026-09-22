@@ -718,7 +718,7 @@ VL.Theme.onChange(fn)                 // subscribe to palette changes</div>
         <div class="auth-form">
           <div class="auth-form-in">
             <h1>${signup ? "Create an account" : "Sign in"}</h1>
-            <p>${signup ? "No email is sent and nothing leaves your browser." : "Welcome back to your ledger."}</p>
+            <p>${signup ? "Your account and dashboards are saved on this device." : "Sign in to open your dashboards."}</p>
 
             <form id="authForm" class="auth-fields" autocomplete="on">
               ${signup ? `
@@ -730,11 +730,11 @@ VL.Theme.onChange(fn)                 // subscribe to palette changes</div>
                 <input id="email" class="ctl" type="email" placeholder="you@company.com"
                   autocomplete="username" required></div>
               <div class="field"><label for="password">Password</label>
-                <input id="password" class="ctl" type="password" placeholder="Password"
+                <input id="password" class="ctl" type="password" placeholder="${signup ? "At least 8 characters" : "Password"}" minlength="${signup ? 8 : 1}"
                   autocomplete="${signup ? "new-password" : "current-password"}" required></div>
               <div class="auth-err" id="authErr" role="alert" aria-live="polite"></div>
               <button class="btn btn-primary" id="authBtn" type="submit" style="width:100%">
-                ${signup ? "Create account and open the console" : "Sign in"}</button>
+                ${signup ? "Create account" : "Sign in"}</button>
             </form>
 
             ${signup ? "" : `<button class="btn btn-ghost" id="demoFill" type="button" style="width:100%;margin-top:10px">
@@ -811,8 +811,8 @@ VL.Theme.onChange(fn)                 // subscribe to palette changes</div>
     if (!form) return;
     const demo = $("#demoFill");
     if (demo) demo.addEventListener("click", () => {
-      $("#email").value = "admin@suryanagar.example";
-      $("#password").value = "password123";
+      $("#email").value = V.Store.DEMO.email;
+      $("#password").value = V.Store.DEMO.password;
       form.requestSubmit();
     });
     form.addEventListener("submit", async e => {
@@ -823,25 +823,23 @@ VL.Theme.onChange(fn)                 // subscribe to palette changes</div>
       btn.textContent = "Authenticating…";
       err.textContent = "";
 
-      const orgName = $("#orgName");
-      if (orgName && orgName.value.trim()) {
-        V.Store.setOrg({ name: orgName.value.trim(), legal: orgName.value.trim() });
-      }
-      const fullName = $("#fullName");
-
-      const result = await V.Store.signIn($("#email").value.trim(), $("#password").value);
+      const orgName = $("#orgName"), fullName = $("#fullName");
+      const email = $("#email").value.trim(), password = $("#password").value;
+      const result = fullName
+        ? await V.Store.signUp({ name: fullName.value.trim(), email, password,
+                                 org: orgName ? orgName.value.trim() : "" })
+        : await V.Store.signIn(email, password);
       if (result.error) {
         err.textContent = result.error;
         btn.disabled = false;
         btn.textContent = original;
         return;
       }
-      if (fullName && fullName.value.trim()) V.Store.user.name = fullName.value.trim();
-
-      toast(result.mode === "live" ? "Connected to the ledger service" : "Running on the local engine",
-            result.mode === "live" ? "JWT session · FastAPI" : `${V.Store.entries.length} entries loaded`,
-            result.mode === "live" ? "ok" : "info");
-      location.hash = "#/app/overview";
+      toast(fullName ? "Account created" : `Welcome back, ${V.Store.user.name.split(" ")[0]}`,
+            result.mode === "live" ? "Connected to the Terrawise service" : "Signed in on this device", "ok");
+      // Go where the visitor was heading, or to their dashboards.
+      const next = new URLSearchParams((location.hash.split("?")[1] || "")).get("next");
+      location.hash = next && next.startsWith("/app") ? "#" + next : "#/app/dashboards";
     });
   }
   signin.mount = mountAuth;

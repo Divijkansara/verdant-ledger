@@ -18,7 +18,13 @@ window.VL = window.VL || {};
 
   // Set window.VERDANT_API before this script to point at a deployed API.
   const API_BASE = window.VERDANT_API || "http://127.0.0.1:8000";
-  const LS = { ledger: "vl.ledger.v3", session: "vl.session.v1", token: "vl.token.v1" };
+  const LS = { ledger: "vl.ledger.v3", session: "vl.session.v1", token: "vl.token.v1",
+               accounts: "vl.accounts.v1", dashes: "vl.dashes.v1:" };
+  const DEMO = { email: "admin@suryanagar.example", password: "password123", name: "Divij Rao" };
+  const read = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || "null") ?? d; } catch (_) { return d; } };
+  const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} };
+  const blankOrg = () => ({ name: "", legal: "", sector: "", country: "India", headcount: 50,
+                            site: "", baselineYear: 2025, targetYear: 2030, reductionPct: 42 });
 
   const Store = {
     mode: "demo",
@@ -44,9 +50,13 @@ window.VL = window.VL || {};
 
     /* ══════════════════ lifecycle ═════════════════════════════════════ */
 
+    dashboards: [],         // this user's dashboards: [{id, name, sector, created, sample}]
+    dashId: null,           // the one open in the console
+
     async boot() {
       this.restoreSession();
-      this.loadLedger();
+      if (this.signedIn) this.loadDashboards();
+      else this.entries = [];
       this.reseal();
       // Probe the API without blocking first paint — the app is already
       // usable by the time this resolves.
@@ -66,21 +76,97 @@ window.VL = window.VL || {};
       } catch (_) { return false; }
     },
 
-    loadLedger() {
-      let saved = null;
-      try { saved = JSON.parse(localStorage.getItem(LS.ledger) || "null"); } catch (_) {}
-      if (saved && Array.isArray(saved.entries) && saved.entries.length) {
-        this.entries = saved.entries;
-        if (saved.org) Object.assign(this.org, saved.org);
+    /* ══════════════════ dashboards ════════════════════════════════════
+       Each dashboard is a separate organisation (or site) with its own
+       ledger, stored under its own key. The list belongs to the signed-in
+       user. */
+
+    ledgerKey(id) { return `${LS.ledger}:${id}`; },
+    dashKey() { return LS.dashes + (this.user.email || "").toLowerCase(); },
+
+    loadDashboards() {
+      const saved = read(this.dashKey(), null);
+      if (saved && Array.isArray(saved.list) && saved.list.length) {
+        this.dashboards = saved.list;
+        this.dashId = saved.list.some(d => d.id === saved.active) ? saved.active : saved.list[0].id;
       } else {
-        this.entries = V.generateLedger();
+        // First visit: one dashboard with sample data. The demo account gets
+        // the ledger an earlier version of the app saved, if there is one.
+        const legacy = read(LS.ledger, null);
+        this.dashboards = [];
+        const d = this.createDashboard({ name: this.org.name || "My organisation", sector: this.org.sector,
+                                         headcount: this.org.headcount, sample: true }, true);
+        if (legacy && Array.isArray(legacy.entries) && legacy.entries.length &&
+            this.user.email === DEMO.email) {
+          write(this.ledgerKey(d.id), legacy);
+        }
       }
+      this.loadLedger();
+    },
+
+    saveDashboards() {
+      write(this.dashKey(), { active: this.dashId, list: this.dashboards });
+    },
+
+    get dashboard() { return this.dashboards.find(d => d.id === this.dashId) || null; },
+
+    createDashboard({ name, sector = "", headcount = 50, sample = false }, silent = false) {
+      const id = "d" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      const org = { ...blankOrg(), name, legal: name, sector, headcount: Math.max(1, +headcount || 1) };
+      const seed = [...name].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 20260920);
+      const entries = sample ? V.generateLedger(new Date(), seed) : [];
+      write(this.ledgerKey(id), { org, entries });
+      this.dashboards.push({ id, name, sector, created: V.todayISO(), sample });
+      this.dashId = id;
+      this.saveDashboards();
+      if (!silent) this.loadLedger();
+      return this.dashboard;
+    },
+
+    switchDashboard(id) {
+      if (!this.dashboards.some(d => d.id === id)) return;
+      this.dashId = id;
+      this.saveDashboards();
+      this.loadLedger();
+      this.reseal();
+    },
+
+    deleteDashboard(id) {
+      if (this.dashboards.length <= 1) return false;     // always keep one
+      this.dashboards = this.dashboards.filter(d => d.id !== id);
+      try { localStorage.removeItem(this.ledgerKey(id)); } catch (_) {}
+      if (this.dashId === id) this.dashId = this.dashboards[0].id;
+      this.saveDashboards();
+      this.loadLedger();
+      this.reseal();
+      return true;
+    },
+
+    /** Headline numbers for a dashboard without opening it (for the picker). */
+    peek(id) {
+      const saved = read(this.ledgerKey(id), { org: blankOrg(), entries: [] });
+      const months = V.periodMonths(6);
+      const org = { ...blankOrg(), ...saved.org };
+      const agg = V.aggregate(saved.entries || [], months);
+      const score = V.computeScore(agg, Math.max(1, org.headcount), months.length);
+      const trend = V.periodMonths(12).map(m => V.aggregate(saved.entries || [], [m]).net);
+      return { org, count: (saved.entries || []).length, net: agg.net, score, trend };
+    },
+
+    loadLedger() {
+      const saved = read(this.ledgerKey(this.dashId), null);
+      this.org = { ...blankOrg(), ...(saved && saved.org) };
+      this.entries = saved && Array.isArray(saved.entries) ? saved.entries : [];
+      this.reseal();
     },
 
     persist() {
-      try {
-        localStorage.setItem(LS.ledger, JSON.stringify({ org: this.org, entries: this.entries }));
-      } catch (_) { /* private mode — the session still works, it just won't survive a reload */ }
+      if (!this.dashId) return;
+      write(this.ledgerKey(this.dashId), { org: this.org, entries: this.entries });
+      const d = this.dashboard;
+      if (d && (d.name !== this.org.name || d.sector !== this.org.sector)) {
+        d.name = this.org.name; d.sector = this.org.sector; this.saveDashboards();
+      }
     },
 
     /** Recompute the hash chain and store the new head. */
@@ -103,7 +189,59 @@ window.VL = window.VL || {};
       } catch (_) {}
     },
 
+    /* Local accounts, used when the API is not reachable. Passwords are
+       stored only as a salted SHA-256 digest, never as typed. */
+    hashPassword(email, password) {
+      return V.Chain.sha256(`terrawise\u0000${email.toLowerCase()}\u0000${password}`);
+    },
+
+    accounts() {
+      const list = read(LS.accounts, {});
+      if (!list[DEMO.email]) {
+        list[DEMO.email] = { name: DEMO.name, hash: this.hashPassword(DEMO.email, DEMO.password) };
+        write(LS.accounts, list);
+      }
+      return list;
+    },
+
+    async signUp({ name, email, password, org }) {
+      email = (email || "").trim().toLowerCase();
+      if (!name || !email || !password) return { error: "Fill in every field" };
+      if (password.length < 8) return { error: "Use a password of at least 8 characters" };
+
+      if (await this.probe()) {
+        try {
+          const res = await fetch(`${API_BASE}/api/auth/register`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ org_name: org || name, headcount: 50, sector: "", name, email, password })
+          });
+          const body = await res.json().catch(() => ({}));
+          if (res.ok) {
+            this.token = body.access_token; this.mode = "live";
+            try { localStorage.setItem(LS.token, this.token); } catch (_) {}
+            this.user = { name, email, role: "admin" };
+            this.org = { ...blankOrg(), name: org || name };
+            this.finishSignIn();
+            return { mode: "live" };
+          }
+          const msg = Array.isArray(body.detail) ? body.detail[0]?.msg : body.detail;
+          return { error: msg || "Could not create the account" };
+        } catch (_) { /* fall through to a local account */ }
+      }
+
+      const list = this.accounts();
+      if (list[email]) return { error: "An account with this email already exists. Sign in instead." };
+      list[email] = { name, hash: this.hashPassword(email, password) };
+      write(LS.accounts, list);
+      this.mode = "demo";
+      this.user = { name, email, role: "admin" };
+      this.org = { ...blankOrg(), name: org || name };
+      this.finishSignIn();
+      return { mode: "demo" };
+    },
+
     async signIn(email, password) {
+      email = (email || "").trim().toLowerCase();
       if (!email || !password) return { error: "Enter an email and a password" };
 
       // Try the real service first; fall back to the local engine so the
@@ -127,8 +265,12 @@ window.VL = window.VL || {};
         } catch (_) { /* network dropped mid-request — continue in demo */ }
       }
 
+      const account = this.accounts()[email];
+      if (!account || account.hash !== this.hashPassword(email, password)) {
+        return { error: "Incorrect email or password" };
+      }
       this.mode = "demo";
-      this.user = { name: "Divij Rao", email, role: "admin" };
+      this.user = { name: account.name, email, role: "admin" };
       this.finishSignIn();
       return { mode: "demo" };
     },
@@ -138,12 +280,14 @@ window.VL = window.VL || {};
       try {
         localStorage.setItem(LS.session, JSON.stringify({ signedIn: true, user: this.user }));
       } catch (_) {}
+      this.loadDashboards();
     },
 
     signOut() {
       this.signedIn = false;
       this.token = null;
       this.mode = "demo";
+      this.dashboards = []; this.dashId = null; this.entries = [];
       try { localStorage.removeItem(LS.session); localStorage.removeItem(LS.token); } catch (_) {}
     },
 
@@ -236,7 +380,8 @@ window.VL = window.VL || {};
     },
 
     resetLedger() {
-      this.entries = V.generateLedger();
+      const seed = [...(this.org.name || "x")].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 20260920);
+      this.entries = V.generateLedger(new Date(), seed);
       this.reseal();
       this.persist();
     },
@@ -314,6 +459,7 @@ window.VL = window.VL || {};
     }
   };
 
+  Store.DEMO = { email: DEMO.email, password: DEMO.password };
   V.Store = Store;
   V.API_BASE = API_BASE;
 })();

@@ -402,10 +402,10 @@ window.VL = window.VL || {};
 
     /** Read a saved theme, or fall back to the first preset. */
     load() {
-      try {
-        const saved = JSON.parse(localStorage.getItem(LS_KEY) || "null");
-        if (saved && typeof saved.baseHue === "number") this.seed = { ...DEFAULT_SEED, ...saved };
-      } catch (_) { /* storage blocked — defaults are fine */ }
+      // The brand palette is fixed: a colour picker in a carbon product is
+      // noise. Clear any palette an earlier version saved, then apply it.
+      try { localStorage.removeItem(LS_KEY); } catch (_) {}
+      this.seed = { ...DEFAULT_SEED };
       this.apply();
       return this;
     },

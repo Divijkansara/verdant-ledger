@@ -55,7 +55,7 @@ window.VL = window.VL || {};
       target: "#canvas .module", place: "top", hash: "#/app/integrity" },
 
     { title: "Everything is one keystroke away",
-      body: "Press <kbd>⌘K</kbd> or <kbd>Ctrl K</kbd> for the command palette — jump anywhere, switch theme, export the disclosure. Press <kbd>?</kbd> at any time for every shortcut.",
+      body: "Press <kbd>⌘K</kbd> or <kbd>Ctrl K</kbd> for the command palette — jump anywhere, switch dashboards, export the report. Press <kbd>?</kbd> at any time for every shortcut.",
       target: "#paletteBtn", place: "bottom", hash: "#/app/overview" }
   ];
 

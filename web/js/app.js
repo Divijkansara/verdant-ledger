@@ -52,8 +52,11 @@ window.VL = window.VL || {};
     transition(update) {
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (reduce) return update();
-      if (document.startViewTransition) {
-        document.startViewTransition(update);
+      if (document.startViewTransition && !document.hidden) {
+        // A transition the browser abandons (a background tab, a second
+        // click mid-animation) still runs the update, so its rejection is noise.
+        const t = document.startViewTransition(update);
+        t.ready.catch(() => {}); t.finished.catch(() => {});
         return;
       }
       update();
@@ -68,7 +71,15 @@ window.VL = window.VL || {};
       const raw = (location.hash || "#/").slice(1) || "/";
       const path = raw.split("?")[0];
 
-      if (path.startsWith("/app")) return this.renderApp(path);
+      if (path.startsWith("/app")) {
+        // The console is for signed-in users only.
+        if (!V.Store.signedIn) {
+          history.replaceState(null, "", "#/signin?next=" + encodeURIComponent(path));
+          return this.route();
+        }
+        if (path === "/app/dashboards") return this.renderDashboards();
+        return this.renderApp(path);
+      }
       this.shellMounted = false;
 
       const factory = PUBLIC[path];
@@ -118,7 +129,18 @@ window.VL = window.VL || {};
 
     /* ═══════════════════ console ═════════════════════════════════════ */
 
+    renderDashboards() {
+      this.shellMounted = false;
+      $("#root").innerHTML = V.Dashboards.render();
+      window.scrollTo(0, 0);
+      V.Dashboards.mount();
+      this.current = "/app/dashboards";
+    },
+
     renderApp(path) {
+      // Re-renders (fonts landing, a period change) can arrive while the
+      // dashboards page is showing; it is not a console module.
+      if (path === "/app/dashboards") return this.renderDashboards();
       const entry = MODULES.find(m => m.path === path) || MODULES[0];
       const view = V.AppViews[entry.id];
 
@@ -155,6 +177,13 @@ window.VL = window.VL || {};
         <div class="app">
           <aside class="rail" id="rail">
             <a class="rail-top" href="#/">${V.SiteViews.GLYPH}<b>Terra<span>wise</span></b></a>
+            <div class="dash-switch">
+              <button class="dash-btn" id="dashBtn" aria-haspopup="true" aria-expanded="false">
+                <span class="db-l">Dashboard</span><b id="dashName">—</b>
+                <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              </button>
+              <div class="dash-menu" id="dashMenu" hidden></div>
+            </div>
             <nav class="rail-nav" aria-label="Modules">
               ${groups.map(g => `
                 <div class="rail-group">${g.name}</div>
@@ -215,6 +244,34 @@ window.VL = window.VL || {};
       $("#tourBtn").addEventListener("click", () => V.Tour.start());
       $("#signOut").addEventListener("click", () => { V.Store.signOut(); location.hash = "#/"; });
 
+      /* dashboard switcher */
+      const menu = $("#dashMenu"), btn = $("#dashBtn");
+      const close = () => { menu.hidden = true; btn.setAttribute("aria-expanded", "false"); };
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        if (!menu.hidden) return close();
+        const esc = V.UI.escapeHtml;
+        menu.innerHTML = V.Store.dashboards.map(d => `
+            <button class="dm-item${d.id === V.Store.dashId ? " on" : ""}" data-dash="${d.id}">
+              <b>${esc(d.name || "Untitled")}</b><span>${esc(d.sector || "")}</span></button>`).join("")
+          + `<div class="dm-sep"></div>
+             <button class="dm-item dm-act" data-go="new">+ New dashboard</button>
+             <button class="dm-item dm-act" data-go="all">All dashboards</button>`;
+        menu.hidden = false; btn.setAttribute("aria-expanded", "true");
+      });
+      menu.addEventListener("click", e => {
+        const item = e.target.closest(".dm-item");
+        if (!item) return;
+        close();
+        if (item.dataset.dash) {
+          V.Store.switchDashboard(item.dataset.dash);
+          V.UI.toast("Dashboard opened", V.Store.dashboard.name, "info");
+          this.transition(() => this.renderApp(this.current || "/app/overview"));
+        } else if (item.dataset.go === "new") V.Dashboards.create();
+        else location.hash = "#/app/dashboards";
+      });
+      document.addEventListener("click", e => { if (!e.target.closest(".dash-switch")) close(); });
+
       $("#canvas").addEventListener("click", e => {
         const a = e.target.closest("a[href^='#']");
         if (a) $("#rail").classList.remove("open");
@@ -224,6 +281,7 @@ window.VL = window.VL || {};
     /** Re-read state that lives in the shell: score, user, link status. */
     refreshShell() {
       if (!this.shellMounted) return;
+      if ($("#dashName")) $("#dashName").textContent = V.Store.org.name || "Untitled";
       const { score } = V.Store.summary();
       const grade = $("#railGrade");
       if (grade) {
@@ -286,31 +344,11 @@ window.VL = window.VL || {};
         }
       }));
 
-      V.Theme.PRESETS.forEach(p => cmds.push({
-        group: "Theme", title: `Theme — ${p.name}`, icon: "palette", keywords: "colour " + p.note,
-        run: () => {
-          V.Theme.usePreset(p.id);
-          App.repaintCharts();
-          toast("Theme applied", p.name, "info");
-        }
-      }));
-      cmds.push({
-        group: "Theme", title: "Random palette", icon: "bolt", keywords: "colour shuffle",
-        run: () => {
-          V.Theme.set({
-            accentHue: Math.floor(Math.random() * 360),
-            baseHue: Math.floor(Math.random() * 360),
-            mode: Math.random() > 0.35 ? "dark" : "light"
-          });
-          App.repaintCharts();
-          const r = V.Theme.report;
-          toast("Random palette generated",
-            `${r.allPass ? "all contrast gates pass" : "check the audit"} · accent ${Math.round(V.Theme.seed.accentHue)}°`,
-            r.allPass ? "ok" : "err");
-        }
-      });
-
       cmds.push(
+        { group: "Dashboards", title: "All dashboards", icon: "gauge", keywords: "switch organisation site",
+          run: () => (location.hash = "#/app/dashboards") },
+        { group: "Dashboards", title: "New dashboard", icon: "plus", keywords: "create organisation site",
+          run: () => V.Dashboards.create() },
         { group: "Actions", title: "Run the data check", icon: "shield", keywords: "hash chain tamper",
           run: () => (location.hash = "#/app/integrity") },
         { group: "Actions", title: "Export activity log (CSV)", icon: "download", keywords: "download report",

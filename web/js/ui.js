@@ -145,7 +145,11 @@ window.VL = window.VL || {};
         resolve(value);
       };
 
-      const valid = () => !input || (validate ? validate(field.value) : field.value.trim().length >= 3);
+      // With an input, validate(value) gates the button as the user types; a
+      // form in the body passes validate() alone, checked on submit.
+      const valid = () => input
+        ? (validate ? validate(field.value) : field.value.trim().length >= 3)
+        : (validate ? validate() : true);
 
       function onKey(e) {
         if (e.key === "Escape") { e.preventDefault(); close(null); }
@@ -161,7 +165,7 @@ window.VL = window.VL || {};
       }
 
       if (field) field.addEventListener("input", () => { ok.disabled = !valid(); });
-      ok.addEventListener("click", () => close(input ? field.value.trim() : true));
+      ok.addEventListener("click", () => { if (valid()) close(input ? field.value.trim() : true); });
       cancel.addEventListener("click", () => close(null));
       host.addEventListener("click", e => { if (e.target === host) close(null); });
       document.addEventListener("keydown", onKey, true);
