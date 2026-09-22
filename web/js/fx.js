@@ -79,7 +79,9 @@ window.VL = window.VL || {};
     const target = parseFloat(m[2]), dec = (m[2].split(".")[1] || "").length, sign = m[1];
     const t0 = performance.now(), DUR = 1100;
     (function step(now) {
-      const p = Math.min(1, (now - t0) / DUR);
+      // Clamped at both ends: a clock that jumps backwards must not run
+      // the easing below zero and print a figure that was never true.
+      const p = Math.min(1, Math.max(0, (now - t0) / DUR));
       el.textContent = sign + (target * (1 - Math.pow(1 - p, 4))).toFixed(dec);
       if (p < 1) requestAnimationFrame(step); else el.textContent = raw;
     })(t0);
@@ -552,6 +554,7 @@ window.VL = window.VL || {};
     playground($("#play"));
     laySheets($(".site"));
     reveals($(".site"));
+    if (V.ScrollFX) V.ScrollFX.home();
   }
 
   /** Console panels settle in reading order when a module opens. */

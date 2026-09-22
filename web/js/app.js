@@ -71,6 +71,9 @@ window.VL = window.VL || {};
       const raw = (location.hash || "#/").slice(1) || "/";
       const path = raw.split("?")[0];
 
+      // The landing page's scroll behaviour belongs to the landing page.
+      if (V.ScrollFX && path !== "/") V.ScrollFX.teardown();
+
       if (path.startsWith("/app")) {
         // The console is for signed-in users only.
         if (!V.Store.signedIn) {

@@ -261,3 +261,54 @@ body.cleaning .planet-act{background:transparent;border-color:var(--line-3);
 @media (prefers-reduced-motion:reduce){
   .planet-act:hover{transform:none}
 }
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   scroll behaviour — companion to js/scroll.js
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* the hero's layers move at their own speeds; the browser is told so */
+.planet,.mast-copy{will-change:transform}
+
+/* ── the chapter rail ─────────────────────────────────────────────── */
+.chapters{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:40;
+  display:flex;flex-direction:column;gap:2px;padding:8px 6px;
+  transition:opacity .4s var(--ease-out),transform .4s var(--ease-out)}
+.chapters.hide{opacity:0;pointer-events:none;transform:translateY(-50%) translateX(10px)}
+.ch{display:flex;align-items:center;justify-content:flex-end;gap:10px;
+  background:none;border:0;padding:5px 2px;cursor:pointer;color:var(--text-4);
+  font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.1em;
+  text-transform:uppercase}
+.ch span{opacity:0;transform:translateX(6px);transition:all var(--t-fast);white-space:nowrap}
+.ch i{width:18px;height:2px;border-radius:1px;background:var(--line-3);
+  transition:all var(--t-fast)}
+.ch:hover span,.ch:focus-visible span{opacity:1;transform:none;color:var(--text-2)}
+.ch:hover i{background:var(--text-3);width:24px}
+.ch.on i{background:var(--accent);width:28px}
+.ch.on span{opacity:1;transform:none;color:var(--accent)}
+.ch:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--r-sm)}
+
+/* ── headings arrive word by word ─────────────────────────────────── */
+.h-word{display:inline-block;opacity:0;transform:translateY(14px) rotate(1.2deg);
+  transition:opacity .5s var(--ease-out),transform .6s var(--ease-out);
+  transition-delay:calc(var(--w,0) * 52ms)}
+.h-in .h-word{opacity:1;transform:none}
+
+/* ── the scroll cue ───────────────────────────────────────────────── */
+.scroll-cue{position:absolute;left:50%;bottom:22px;z-index:3;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--text-4);transition:opacity .45s var(--ease-out),transform .45s var(--ease-out)}
+.scroll-cue i{width:1px;height:34px;background:linear-gradient(var(--line-3),transparent);
+  position:relative;overflow:hidden}
+.scroll-cue i::after{content:"";position:absolute;inset:0;background:var(--accent);
+  animation:cueRun 1.9s cubic-bezier(.65,0,.35,1) infinite}
+.scroll-cue.gone{opacity:0;transform:translateX(-50%) translateY(12px)}
+@keyframes cueRun{0%{transform:translateY(-100%)}60%,100%{transform:translateY(100%)}}
+
+@media (max-width:1080px){.chapters{display:none}}
+@media (max-width:819px){.scroll-cue{display:none}}
+@media (prefers-reduced-motion:reduce){
+  .h-word{opacity:1;transform:none;transition:none}
+  .scroll-cue,.chapters{display:none}
+}
