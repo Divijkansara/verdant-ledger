@@ -56,7 +56,7 @@ window.VL = window.VL || {};
     async boot() {
       this.restoreSession();
       if (this.signedIn) this.loadDashboards();
-      else this.entries = [];
+      else this.loadShowcase();
       this.reseal();
       // Probe the API without blocking first paint — the app is already
       // usable by the time this resolves.
@@ -151,6 +151,16 @@ window.VL = window.VL || {};
       const score = V.computeScore(agg, Math.max(1, org.headcount), months.length);
       const trend = V.periodMonths(12).map(m => V.aggregate(saved.entries || [], [m]).net);
       return { org, count: (saved.entries || []).length, net: agg.net, score, trend };
+    },
+
+    /** Signed-out visitors: the sample organisation, so the landing page
+     *  (the planet, the documents, the charts) has real numbers to show.
+     *  Never persisted; the console itself needs a sign-in. */
+    loadShowcase() {
+      this.org = { ...SHOWCASE_ORG };
+      this.entries = V.generateLedger();
+      this.dashboards = []; this.dashId = null;
+      this.reseal();
     },
 
     loadLedger() {
@@ -287,8 +297,8 @@ window.VL = window.VL || {};
       this.signedIn = false;
       this.token = null;
       this.mode = "demo";
-      this.dashboards = []; this.dashId = null; this.entries = [];
       try { localStorage.removeItem(LS.session); localStorage.removeItem(LS.token); } catch (_) {}
+      this.loadShowcase();
     },
 
     /* ══════════════════ reads ═════════════════════════════════════════ */
@@ -459,6 +469,7 @@ window.VL = window.VL || {};
     }
   };
 
+  const SHOWCASE_ORG = { ...Store.org };        // the sample organisation, as declared above
   Store.DEMO = { email: DEMO.email, password: DEMO.password };
   V.Store = Store;
   V.API_BASE = API_BASE;
