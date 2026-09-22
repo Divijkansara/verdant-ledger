@@ -136,8 +136,18 @@ def health() -> dict:
         database = "ok"
     except Exception as exc:  # noqa: BLE001
         database = scrub(f"{type(exc).__name__}: {getattr(exc, 'orig', exc)}")[:400]
-    return {"status": "ok", "service": settings.app_name, "version": settings.app_version,
+    body = {"status": "ok", "service": settings.app_name, "version": settings.app_version,
             "database": database}
+    if database != "ok":
+        # Which server the URL points at, never the password: most failures
+        # are a mangled copy-paste, and this shows where it went wrong.
+        try:
+            u = engine.url
+            body["connecting_to"] = {"host": repr(u.host), "port": u.port,
+                                     "user": u.username, "database": u.database}
+        except Exception:  # noqa: BLE001
+            pass
+    return body
 
 
 app.include_router(auth.router)
