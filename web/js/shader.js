@@ -330,10 +330,11 @@ void main() {
        Eased every frame, so a jump in scroll still arrives as a move. */
     const cam = { zoom: 1, dx: 0, dy: 0, spin: 0 };
     const camTo = { zoom: 1, dx: 0, dy: 0, spin: 0 };
+    let camEase = 0.14;                 // per frame; lower is a longer glide
 
     const place = () => {
       const g = layout(cv.width / scale, cv.height / scale);
-      const k = still() ? 1 : 0.14;
+      const k = still() ? 1 : camEase;
       for (const key in cam) cam[key] += (camTo[key] - cam[key]) * k;
       const x = g.x + cam.dx * (cv.width / scale);
       const y = g.y + cam.dy * (cv.height / scale);
@@ -386,6 +387,7 @@ void main() {
       /** Fly the camera: zoom is a multiple of the laid-out radius, dx/dy
           are fractions of the canvas, spin is extra longitude in radians. */
       camera(c) {
+        if (c.ease != null) camEase = c.ease;
         if (c.zoom != null) camTo.zoom = c.zoom;
         if (c.dx != null) camTo.dx = c.dx;
         if (c.dy != null) camTo.dy = c.dy;

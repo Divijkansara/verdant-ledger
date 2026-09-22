@@ -47,6 +47,16 @@
 .cine-tilt:hover::after{opacity:1}
 .bcard,.note,.entry,.closing-in{position:relative}
 
+/* ── the page has a floor ────────────────────────────────────────────
+   Sections do not fade upward, they tip up into place, as though the
+   page were laid on a surface a little below the eye. */
+.cinema-on .clause.anim-rise,.cinema-on .closing-in.anim-rise{
+  transform:perspective(1200px) rotateX(6deg) translateY(26px);
+  transform-origin:50% 130%;
+  transition:opacity .7s var(--ease-out),transform .9s var(--ease-out)}
+.cinema-on .clause.anim-rise.anim-in,.cinema-on .closing-in.anim-rise.anim-in{
+  transform:perspective(1200px) rotateX(0deg) translateY(0)}
+
 /* ── the buttons pull, then settle ──────────────────────────────────── */
 .cinema-on .mast-cta .btn,.cinema-on .closing .btn,.cinema-on .mast-next .btn{
   transition:transform .5s var(--ease-out),background var(--t-fast),

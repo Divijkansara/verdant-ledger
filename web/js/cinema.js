@@ -46,6 +46,15 @@
     planet.classList.add("cine");
     document.body.classList.add("cinema-on");
 
+    // The arrival. At the top of the page the planet starts small and far
+    // and glides in while the headline assembles; the slow ease is handed
+    // back to the scroll rate once it has landed.
+    if (scrollY < 40) {
+      shader.camera({ ease: 0.035, zoom: 0.55, dx: 0.1, dy: 0.04, spin: -0.5 });
+      setTimeout(() => shader.camera({ zoom: 1, dx: 0, dy: 0, spin: 0 }), 90);
+      setTimeout(() => shader.camera({ ease: 0.14 }), 2400);
+    }
+
     return () => {
       const heroH = mast.offsetHeight || innerHeight;
       const bandEnd = (deck ? deck.offsetTop : heroH * 2);
