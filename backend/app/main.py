@@ -18,7 +18,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.database import init_db
+from sqlalchemy import text
+
+from app.database import engine, init_db, scrub
 from app.routers import auth, dashboard, entries, events, factors, reports
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -45,8 +47,12 @@ score.
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     """Startup: make sure the schema exists. Shutdown: nothing to unwind."""
-    init_db()
-    logger.info("Database ready at %s", settings.database_url)
+    # Never log the URL itself: it carries the database password.
+    try:
+        init_db()
+        logger.info("Database ready (%s)", engine.dialect.name)
+    except Exception:  # noqa: BLE001 — /api/health reports it; keep serving
+        logger.exception("Database not reachable at startup")
     yield
 
 
@@ -87,7 +93,16 @@ async def value_error_handler(request: Request, exc: ValueError):
 
 @app.get("/api/health", tags=["meta"])
 def health() -> dict:
-    return {"status": "ok", "service": settings.app_name, "version": settings.app_version}
+    """Liveness plus a real database round trip, so a deployment shows at a
+    glance whether it can reach its database and, if not, why."""
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        database = "ok"
+    except Exception as exc:  # noqa: BLE001
+        database = scrub(f"{type(exc).__name__}: {getattr(exc, 'orig', exc)}")[:400]
+    return {"status": "ok", "service": settings.app_name, "version": settings.app_version,
+            "database": database}
 
 
 app.include_router(auth.router)

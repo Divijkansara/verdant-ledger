@@ -1,6 +1,7 @@
 """Database engine, session factory and the FastAPI dependency."""
 
 import os
+import re
 from collections.abc import Generator
 
 from sqlalchemy import create_engine
@@ -8,6 +9,11 @@ from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.config import settings
+
+def scrub(message: str) -> str:
+    """Remove any password from a connection string inside an error message."""
+    return re.sub(r"(://[^:/@\s]+:)[^@\s]+@", r"\1****@", message)
+
 
 def normalize_url(url: str) -> str:
     """Accept the connection string exactly as Supabase (or any Postgres host)
