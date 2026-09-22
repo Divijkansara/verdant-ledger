@@ -297,8 +297,8 @@ void main() {
       }
       // must match the padding-top in site.css for the same media query
       // must match .planet's height and the stage padding in site.css
-      const r = Math.min(vw * 0.40, vh * 0.23);
-      return { x: W * 0.5, y: 56 + r, r };
+      const r = Math.min(vw * 0.32, vh * 0.18);
+      return { x: W * 0.5, y: 44 + r, r };
     };
 
     const size = () => {
