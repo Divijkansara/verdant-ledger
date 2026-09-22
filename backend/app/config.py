@@ -53,9 +53,11 @@ def get_settings() -> Settings:
 settings = get_settings()
 
 # On a deployment (Vercel sets VERCEL=1) the public dev key would let anyone
-# forge a login token, so refuse to start with it rather than run insecurely.
-if os.environ.get("VERCEL") and settings.secret_key.startswith("change-me"):
-    raise RuntimeError(
-        "SECRET_KEY is not set. Add a SECRET_KEY environment variable in the "
-        "Vercel project settings (any long random string) and redeploy."
-    )
+# forge a login token. The app still imports (so Vercel can start it) but
+# answers every request with this message until SECRET_KEY is set.
+SERVERLESS = bool(os.environ.get("VERCEL"))
+STARTUP_PROBLEM = (
+    "SECRET_KEY is not set. Add a SECRET_KEY environment variable in the Vercel "
+    "project settings (any long random string) and redeploy."
+    if SERVERLESS and settings.secret_key.startswith("change-me") else None
+)

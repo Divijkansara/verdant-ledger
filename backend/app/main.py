@@ -10,17 +10,19 @@ signatures and Pydantic schemas:
 """
 
 import logging
+import threading
 import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 
-from app.config import settings
+from app.config import SERVERLESS, STARTUP_PROBLEM, settings
 from sqlalchemy import text
 
-from app.database import engine, init_db, scrub
+from app.database import SessionLocal, engine, init_db, scrub
 from app.routers import auth, dashboard, entries, events, factors, reports
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -83,6 +85,39 @@ async def log_requests(request: Request, call_next):
     response.headers["X-Process-Time-ms"] = f"{elapsed_ms:.1f}"
     logger.info("%s %s -> %s in %.1fms", request.method, request.url.path, response.status_code, elapsed_ms)
     return response
+
+
+_setup_lock = threading.Lock()
+_setup_done = False
+
+
+def _serverless_setup() -> None:
+    """Once per serverless instance: create missing tables, then load the
+    factors and demo organisation if a fresh database lacks them. Runs on the
+    first request because serverless hosts do not reliably run startup
+    events. Failures are logged and shown by /api/health, never fatal."""
+    global _setup_done
+    with _setup_lock:
+        if _setup_done:
+            return
+        _setup_done = True
+        try:
+            from app.seed import seed_demo_org, seed_factors
+
+            init_db()
+            with SessionLocal() as db:
+                seed_demo_org(db, seed_factors(db))
+        except Exception:  # noqa: BLE001
+            logger.exception("Database setup skipped")
+
+
+@app.middleware("http")
+async def serverless_guard(request: Request, call_next):
+    if STARTUP_PROBLEM:
+        return JSONResponse(status_code=503, content={"status": "misconfigured", "reason": STARTUP_PROBLEM})
+    if SERVERLESS and not _setup_done:
+        await run_in_threadpool(_serverless_setup)
+    return await call_next(request)
 
 
 @app.exception_handler(ValueError)
