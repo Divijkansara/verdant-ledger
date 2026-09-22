@@ -16,7 +16,6 @@ from calendar import monthrange
 from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
 
-from app.database import engine
 from app.models import Category, EmissionFactor, EntryStatus, LedgerEntry, Organization, ResourceKind
 from app.services.scoring import ScoreInput, ScoreResult, compute_score
 
@@ -60,9 +59,10 @@ def month_keys(start: date, end: date) -> list[str]:
 
 # Grouping by month is the one place the two supported databases differ:
 # SQLite has strftime, PostgreSQL has to_char. Isolating it in one helper
-# keeps every query below portable.
-def _month_expr():
-    if engine.dialect.name == "postgresql":
+# keeps every query below portable. It asks the session, not the global
+# engine, so the same code is right whichever database a session is bound to.
+def _month_expr(db: Session):
+    if db.get_bind().dialect.name == "postgresql":
         return func.to_char(LedgerEntry.activity_date, "YYYY-MM")
     return func.strftime("%Y-%m", LedgerEntry.activity_date)
 
@@ -148,7 +148,7 @@ def monthly_series(db: Session, org_id: int, months: int, today: date | None = N
     avoided = func.sum(case((LedgerEntry.co2e_kg < 0, -LedgerEntry.co2e_kg), else_=0.0))
 
     rows = db.execute(
-        select(_month_expr().label("m"), gross, avoided)
+        select(_month_expr(db).label("m"), gross, avoided)
         .where(
             LedgerEntry.org_id == org_id,
             LedgerEntry.status == EntryStatus.POSTED,

@@ -3,19 +3,20 @@ SQLite database, using FastAPI's dependency override so no test ever
 touches the development database.
 """
 
+import os
 from datetime import date, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.database import Base, get_db
+from app.database import Base, get_db, make_engine
 from app.main import app
 from app.seed import seed_factors
 
-TEST_URL = "sqlite:///./test_verdant.db"
-engine = create_engine(TEST_URL, connect_args={"check_same_thread": False})
+# Set TEST_DATABASE_URL to run the same suite against PostgreSQL / Supabase.
+TEST_URL = os.environ.get("TEST_DATABASE_URL", "sqlite:///./test_verdant.db")
+engine = make_engine(TEST_URL)
 TestSession = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 

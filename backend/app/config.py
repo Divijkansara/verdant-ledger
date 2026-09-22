@@ -4,6 +4,7 @@ Everything that differs between a laptop, the lab machine and a deployment
 lives here — nothing else in the codebase reads os.environ directly.
 """
 
+import os
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -38,7 +39,9 @@ class Settings(BaseSettings):
 
     @property
     def cors_origin_list(self) -> list[str]:
-        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+        # A browser sends its Origin without a trailing slash, so a pasted
+        # "https://site.vercel.app/" would otherwise never match.
+        return [o.strip().rstrip("/") for o in self.cors_origins.split(",") if o.strip()]
 
 
 @lru_cache
@@ -48,3 +51,11 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
+
+# On a deployment (Vercel sets VERCEL=1) the public dev key would let anyone
+# forge a login token, so refuse to start with it rather than run insecurely.
+if os.environ.get("VERCEL") and settings.secret_key.startswith("change-me"):
+    raise RuntimeError(
+        "SECRET_KEY is not set. Add a SECRET_KEY environment variable in the "
+        "Vercel project settings (any long random string) and redeploy."
+    )
