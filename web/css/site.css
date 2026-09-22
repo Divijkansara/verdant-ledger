@@ -355,8 +355,8 @@
   .mast::before{display:none}
   /* The globe sits in a band at the top, so the canvas is that band and
      not the whole hero: on a phone that is a quarter of the pixels. */
-  .planet{bottom:auto;height:calc(2 * min(40vw, 23svh) + 104px)}
-  .mast-stage{padding-top:calc(2 * min(40vw, 23svh) + 84px);padding-bottom:48px}
+  .planet{bottom:auto;height:calc(2 * min(40vw, 23svh) + 96px)}
+  .mast-stage{padding-top:calc(2 * min(40vw, 23svh) + 68px);padding-bottom:40px}
   .mast-copy{max-width:none}
   .mast h1{font-size:clamp(30px,8.6vw,44px)}
   .mast .lede{font-size:15px;line-height:1.6;margin-top:14px}
