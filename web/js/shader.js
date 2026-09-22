@@ -267,8 +267,13 @@ void main() {
     let target = 0.5, current = 0.5, visible = true, running = false;
     let t0 = performance.now(), lastW = 0, lastH = 0;
 
-    /* Full native resolution, every frame — no cap and no downscaling. */
-    let scale = window.devicePixelRatio || 1;
+    /* Full native resolution on a desktop — no cap, no downscaling.
+       A phone is different hardware, not a weaker preference: at DPR 3 a
+       full-hero canvas is over four million shaded pixels every frame,
+       which no handset GPU sustains. Phones therefore cap at 2. */
+    const phone = () => matchMedia("(pointer: coarse)").matches && window.innerWidth < 820;
+    const dpr = () => Math.min(window.devicePixelRatio || 1, phone() ? 2 : Infinity);
+    let scale = dpr();
 
     /* Where the globe sits in the stage. Wide screens: large, right of
        centre, with the copy over its left limb. Narrow screens: top and
@@ -291,12 +296,13 @@ void main() {
         return { x: W * 0.64, y: vh * 0.5, r };
       }
       // must match the padding-top in site.css for the same media query
-      const r = Math.min(vw * 0.44, vh * 0.26);
-      return { x: W * 0.5, y: 64 + r, r };
+      // must match .planet's height and the stage padding in site.css
+      const r = Math.min(vw * 0.40, vh * 0.23);
+      return { x: W * 0.5, y: 56 + r, r };
     };
 
     const size = () => {
-      scale = window.devicePixelRatio || 1;
+      scale = dpr();
       const r = host.getBoundingClientRect();
       const w = Math.max(1, Math.round(r.width * scale));
       const h = Math.max(1, Math.round(r.height * scale));

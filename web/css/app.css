@@ -405,6 +405,27 @@ tbody tr.voided .strike{text-decoration:line-through}
   .readout .ro-out{font-size:27px}
   .sim-result,.countdown{grid-template-columns:minmax(0,1fr)}
   .form-row.c3,.form-row.c2{grid-template-columns:minmax(0,1fr)}
+  /* The status pill wrapped onto three lines and squeezed the title out;
+     on a phone the coloured dot carries the same meaning. */
+  .link-state span{display:none}
+  .link-state{padding:6px;gap:0}
+  .topbar h1{font-size:17px}
+  .topbar{gap:8px;padding:0 10px}
+  .seg button{padding-inline:9px}
+  /* Touch targets: 44px is the accessibility floor. */
+  .menu-btn,.icon-btn,.tour-btn{min-width:40px;min-height:40px}
+  .canvas{padding:10px 10px 28px}
+  .cat-grid{grid-template-columns:minmax(0,1fr)}
+  /* A six-column table cannot be read on a phone; the two columns that
+     only repeat what the row already says are dropped. */
+  #ledgerTable th:nth-child(2),#ledgerTable td:nth-child(2),
+  #ledgerTable th:nth-child(4),#ledgerTable td:nth-child(4),
+  #ledgerTable th:nth-child(5),#ledgerTable td:nth-child(5),
+  #ledgerTable th:nth-child(7),#ledgerTable td:nth-child(7){display:none}
+  #ledgerTable th,#ledgerTable td{padding-inline:10px}
+  .tour-nudge{left:10px;right:10px;bottom:10px;max-width:none;padding:14px}
+  .dash-main h1{font-size:clamp(28px,9vw,40px)}
+  .dash-grid{gap:14px}
 }
 
 
