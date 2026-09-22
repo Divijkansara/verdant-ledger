@@ -457,7 +457,7 @@ window.VL = window.VL || {};
       const lines = Object.keys(tokens)
         .filter(k => !k.startsWith("--shadow") && k !== "--glow")
         .map(k => `  ${k}: ${tokens[k]};`);
-      return `/* Verdant Ledger — generated palette\n   seed: ${JSON.stringify(this.seed)} */\n:root {\n${lines.join("\n")}\n}`;
+      return `/* Terrawise — generated palette\n   seed: ${JSON.stringify(this.seed)} */\n:root {\n${lines.join("\n")}\n}`;
     },
 
     PRESETS,

@@ -26,17 +26,17 @@ window.VL = window.VL || {};
   };
 
   const MODULES = [
-    { id:"overview",    path:"/app/overview",    icon:"gauge",   key:"1", group:"Operations" },
-    { id:"post",        path:"/app/post",        icon:"plus",    key:"2", group:"Operations" },
-    { id:"ledger",      path:"/app/ledger",      icon:"table",   key:"3", group:"Operations" },
-    { id:"simulate",    path:"/app/simulate",    icon:"sliders", key:"4", group:"Decide" },
-    { id:"insights",    path:"/app/insights",    icon:"pulse",   key:"5", group:"Decide" },
-    { id:"targets",     path:"/app/targets",     icon:"target",  key:"6", group:"Decide" },
-    { id:"departments", path:"/app/departments", icon:"users",   key:"7", group:"Decide" },
-    { id:"integrity",   path:"/app/integrity",   icon:"shield",  key:"8", group:"Assurance" },
-    { id:"reports",     path:"/app/reports",     icon:"report",  key:"9", group:"Assurance" },
-    { id:"methodology", path:"/app/methodology", icon:"book",    key:"",  group:"Assurance" },
-    { id:"settings",    path:"/app/settings",    icon:"gear",    key:"",  group:"Assurance" }
+    { id:"overview",    path:"/app/overview",    icon:"gauge",   key:"1", group:"Track" },
+    { id:"post",        path:"/app/post",        icon:"plus",    key:"2", group:"Track" },
+    { id:"ledger",      path:"/app/ledger",      icon:"table",   key:"3", group:"Track" },
+    { id:"simulate",    path:"/app/simulate",    icon:"sliders", key:"4", group:"Plan" },
+    { id:"insights",    path:"/app/insights",    icon:"pulse",   key:"5", group:"Plan" },
+    { id:"targets",     path:"/app/targets",     icon:"target",  key:"6", group:"Plan" },
+    { id:"departments", path:"/app/departments", icon:"users",   key:"7", group:"Plan" },
+    { id:"integrity",   path:"/app/integrity",   icon:"shield",  key:"8", group:"Verify" },
+    { id:"reports",     path:"/app/reports",     icon:"report",  key:"9", group:"Verify" },
+    { id:"methodology", path:"/app/methodology", icon:"book",    key:"",  group:"Verify" },
+    { id:"settings",    path:"/app/settings",    icon:"gear",    key:"",  group:"Verify" }
   ];
 
   const App = {
@@ -135,7 +135,7 @@ window.VL = window.VL || {};
       return `
         <div class="app">
           <aside class="rail" id="rail">
-            <a class="rail-top" href="#/">${V.SiteViews.GLYPH}<b>Verdant<span> Ledger</span></b></a>
+            <a class="rail-top" href="#/">${V.SiteViews.GLYPH}<b>Terra<span>wise</span></b></a>
             <nav class="rail-nav" aria-label="Modules">
               ${groups.map(g => `
                 <div class="rail-group">${g.name}</div>
@@ -150,7 +150,7 @@ window.VL = window.VL || {};
             <div class="rail-foot">
               <div class="rail-score">
                 <span class="rs-grade" id="railGrade">—</span>
-                <span class="rs-meta"><i>Sustainability score</i><b id="railScore">—</b></span>
+                <span class="rs-meta"><i>Your score</i><b id="railScore">—</b></span>
               </div>
               <div class="rail-user">
                 <span class="avatar" id="userAvatar">DR</span>
@@ -210,7 +210,7 @@ window.VL = window.VL || {};
       if (grade) {
         grade.textContent = score.grade;
         grade.style.color = V.bandVar(score.composite);
-        $("#railScore").textContent = `${nf(score.composite, 1)} / 100`;
+        $("#railScore").textContent = `${nf(score.composite, 0)} / 100`;
       }
 
       const u = V.Store.user;
@@ -292,13 +292,13 @@ window.VL = window.VL || {};
       });
 
       cmds.push(
-        { group: "Actions", title: "Verify ledger integrity", icon: "shield", keywords: "hash chain tamper",
+        { group: "Actions", title: "Run the data check", icon: "shield", keywords: "hash chain tamper",
           run: () => (location.hash = "#/app/integrity") },
-        { group: "Actions", title: "Export ledger as CSV", icon: "download", keywords: "download report",
-          run: () => { V.UI.download(`verdant-ledger-${V.todayISO()}.csv`, V.Store.csv());
-            toast("Ledger exported", "CSV with hash columns"); } },
+        { group: "Actions", title: "Export activity log (CSV)", icon: "download", keywords: "download report",
+          run: () => { V.UI.download(`terrawise-activity-${V.todayISO()}.csv`, V.Store.csv());
+            toast("Activity log exported", "Saved as a CSV file"); } },
         { group: "Actions", title: "Export disclosure JSON", icon: "download", keywords: "report auditor",
-          run: () => { V.UI.download(`verdant-disclosure-${V.todayISO()}.json`,
+          run: () => { V.UI.download(`terrawise-report-${V.todayISO()}.json`,
             JSON.stringify(V.Store.disclosure(12), null, 2), "application/json");
             toast("Disclosure exported", "GHG Protocol shaped"); } },
         { group: "Help", title: "Take the guided tour", icon: "play", keywords: "walkthrough onboarding demo help",

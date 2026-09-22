@@ -33,7 +33,7 @@ window.VL = window.VL || {};
       unitLabel: "% of fleet km",
       max: 100, step: 5, def: 0,
       capex: "≈ ₹18 lakh per vehicle, offset by ≈₹1.2 lakh/yr running cost",
-      detail: "Moves petrol and diesel company-car kilometres onto the EV factor (0.112 kg/km on the Indian grid, versus 0.170).",
+      detail: "Swap petrol and diesel company cars for electric ones. An EV emits about a third less per km on the Indian grid.",
       apply: (entries, pct) => shift(entries, ["transport:car_petrol", "transport:car_diesel"], "transport:ev", pct / 100)
     },
     {
@@ -42,7 +42,7 @@ window.VL = window.VL || {};
       unitLabel: "% of electricity",
       max: 80, step: 5, def: 0,
       capex: "≈ ₹45,000 per kWp installed · 4–5 year payback at commercial tariffs",
-      detail: "Generates self-consumed solar equal to the chosen share of grid draw, posted as a credit at the grid factor.",
+      detail: "Put solar panels on the roof to cover part of the electricity you buy.",
       apply: (entries, pct) => offsetEnergy(entries, "electricity:grid", "renewable:solar_pv", pct / 100)
     },
     {
@@ -51,7 +51,7 @@ window.VL = window.VL || {};
       unitLabel: "% of landfill mass",
       max: 90, step: 5, def: 0,
       capex: "Segregation bins and a contracted recycler · low capital, high behavioural",
-      detail: "Moves mixed landfill waste into composting and materials recycling in the proportion the site actually generates.",
+      detail: "Recycle and compost waste instead of sending it to landfill.",
       apply: (entries, pct) => {
         let next = shift(entries, ["waste:landfill"], "waste:composted", (pct / 100) * 0.45);
         next = shift(next, ["waste:landfill"], "recycling:paper", (pct / 100) * 0.33);
@@ -65,7 +65,7 @@ window.VL = window.VL || {};
       unitLabel: "% of car & taxi km",
       max: 80, step: 5, def: 0,
       capex: "Shuttle contract and a transit allowance · ≈₹1,100 per employee per month",
-      detail: "Moves reimbursed taxi and two-wheeler kilometres onto metro and the company shuttle.",
+      detail: "Get staff out of taxis and bikes and onto the metro or a company shuttle.",
       apply: (entries, pct) => {
         let next = shift(entries, ["transport:taxi"], "transport:metro", (pct / 100) * 0.6);
         next = shift(next, ["transport:taxi"], "transport:bus", (pct / 100) * 0.4);
@@ -78,7 +78,7 @@ window.VL = window.VL || {};
       unitLabel: "% reduction",
       max: 90, step: 5, def: 0,
       capex: "Digital approvals and duplex defaults · negligible capital",
-      detail: "Scales down virgin A4 consumption and moves the remainder to recycled-content stock.",
+      detail: "Print less, and use recycled paper for what you still print.",
       apply: (entries, pct) => {
         let next = scale(entries, ["paper:a4_ream", "paper:a4_sheet"], 1 - pct / 100);
         next = shift(next, ["paper:a4_ream"], "paper:recycled", 0.5 * (pct / 100));
@@ -91,7 +91,7 @@ window.VL = window.VL || {};
       unitLabel: "% of grid draw saved",
       max: 35, step: 1, def: 0,
       capex: "≈ ₹1,400 per m² · LED, BMS scheduling, chiller sequencing",
-      detail: "Reduces grid electricity directly. Typical retrofits deliver 12–22% on an office of this age.",
+      detail: "Upgrade air-conditioning and lighting. This usually cuts electricity use by 12–22%.",
       apply: (entries, pct) => scale(entries, ["electricity:grid"], 1 - pct / 100)
     },
     {
@@ -100,7 +100,7 @@ window.VL = window.VL || {};
       unitLabel: "% of flights avoided",
       max: 80, step: 5, def: 0,
       capex: "Policy change · saves ≈₹22,000 per avoided domestic return",
-      detail: "Removes a share of domestic and international flight distance outright.",
+      detail: "Replace some flights with video calls.",
       apply: (entries, pct) => scale(entries, ["transport:flight_dom", "transport:flight_intl"], 1 - pct / 100)
     },
     {
@@ -109,7 +109,7 @@ window.VL = window.VL || {};
       unitLabel: "% of electricity",
       max: 100, step: 5, def: 0,
       capex: "Group-captive wind, ≈₹4.6/kWh versus ₹8.1 commercial tariff",
-      detail: "Contracts renewable generation equal to the chosen share of remaining grid draw.",
+      detail: "Buy green power from your electricity supplier for the rest.",
       apply: (entries, pct) => offsetEnergy(entries, "electricity:grid", "renewable:ppa", pct / 100)
     }
   ];
@@ -242,11 +242,11 @@ window.VL = window.VL || {};
 
   /** A named set of lever positions the user can load in one click. */
   const PLAYBOOKS = [
-    { id:"quick",  name:"Quick wins",      note:"No capital. Policy and behaviour only.",
+    { id:"quick",  name:"Quick wins",      note:"Free changes: habits and policies.",
       positions:{ divert:60, paperless:55, flights:40, commute:30 } },
-    { id:"capital",name:"Capital programme",note:"Solar, EV fleet and an HVAC retrofit.",
+    { id:"capital",name:"Big investments",note:"Solar, electric cars and new air-conditioning.",
       positions:{ solar:45, ev:60, hvac:18 } },
-    { id:"sbti",   name:"1.5 °C aligned",  note:"Everything needed to hit −42% by 2030.",
+    { id:"sbti",   name:"Full plan",       note:"Everything needed to cut 42% by 2030.",
       positions:{ solar:55, ppa:25, ev:80, hvac:22, divert:80, commute:50, paperless:70, flights:50 } }
   ];
 

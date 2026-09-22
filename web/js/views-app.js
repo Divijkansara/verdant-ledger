@@ -34,7 +34,7 @@ window.VL = window.VL || {};
      ══════════════════════════════════════════════════════════════════ */
   const overview = {
     title: "Overview",
-    crumb: "OPERATIONS",
+    crumb: "TRACK",
     render() {
       return `
         <div class="module">
@@ -42,44 +42,48 @@ window.VL = window.VL || {};
 
           <div class="wall g-hero stack">
             <div class="panel">
-              <div class="panel-hd"><h2>Sustainability score</h2>
+              <div class="panel-hd"><h2>Your score</h2>
                 <span class="hd-note" id="periodLabel"></span></div>
               <div class="score-dial" id="scoreDial"></div>
               <div class="score-read">
                 <div class="grade" id="scoreGrade">—</div>
                 <div class="val" id="scoreNum"></div>
               </div>
-              <div class="subs" id="subScores"></div>
+              <p class="plain" id="scorePlain"></p>
+              <details class="more"><summary>How this score is worked out</summary>
+                <div class="subs" id="subScores"></div></details>
             </div>
-            ${chartPanel("Emissions issued and avoided", "12 MONTHS · CURRENT MONTH TO DATE", "trendWrap", `
+            ${chartPanel("Your carbon, month by month", "LAST 12 MONTHS", "trendWrap", `
               <div class="legend">
-                <span><i style="background:var(--gross)"></i>GROSS ISSUED</span>
-                <span><i style="background:var(--good)"></i>AVOIDED — BELOW AXIS</span>
-                <span><i class="line" style="background:var(--accent)"></i>NET POSITION</span>
-              </div>
-              <div class="stat-strip" id="trendFoot"></div>`)}
+                <span><i style="background:var(--gross)"></i>EMITTED</span>
+                <span><i style="background:var(--good)"></i>SAVED</span>
+                <span><i class="line" style="background:var(--accent)"></i>OVERALL</span>
+              </div>`)}
           </div>
 
           <div class="wall g-split stack">
-            ${chartPanel("Where the carbon comes from", "", "catWrap")}
-            <div class="panel">
-              <div class="panel-hd"><h2>GHG Protocol scopes</h2></div>
-              <div id="scopeDonut" style="max-width:200px;margin:0 auto"></div>
-              <div class="subs" id="scopeKeys" style="margin-top:12px"></div>
-              <div class="panel-hd" style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line-1)">
-                <h2>Resource intensity</h2><span class="hd-note">PER EMP / MONTH</span></div>
-              <div class="subs" style="margin-top:0;padding-top:0;border-top:0" id="resources"></div>
-            </div>
-          </div>
-
-          <div class="wall stack">
+            ${chartPanel("Where your carbon comes from", "", "catWrap")}
             <div class="panel panel-flush">
               <div class="panel-hd" style="padding:16px 18px 0;margin-bottom:6px">
                 <h2>What to fix first</h2>
-                <span class="hd-note">GENERATED FROM THE LEDGER</span></div>
+                <span class="hd-note">TOP 3 FOR YOU</span></div>
               <div id="insightFeed"></div>
             </div>
           </div>
+
+          <details class="more more-wall">
+            <summary>Show detailed breakdown <em>emission scopes and resource use, for specialists</em></summary>
+          <div class="wall g-split stack">
+            <div class="panel">
+              <div class="panel-hd"><h2>Emission scopes</h2><span class="hd-note">GHG PROTOCOL</span></div>
+              <div id="scopeDonut" style="max-width:200px;margin:0 auto"></div>
+              <div class="subs" id="scopeKeys" style="margin-top:12px"></div>
+              <div class="panel-hd" style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line-1)">
+                <h2>Resource use</h2><span class="hd-note">PER PERSON / MONTH</span></div>
+              <div class="subs" style="margin-top:0;padding-top:0;border-top:0" id="resources"></div>
+            </div>
+          </div>
+          </details>
         </div>`;
     },
 
@@ -96,7 +100,12 @@ window.VL = window.VL || {};
       const grade = $("#scoreGrade");
       grade.textContent = score.grade;
       grade.style.color = V.bandVar(score.composite);
-      $("#scoreNum").innerHTML = `<b>${nf(score.composite, 1)}</b> / 100 composite`;
+      $("#scoreNum").innerHTML = `<b>${nf(score.composite, 0)}</b> out of 100`;
+      $("#scorePlain").textContent = score.composite >= 67
+        ? "Good. You are ahead of most organisations your size."
+        : score.composite >= 40
+        ? "Average. A few of the fixes below would move you up a grade."
+        : "Needs attention. Start with the top fix below.";
 
       $("#subScores").innerHTML = score.subscores.map(s => {
         const detail = s.key === "carbon"    ? `${nf(s.observed, 1)} kg/emp/mo`
@@ -118,19 +127,19 @@ window.VL = window.VL || {};
       const divPct = agg.waste ? (100 * agg.diverted) / agg.waste : 0;
 
       const tiles = [
-        { id:"kNet", label:"Net position", value: agg.net/1000, dec:1, unit:"t CO₂e",
-          note:`${tonnes(agg.gross)} t issued · ${tonnes(agg.avoided)} t avoided`,
+        { id:"kNet", label:"Carbon footprint", value: agg.net/1000, dec:1, unit:"tonnes CO₂",
+          note:`over ${months.length} month${months.length>1?"s":""}`,
           chip:null, spark: series.map(s=>s.net), color:"var(--accent)" },
-        { id:"kInt", label:"Per employee / month", value: perEmp, dec:1, unit:"kg",
-          note:`target ≤ ${V.BANDS.carbon.target} kg`,
+        { id:"kInt", label:"Per person, per month", value: perEmp, dec:0, unit:"kg CO₂",
+          note:`goal: under ${V.BANDS.carbon.target} kg`,
           chip: score.subscores.find(s=>s.key==="carbon").value,
           spark: series.map(s=>s.net), color:"var(--gross-hi)" },
-        { id:"kRen", label:"Renewable electricity", value: renPct, dec:1, unit:"%",
-          note:`${nf(agg.renewable,0)} of ${nf(agg.energy,0)} kWh`,
+        { id:"kRen", label:"Clean electricity", value: renPct, dec:0, unit:"%",
+          note:"from solar or green power",
           chip: score.subscores.find(s=>s.key==="renewable").value,
           spark: series.map(s=>s.avoided), color:"var(--good)" },
-        { id:"kDiv", label:"Diverted from landfill", value: divPct, dec:1, unit:"%",
-          note:`${nf(agg.diverted,0)} of ${nf(agg.waste,0)} kg`,
+        { id:"kDiv", label:"Waste recycled", value: divPct, dec:0, unit:"%",
+          note:"kept out of landfill",
           chip: score.subscores.find(s=>s.key==="diversion").value,
           spark: series.map(s=>s.avoided), color:"var(--good)" }
       ];
@@ -146,7 +155,7 @@ window.VL = window.VL || {};
             ${t.chip != null
               ? `<span class="chip chip-${V.bandFor(t.chip)}"><i></i>${
                    t.chip >= 67 ? "On track" : t.chip >= 40 ? "Needs work" : "Off track"}</span>`
-              : `<span class="chip chip-flat"><i></i>${nf(agg.net/1000/months.length,1)} t / mo</span>`}
+              : `<span class="chip chip-flat"><i></i>${nf(agg.net/1000/months.length,1)} t a month</span>`}
             <span class="kpi-note">${t.note}</span>
           </div>
         </div>`).join("");
@@ -157,17 +166,6 @@ window.VL = window.VL || {};
 
       /* trend */
       V.Charts.trend($("#trendWrap"), series);
-      $("#trendFoot").innerHTML = [
-        { l:"Issued this period", v:agg.gross, c:"var(--text-1)",
-          s:`${agg.count} entries · ${months.length} month${months.length>1?"s":""}` },
-        { l:"Avoided", v:agg.avoided, c:"var(--good)",
-          s:`${nf(agg.gross?100*agg.avoided/agg.gross:0,1)}% of gross offset` },
-        { l:"Net position", v:agg.net, c:"var(--accent)",
-          s:`${nf(agg.net/1000/months.length,1)} t per month` }
-      ].map(x => `<div><div class="sl">${x.l}</div>
-          <div class="sv" style="color:${x.c}">${tonnes(x.v)}<u style="font-size:var(--fs-small);color:var(--text-3)"> t</u></div>
-          <div class="ss">${x.s}</div></div>`).join("");
-
       /* categories */
       const catRows = V.CATEGORIES.filter(c => c.kind === "charge")
         .map(c => ({ name: c.name, color: V.catColor(c.id), value: Math.max(0, agg.byCat[c.id]),
@@ -234,34 +232,34 @@ window.VL = window.VL || {};
     if (emitting[0] && emitting[0].v > 0) {
       const top = emitting[0];
       out.push({ sev:"low", icon:"bolt",
-        title:`${top.c.name} is your largest single source`,
-        body:`It accounts for <b>${nf(100*top.v/(agg.gross||1),0)}%</b> of gross emissions — <b>${tonnes(top.v)} t CO₂e</b> this period. A 10% reduction removes <b>${tonnes(top.v*0.1)} t</b>.`,
-        action:["Model a reduction","/app/simulate"] });
+        title:`${top.c.name} is your biggest source of carbon`,
+        body:`It makes up <b>${nf(100*top.v/(agg.gross||1),0)}%</b> of your footprint. Cutting it by a tenth saves <b>${tonnes(top.v*0.1)} tonnes</b>.`,
+        action:["Try it in the planner","/app/simulate"] });
     }
 
     const weakest = score.subscores.slice().sort((a, b) => a.value - b.value)[0];
     if (weakest) {
       const gain = (100 - weakest.value) * weakest.weight;
       out.push({ sev: weakest.band === "bad" ? "high" : "medium", icon:"target",
-        title:`${weakest.label} is the weakest sub-score`,
-        body:`At <b>${nf(weakest.value,0)}/100</b> it carries <b>${nf(weakest.weight*100,0)}%</b> of the composite. Closing it fully lifts the overall score by <b>${nf(gain,1)}</b> points, to <b>${nf(Math.min(100,score.composite+gain),1)}</b>.`,
-        action:["See the targets","/app/targets"] });
+        title:`${weakest.label} is pulling your score down`,
+        body:`It scores <b>${nf(weakest.value,0)} out of 100</b>. Fixing it could raise your overall score from <b>${nf(score.composite,0)}</b> to <b>${nf(Math.min(100,score.composite+gain),0)}</b>.`,
+        action:["See your goals","/app/targets"] });
     }
 
     if (agg.energy > 0) {
       const gap = Math.max(0, 0.6 * agg.energy - agg.renewable);
       if (gap > 0) out.push({ sev:"medium", icon:"sun",
-        title:"Renewable electricity is below the 60% target",
-        body:`Adding <b>${nf(gap,0)} kWh</b> of on-site or contracted renewables over this period reaches the target and avoids about <b>${tonnes(gap*0.716)} t CO₂e</b>.`,
-        action:["Simulate solar","/app/simulate"] });
+        title:"Too little of your electricity is clean",
+        body:`The goal is 60% from solar or green power. Getting there would save about <b>${tonnes(gap*0.716)} tonnes</b> of CO₂.`,
+        action:["Try solar in the planner","/app/simulate"] });
     }
 
     const landfill = agg.waste - agg.diverted;
     if (landfill > 0) {
       out.push({ sev:"medium", icon:"recycle",
-        title:"Waste still defaults to landfill",
-        body:`<b>${nf(landfill,0)} kg</b> went to landfill at 0.586 kg CO₂e/kg. Diverting half to recycling and composting avoids roughly <b>${tonnes(landfill*0.5*(0.586+0.9))} t CO₂e</b> once the recycling credit is counted.`,
-        action:["Model diversion","/app/simulate"] });
+        title:"A lot of waste still goes to landfill",
+        body:`<b>${nf(landfill,0)} kg</b> was thrown away. Recycling or composting half of it would save about <b>${tonnes(landfill*0.5*(0.586+0.9))} tonnes</b> of CO₂.`,
+        action:["Try it in the planner","/app/simulate"] });
     }
 
     const anomalies = V.Analytics.detectAnomalies(S().entries, { months: 12 })
@@ -269,19 +267,21 @@ window.VL = window.VL || {};
     if (anomalies.length) {
       const a = anomalies[0];
       out.push({ sev:"high", icon:"warning",
-        title:`Anomaly detected in ${V.monthLabel(a.month)}`,
-        body:`${V.Analytics.explain(a)} Carbon consequence: <b>${tonnes(Math.abs(a.co2Impact))} t CO₂e</b>.`,
-        action:["Investigate","/app/insights"] });
+        title:`Something looks unusual in ${V.monthLabel(a.month)}`,
+        body:`${a.factor.label} was much higher than normal that month, adding <b>${tonnes(Math.abs(a.co2Impact))} tonnes</b> of CO₂. It may be a fault or a wrong meter reading.`,
+        action:["Take a look","/app/insights"] });
     }
-    return out;
+    // Most urgent first, and only three: a short list gets acted on.
+    const rank = { high: 0, medium: 1, low: 2 };
+    return out.sort((x, y) => rank[x.sev] - rank[y.sev]).slice(0, 3);
   }
 
   /* ══════════════════════════════════════════════════════════════════
      2 · SIMULATOR
      ══════════════════════════════════════════════════════════════════ */
   const simulate = {
-    title: "Scenario simulator",
-    crumb: "DECIDE",
+    title: "What-if planner",
+    crumb: "PLAN",
     positions: {},
 
     render() {
@@ -289,7 +289,7 @@ window.VL = window.VL || {};
         <div class="module">
           <div class="wall g-split sim-grid">
             <div class="panel">
-              <div class="panel-hd"><h2>Interventions</h2>
+              <div class="panel-hd"><h2>Changes you could make</h2>
                 <button class="btn btn-sm" id="simReset">${icon("reset",13)} Reset</button></div>
               <div class="playbooks">
                 ${V.Simulate.PLAYBOOKS.map(p => `<button class="btn btn-sm" data-playbook="${p.id}"
@@ -447,8 +447,8 @@ window.VL = window.VL || {};
      3 · POST ENTRY
      ══════════════════════════════════════════════════════════════════ */
   const post = {
-    title: "Post entry",
-    crumb: "OPERATIONS",
+    title: "Add activity",
+    crumb: "TRACK",
     form: { cat:"electricity", factorId:1, qty:17800, date:null, ref:"", dept:"facilities" },
 
     render() {
@@ -457,8 +457,8 @@ window.VL = window.VL || {};
         <div class="module">
           <div class="wall g-split" style="grid-template-columns:minmax(0,1fr) minmax(0,340px)">
             <div class="panel">
-              <div class="panel-hd"><h2>Post an entry</h2>
-                <span class="hd-note">PRICED BY A PUBLISHED FACTOR</span></div>
+              <div class="panel-hd"><h2>Add an activity</h2>
+                <span class="hd-note">CO₂ WORKED OUT FOR YOU</span></div>
               <div class="cat-grid" id="catGrid"></div>
 
               <div class="form-row c3">
@@ -481,7 +481,7 @@ window.VL = window.VL || {};
               </div>
 
               <div class="readout" id="readout">
-                <div class="ro-top"><span class="eyebrow">Computed impact</span>
+                <div class="ro-top"><span class="eyebrow">Carbon impact</span>
                   <span class="ro-calc" id="roCalc"></span></div>
                 <div class="ro-out" id="roOut">—</div>
                 <div class="ro-meta" id="roMeta"></div>
@@ -489,14 +489,14 @@ window.VL = window.VL || {};
               </div>
 
               <div class="row center wrapflex mt-16" style="gap:12px">
-                <button class="btn btn-primary" id="postBtn">${icon("plus",14)} Post to ledger</button>
-                <span class="kpi-note">NOTHING IS SAVED UNTIL YOU POST · THE PREVIEW USES THE SAME ENGINE</span>
+                <button class="btn btn-primary" id="postBtn">${icon("plus",14)} Add activity</button>
+                <span class="kpi-note">NOTHING IS SAVED UNTIL YOU CLICK ADD</span>
               </div>
             </div>
 
             <div class="panel panel-flush">
               <div class="panel-hd" style="padding:16px 18px 0;margin-bottom:6px">
-                <h2>Recent postings</h2></div>
+                <h2>Recently added</h2></div>
               <div id="recent"></div>
             </div>
           </div>
@@ -519,7 +519,7 @@ window.VL = window.VL || {};
         <button class="cat-btn ${c.id === post.form.cat ? "on" : ""}" data-cat="${c.id}"
           aria-pressed="${c.id === post.form.cat}">
           <span class="cb-name"><i style="background:${V.catColor(c.id)}"></i>${c.name}</span>
-          <span class="cb-kind">${c.kind === "credit" ? "posts a credit" : "posts a charge"}</span>
+          <span class="cb-kind">${c.kind === "credit" ? "saves carbon" : "adds carbon"}</span>
         </button>`).join("");
 
       $$("#catGrid .cat-btn").forEach(b => b.addEventListener("click", () => {
@@ -583,7 +583,7 @@ window.VL = window.VL || {};
       try {
         const entry = await S().addEntry({ ...post.form });
         const f = V.byId[entry.factorId];
-        toast("Posted to the ledger",
+        toast("Activity added",
           `${f.label} · ${entry.co2<0?"−":""}${nf(Math.abs(entry.co2),1)} kg CO₂e`);
         post.form.ref = "";
         post.paint();
@@ -611,8 +611,8 @@ window.VL = window.VL || {};
      4 · LEDGER
      ══════════════════════════════════════════════════════════════════ */
   const ledger = {
-    title: "Ledger",
-    crumb: "AUDIT TRAIL",
+    title: "Activity log",
+    crumb: "TRACK",
     f: { cat:"", month:"", scope:"", dept:"", q:"", voided:false },
     sort: { key:"date", dir:-1 },
     page: 1, size: 25,
@@ -621,7 +621,7 @@ window.VL = window.VL || {};
       return `
         <div class="module"><div class="wall"><div class="panel panel-flush">
           <div class="panel-hd" style="padding:16px 18px 0">
-            <h2>Ledger</h2><span class="hd-note" id="ledgerCount"></span></div>
+            <h2>Activity log</h2><span class="hd-note" id="ledgerCount"></span></div>
 
           <div style="padding:0 18px 16px">
             <div class="filters">
@@ -632,7 +632,7 @@ window.VL = window.VL || {};
               <div class="field"><label for="fDept">Department</label><select id="fDept" class="ctl">
                 <option value="">All departments</option>
                 ${V.DEPARTMENTS.map(d=>`<option value="${d.id}">${d.name}</option>`).join("")}</select></div>
-              <div class="field"><label for="fScope">Scope</label><select id="fScope" class="ctl">
+              <div class="field"><label for="fScope">Emission type</label><select id="fScope" class="ctl">
                 <option value="">All scopes</option><option value="1">Scope 1</option>
                 <option value="2">Scope 2</option><option value="3">Scope 3</option></select></div>
               <div class="field grow"><label for="fSearch">Search</label>
@@ -674,8 +674,8 @@ window.VL = window.VL || {};
       $("#fSearch").oninput = e => { L.f.q = e.target.value; L.page = 1; L.paint(); };
       $("#fVoided").onchange= e => { L.f.voided = e.target.checked; L.page = 1; L.paint(); };
       $("#csvBtn").onclick  = () => {
-        V.UI.download(`verdant-ledger-${V.todayISO()}.csv`, S().csv());
-        toast("Ledger exported", `${S().entries.length} rows including hash columns`);
+        V.UI.download(`terrawise-activity-${V.todayISO()}.csv`, S().csv());
+        toast("Activity log downloaded", `${S().entries.length} rows`);
       };
       $$("#ledgerTable th.sortable").forEach(th => th.addEventListener("click", () => {
         const k = th.dataset.key;
@@ -783,19 +783,19 @@ window.VL = window.VL || {};
      5 · INTEGRITY
      ══════════════════════════════════════════════════════════════════ */
   const integrity = {
-    title: "Ledger integrity",
-    crumb: "CRYPTOGRAPHIC",
+    title: "Data check",
+    crumb: "VERIFY",
     render() {
       return `
         <div class="module">
           <div class="wall"><div class="panel">
-            <div class="panel-hd"><h2>Chain head</h2>
-              <span class="hd-note">SHA-256 · CANONICAL FIELD ORDER</span></div>
+            <div class="panel-hd"><h2>Is the data untouched?</h2>
+              <span class="hd-note">EVERY ENTRY IS LOCKED TO THE ONE BEFORE IT</span></div>
             <div class="chain-head" id="chainHead"></div>
             <div class="row wrapflex mt-16" style="gap:10px">
-              <button class="btn btn-primary" id="verifyBtn">${icon("shield",14)} Verify the whole chain</button>
-              <button class="btn" id="tamperBtn">${icon("warning",14)} Demonstrate tampering</button>
-              <button class="btn" id="resealBtn">${icon("reset",14)} Re-seal the ledger</button>
+              <button class="btn btn-primary" id="verifyBtn">${icon("shield",14)} Check all records</button>
+              <button class="btn" id="tamperBtn">${icon("warning",14)} Try editing a record</button>
+              <button class="btn" id="resealBtn">${icon("reset",14)} Reset the lock</button>
             </div>
             <div class="verify-bar" id="verifyBar" hidden><i></i></div>
             <div id="verifyOut" class="mt-16"></div>
@@ -803,7 +803,7 @@ window.VL = window.VL || {};
 
           <div class="wall g2 stack">
             <div class="panel">
-              <div class="panel-hd"><h2>How the chain works</h2></div>
+              <div class="panel-hd"><h2>How it works <span class="faint">(technical)</span></h2></div>
               <div class="prose" style="font-size:var(--fs-small)">
                 <p>Each entry is hashed together with the hash of the entry before it:</p>
               </div>
@@ -838,11 +838,11 @@ canonical(e) = id | date | factor_id | qty(3dp)
         S().reseal(); S().persist();
         integrity.paintHead(); integrity.paintBlocks();
         $("#verifyOut").innerHTML = "";
-        toast("Ledger re-sealed", "Every hash recomputed from genesis", "info");
+        toast("Records locked again", "Every record re-checked from the start", "info");
       };
       $("#tamperBtn").onclick = async () => {
         const ok = await dialog({
-          title: "Demonstrate tampering?",
+          title: "Try editing a record?",
           body: `<p>This will silently alter the quantity on one historical entry — exactly what
                  a bad actor editing the database directly would do — <b>without</b> updating its
                  hash.</p><p style="margin-top:8px">Then run the verifier and watch it find the
@@ -865,7 +865,7 @@ canonical(e) = id | date | factor_id | qty(3dp)
       $("#chainHead").innerHTML = `
         <div class="ch-ico">${icon(r.ok ? "shield" : "warning", 19)}</div>
         <div style="flex:1;min-width:0">
-          <div class="ch-label">Head hash · ${S().entries.length} blocks</div>
+          <div class="ch-label">Data-check code · ${S().entries.length} records</div>
           <div class="ch-hash">${S().head}</div>
         </div>
         <span class="chip ${r.ok ? "chip-good" : "chip-bad"}"><i></i>${r.ok ? "Sealed" : "Broken"}</span>`;
@@ -935,7 +935,7 @@ canonical(e) = id | date | factor_id | qty(3dp)
 recomputed  ${result.firstBreak.recomputed}</div>
             <div class="f-meta">
               <span class="chip chip-bad"><i></i>TAMPER DETECTED</span>
-              <button class="chip chip-accent" id="fixChain"><i></i>Re-seal the ledger</button>
+              <button class="chip chip-accent" id="fixChain"><i></i>Reset the lock</button>
             </div>
           </div></div>`;
 
@@ -953,13 +953,13 @@ recomputed  ${result.firstBreak.recomputed}</div>
      ══════════════════════════════════════════════════════════════════ */
   const insights = {
     title: "Insights",
-    crumb: "DETECTION",
+    crumb: "PLAN",
     render() {
       return `
         <div class="module">
           <div class="wall g4" id="insightKpis"></div>
           ${`<div class="wall stack">` +
-            chartPanel("Net position — measured and projected", "OLS FIT · 95% PREDICTION INTERVAL",
+            chartPanel("Your carbon so far, and where it is heading", "SHADED AREA = LIKELY RANGE",
               "forecastWrap", `<div class="legend">
                 <span><i class="line" style="background:var(--text-2)"></i>MEASURED</span>
                 <span><i class="line" style="background:var(--accent)"></i>PROJECTED</span>
@@ -969,7 +969,7 @@ recomputed  ${result.firstBreak.recomputed}</div>
           <div class="wall stack"><div class="panel panel-flush">
             <div class="panel-hd" style="padding:16px 18px 0;margin-bottom:6px">
               <h2>Anomalies</h2>
-              <span class="hd-note">ROLLING MEAN ± 2.5σ · CURRENT MONTH EXCLUDED</span></div>
+              <span class="hd-note">MONTHS THAT WERE FAR ABOVE NORMAL</span></div>
             <div id="anomalyList"></div>
           </div></div>
 
@@ -985,13 +985,13 @@ recomputed  ${result.firstBreak.recomputed}</div>
       const bad = anomalies.filter(a => !a.isGood);
 
       $("#insightKpis").innerHTML = [
-        { l:"Anomalies flagged", v:anomalies.length, note:`${bad.length} need attention`,
+        { l:"Unusual months", v:anomalies.length, note:`${bad.length} worth checking`,
           chip: bad.length ? "bad" : "good" },
-        { l:"Trend", v:`${signed(fc.trendPerMonth/1000,2)}`, unit:" t/mo",
-          note:`r² = ${nf(fc.confidence,3)}`, chip: fc.trendPerMonth < 0 ? "good" : "warn" },
-        { l:"Annual run rate", v:nf(fc.annualRunRate/1000,1), unit:" t/yr",
-          note:"from the last three months", chip:"flat" },
-        { l:"Projected in 6 months", v:nf(fc.projection[5].net/1000,1), unit:" t/mo",
+        { l:"Direction", v:`${signed(fc.trendPerMonth/1000,2)}`, unit:" t a month",
+          note: fc.trendPerMonth < 0 ? "going down" : "going up", chip: fc.trendPerMonth < 0 ? "good" : "warn" },
+        { l:"Yearly pace", v:nf(fc.annualRunRate/1000,1), unit:" t a year",
+          note:"based on the last 3 months", chip:"flat" },
+        { l:"Expected in 6 months", v:nf(fc.projection[5].net/1000,1), unit:" t a month",
           note:`range ${nf(fc.projection[5].lower/1000,1)}–${nf(fc.projection[5].upper/1000,1)}`,
           chip:"flat" }
       ].map(k => `
@@ -1003,10 +1003,10 @@ recomputed  ${result.firstBreak.recomputed}</div>
 
       V.Charts.forecastLine($("#forecastWrap"), history, fc.projection);
       $("#forecastStats").innerHTML = [
-        { l:"Slope", v:`${signed(fc.trendPerMonth,0)} kg`, s:"per month, least squares" },
-        { l:"Fit quality", v:`r² ${nf(fc.confidence,3)}`,
+        { l:"Change each month", v:`${signed(fc.trendPerMonth,0)} kg`, s:"on average" },
+        { l:"How reliable", v: fc.confidence >= 0.6 ? "Fairly sure" : fc.confidence >= 0.3 ? "Rough guess" : "Very rough",
           s: fc.confidence > 0.5 ? "a usable trend" : "noisy — treat with caution" },
-        { l:"Year on year", v:`${signed(fc.trendPerYearPct,1)}%`, s:"if nothing changes" }
+        { l:"Next year", v:`${signed(fc.trendPerYearPct,0)}%`, s:"if nothing changes" }
       ].map(x => `<div><div class="sl">${x.l}</div><div class="sv">${x.v}</div>
         <div class="ss">${x.s}</div></div>`).join("");
 
@@ -1018,7 +1018,7 @@ recomputed  ${result.firstBreak.recomputed}</div>
             <p>${V.Analytics.explain(a)}</p>
             <div class="f-meta">
               <span class="chip chip-${a.isGood ? "good" : a.severity === "high" ? "bad" : "warn"}">
-                <i></i>${Math.abs(a.z).toFixed(1)}σ ${a.direction}</span>
+                <i></i>${a.severity === "high" ? "Very unusual" : "Unusual"}</span>
               <span class="chip chip-flat"><i></i>${signed(a.deltaPct,0)}% vs expected</span>
               <span class="chip chip-flat"><i></i>${a.isGood ? "saved" : "cost"} ${tonnes(Math.abs(a.co2Impact))} t</span>
               <span class="chip chip-outline">${V.CAT[a.category].name}</span>
@@ -1045,13 +1045,13 @@ recomputed  ${result.firstBreak.recomputed}</div>
      7 · TARGETS
      ══════════════════════════════════════════════════════════════════ */
   const targets = {
-    title: "Targets & budget",
-    crumb: "COMMITMENT",
+    title: "Goals",
+    crumb: "PLAN",
     render() {
       return `
         <div class="module">
           <div class="wall"><div class="panel">
-            <div class="panel-hd"><h2>Carbon budget</h2>
+            <div class="panel-hd"><h2>Your carbon budget</h2>
               <span class="hd-note" id="budgetNote"></span></div>
             <div class="budget-gauge" id="budgetGauge"></div>
             <div class="countdown" id="countdown"></div>
@@ -1059,7 +1059,7 @@ recomputed  ${result.firstBreak.recomputed}</div>
           </div></div>
 
           ${`<div class="wall stack">` +
-            chartPanel("Glide path to the target", "SBTi-SHAPED LINEAR PATHWAY", "budgetWrap",
+            chartPanel("The path to your goal", "WHAT YOU CAN EMIT EACH YEAR", "budgetWrap",
               `<div class="legend">
                 <span><i style="background:var(--good)"></i>ALLOWED UNDER THE PATHWAY</span>
                 <span><i class="line" style="background:var(--bad)"></i>CURRENT RUN RATE</span>
@@ -1076,7 +1076,7 @@ recomputed  ${result.firstBreak.recomputed}</div>
                     min="5" max="100" step="1"><span class="unit">%</span></div></div>
               </div>
               <div class="prose mt-16" style="font-size:var(--fs-small)">
-                <p>The default is the <b>SBTi 1.5 °C aligned</b> pathway: a 42% absolute reduction
+                <p>The default follows the <b>1.5 °C climate goal</b>: a 42% absolute reduction
                    by 2030 against the baseline year. Changing either value recomputes the budget,
                    the glide path and the exhaustion date immediately.</p>
               </div>
@@ -1129,9 +1129,9 @@ recomputed  ${result.firstBreak.recomputed}</div>
           c: budget.onTrack ? "var(--good)" : "var(--warn)" },
         { v: nf(budget.yearsLeft, 1), l: "years to target", c: "var(--text-1)" },
         { v: budget.exhaustDate ? budget.exhaustDate.toISOString().slice(0, 7) : "—",
-          l: "budget exhausted",
+          l: "budget runs out",
           c: budget.exhaustsBeforeTarget ? "var(--bad)" : "var(--good)" },
-        { v: `${signed(budget.gapPct, 0)}%`, l: "vs the pathway",
+        { v: `${signed(budget.gapPct, 0)}%`, l: "vs where you should be",
           c: budget.onTrack ? "var(--good)" : "var(--bad)" }
       ].map(c => `<div><div class="cd-v" style="color:${c.c}">${c.v}</div>
         <div class="cd-l">${c.l}</div></div>`).join("");
@@ -1166,22 +1166,22 @@ recomputed  ${result.firstBreak.recomputed}</div>
      8 · DEPARTMENTS
      ══════════════════════════════════════════════════════════════════ */
   const departments = {
-    title: "Departments",
-    crumb: "ACCOUNTABILITY",
+    title: "Teams",
+    crumb: "PLAN",
     render() {
       return `
         <div class="module">
           <div class="wall"><div class="panel panel-flush">
             <div class="panel-hd" style="padding:16px 18px 0">
-              <h2>Leaderboard</h2>
-              <span class="hd-note">RANKED BY kg CO₂e PER HEAD PER MONTH</span></div>
+              <h2>Team ranking</h2>
+              <span class="hd-note">LOWEST CARBON PER PERSON FIRST</span></div>
             <div id="deptList" style="margin-top:8px"></div>
           </div></div>
 
           <div class="wall g2 stack">
-            ${chartPanel("Net position by department", "", "deptChart")}
+            ${chartPanel("Carbon by team", "", "deptChart")}
             <div class="panel">
-              <div class="panel-hd"><h2>Why per head</h2></div>
+              <div class="panel-hd"><h2>Why per person?</h2></div>
               <div class="prose" style="font-size:var(--fs-small)">
                 <p>Ranking teams by absolute tonnage would put Facilities last every month simply
                    because it holds the electricity meter for the whole building. Ranking by
@@ -1210,7 +1210,7 @@ recomputed  ${result.firstBreak.recomputed}</div>
           <span class="d-name"><b>${r.d.name}</b><span>${r.d.head} people · ${r.agg.count} entries</span></span>
           <span class="d-bar"><i style="width:${V.clamp01(Math.abs(r.perHead)/max)*100}%;
             background:${V.bandVar(r.score.composite)}"></i></span>
-          <span class="d-val">${nf(r.perHead, 1)} <span class="faint">kg/head/mo</span></span>
+          <span class="d-val">${nf(r.perHead, 1)} <span class="faint">kg per person a month</span></span>
           <span class="d-grade" style="color:${V.bandVar(r.score.composite)}">${r.score.grade}</span>
         </div>`).join("");
 
@@ -1223,10 +1223,10 @@ recomputed  ${result.firstBreak.recomputed}</div>
 
       const best = rows[0], worst = rows[rows.length - 1];
       $("#deptStats").innerHTML = [
-        { l:"Best", v:best.d.name, s:`${nf(best.perHead,1)} kg/head/mo` },
+        { l:"Best", v:best.d.name, s:`${nf(best.perHead,0)} kg per person a month` },
         { l:"Spread", v:`${nf(worst.perHead / Math.max(0.01, best.perHead), 1)}×`,
           s:"highest vs lowest intensity" },
-        { l:"Needs support", v:worst.d.name, s:`${nf(worst.perHead,1)} kg/head/mo` }
+        { l:"Needs support", v:worst.d.name, s:`${nf(worst.perHead,0)} kg per person a month` }
       ].map(x => `<div><div class="sl">${x.l}</div>
         <div class="sv" style="font-size:15px">${x.v}</div><div class="ss">${x.s}</div></div>`).join("");
     }
@@ -1237,26 +1237,25 @@ recomputed  ${result.firstBreak.recomputed}</div>
      ══════════════════════════════════════════════════════════════════ */
   const reports = {
     title: "Reports",
-    crumb: "DISCLOSURE",
+    crumb: "VERIFY",
     render() {
       return `
         <div class="module">
           <div class="wall g2">
             <div class="panel">
-              <div class="panel-hd"><h2>Exports</h2></div>
+              <div class="panel-hd"><h2>Download</h2></div>
               <div class="prose" style="font-size:var(--fs-small)">
-                <p>The CSV carries the <b>hash columns</b> alongside every row, so an auditor can
-                   re-derive the chain independently from the export alone.</p>
+                <p>Download your data to share with your team or an auditor.</p>
               </div>
               <div class="col mt-16" style="gap:9px">
-                <button class="btn" id="expCsv">${icon("download",14)} Ledger as CSV (with hashes)</button>
-                <button class="btn" id="expJson">${icon("download",14)} Disclosure report as JSON</button>
-                <button class="btn" id="expTheme">${icon("palette",14)} Current palette as CSS</button>
-                <button class="btn" id="copyHead">${icon("copy",14)} Copy the chain head</button>
+                <button class="btn" id="expCsv">${icon("download",14)} Activity log (spreadsheet)</button>
+                <button class="btn" id="expJson">${icon("download",14)} Full report (data file)</button>
+                <button class="btn" id="expTheme">${icon("palette",14)} Colour theme (for developers)</button>
+                <button class="btn" id="copyHead">${icon("copy",14)} Copy the data-check code</button>
               </div>
             </div>
             <div class="panel">
-              <div class="panel-hd"><h2>Period summary</h2>
+              <div class="panel-hd"><h2>Summary</h2>
                 <span class="hd-note" id="repPeriod"></span></div>
               <div class="stat-strip" id="repTotals" style="margin-top:0"></div>
               <div class="subs" id="repScopes" style="border-top:0;padding-top:14px"></div>
@@ -1264,8 +1263,8 @@ recomputed  ${result.firstBreak.recomputed}</div>
           </div>
 
           <div class="wall stack"><div class="panel">
-            <div class="panel-hd"><h2>Disclosure preview</h2>
-              <span class="hd-note">WHAT THE JSON EXPORT CONTAINS</span></div>
+            <div class="panel-hd"><h2>What's inside the report file</h2>
+              <span class="hd-note">FOR AUDITORS AND DEVELOPERS</span></div>
             <div class="code-block" id="repJson" style="max-height:420px;overflow:auto"></div>
           </div></div>
         </div>`;
@@ -1278,9 +1277,9 @@ recomputed  ${result.firstBreak.recomputed}</div>
         `${V.monthLabel(months[0])} — ${V.monthLabel(months[months.length-1])}`.toUpperCase();
 
       $("#repTotals").innerHTML = [
-        { l:"Gross issued", v:tonnes(agg.gross), c:"var(--text-1)" },
+        { l:"Emitted", v:tonnes(agg.gross), c:"var(--text-1)" },
         { l:"Avoided", v:tonnes(agg.avoided), c:"var(--good)" },
-        { l:"Net position", v:tonnes(agg.net), c:"var(--accent)" }
+        { l:"Overall", v:tonnes(agg.net), c:"var(--accent)" }
       ].map(x => `<div><div class="sl">${x.l}</div>
         <div class="sv" style="color:${x.c}">${x.v}<u style="font-size:var(--fs-small);color:var(--text-3)"> t</u></div>
         </div>`).join("");
@@ -1299,21 +1298,21 @@ recomputed  ${result.firstBreak.recomputed}</div>
       $("#repJson").textContent = JSON.stringify(doc, null, 2);
 
       $("#expCsv").onclick = () => {
-        V.UI.download(`verdant-ledger-${V.todayISO()}.csv`, S().csv());
-        toast("Ledger exported", `${S().entries.length} rows with hash columns`);
+        V.UI.download(`terrawise-activity-${V.todayISO()}.csv`, S().csv());
+        toast("Activity log downloaded", `${S().entries.length} rows`);
       };
       $("#expJson").onclick = () => {
-        V.UI.download(`verdant-disclosure-${V.todayISO()}.json`,
+        V.UI.download(`terrawise-report-${V.todayISO()}.json`,
           JSON.stringify(doc, null, 2), "application/json");
         toast("Disclosure exported", "JSON · GHG Protocol shaped");
       };
       $("#expTheme").onclick = () => {
-        V.UI.download("verdant-palette.css", V.Theme.toCSS(), "text/css");
+        V.UI.download("terrawise-palette.css", V.Theme.toCSS(), "text/css");
         toast("Palette exported", "Generated CSS custom properties");
       };
       $("#copyHead").onclick = async () => {
         const ok = await V.UI.copyText(S().head);
-        toast(ok ? "Chain head copied" : "Could not copy",
+        toast(ok ? "Code copied" : "Could not copy",
           ok ? V.Chain.shortHash(S().head) : "Clipboard unavailable", ok ? "ok" : "err");
       };
     }
@@ -1323,8 +1322,8 @@ recomputed  ${result.firstBreak.recomputed}</div>
      10 · METHODOLOGY (in-app)
      ══════════════════════════════════════════════════════════════════ */
   const methodology = {
-    title: "Methodology",
-    crumb: "REFERENCE",
+    title: "How we calculate",
+    crumb: "VERIFY",
     render() {
       return `
         <div class="module">
@@ -1412,7 +1411,7 @@ grade      A+ ≥ 85 · A ≥ 75 · B+ ≥ 65 · B ≥ 55 · C+ ≥ 45 · C ≥ 
      ══════════════════════════════════════════════════════════════════ */
   const settings = {
     title: "Settings",
-    crumb: "CONFIGURATION",
+    crumb: "VERIFY",
     render() {
       return `
         <div class="module">

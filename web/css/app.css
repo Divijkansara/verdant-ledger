@@ -459,3 +459,18 @@ tbody tr.voided .strike{text-decoration:line-through}
   border-radius:var(--r-sm);padding:5px 10px;transition:all var(--t-fast)}
 .tour-btn:hover{border-color:var(--accent)}
 @media (max-width:700px){.tour-btn span{display:none}}
+
+
+/* ═══════════════════════ progressive disclosure ═══════════════════
+   Specialist detail stays one click away instead of on every screen. */
+.plain{margin:10px 0 0;color:var(--text-2);font-size:var(--fs-small);line-height:1.5}
+details.more>summary{list-style:none;cursor:pointer;display:flex;align-items:baseline;gap:10px;
+  margin-top:14px;font-size:var(--fs-small);color:var(--accent);font-weight:500}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::before{content:"+";font-family:var(--font-mono);width:12px}
+details.more[open]>summary::before{content:"\2212"}
+details.more>summary em{font-style:normal;color:var(--text-4);font-weight:400}
+details.more>summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+details.more-wall{margin-top:6px}
+details.more-wall>summary{padding:14px 18px;border:1px dashed var(--line-2);margin:0 0 14px}
+details.more-wall[open]>summary{border-style:solid}

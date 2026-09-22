@@ -1,4 +1,4 @@
-# Verdant Ledger — handoff brief for the next AI
+# Terrawise (formerly Verdant Ledger) — handoff brief for the next AI
 
 Paste this whole file to the next assistant. It explains the project, how the owner wants it, what's done, and what to watch out for.
 

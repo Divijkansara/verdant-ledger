@@ -12,7 +12,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # --- application -------------------------------------------------------
-    app_name: str = "Verdant Ledger API"
+    app_name: str = "Terrawise API"
     app_version: str = "1.0.0"
     debug: bool = True
 

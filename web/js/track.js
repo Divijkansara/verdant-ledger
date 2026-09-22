@@ -28,9 +28,11 @@
     save();
   };
 
-  let sending = false;
+  // When the API is down, wait longer between attempts (5 s doubling to
+  // 5 min) instead of retrying every few seconds for the whole visit.
+  let sending = false, wait = 5000, nextTry = 0;
   async function flush() {
-    if (sending || !queue.length) return;
+    if (sending || !queue.length || Date.now() < nextTry) return;
     sending = true;
     const batch = queue.slice(0, 50);
     try {
@@ -39,8 +41,11 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sid, events: batch }),
       });
-      if (res.ok) { queue = queue.slice(batch.length); save(); }
-    } catch (_) { /* offline: keep the queue */ }
+      if (!res.ok) throw new Error(res.status);
+      queue = queue.slice(batch.length); save(); wait = 5000;
+    } catch (_) {           // offline: keep the queue, back off
+      nextTry = Date.now() + wait; wait = Math.min(wait * 2, 300000);
+    }
     sending = false;
   }
 

@@ -1,4 +1,4 @@
-# Verdant Ledger — Web application
+# Terrawise — Web application
 
 Fifteen routes. Eleven console modules. No framework, no bundler, no
 dependencies. Opens from a double-click.

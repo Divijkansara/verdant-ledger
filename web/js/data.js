@@ -16,7 +16,7 @@ window.VL = window.VL || {};
   const CATEGORIES = [
     { id: "electricity", name: "Electricity",  s: 1, kind: "charge", icon: "bolt"      },
     { id: "transport",   name: "Transport",    s: 2, kind: "charge", icon: "route"     },
-    { id: "procurement", name: "Procurement",  s: 3, kind: "charge", icon: "box"       },
+    { id: "procurement", name: "Purchases",    s: 3, kind: "charge", icon: "box"       },
     { id: "waste",       name: "Waste",        s: 4, kind: "charge", icon: "trash"     },
     { id: "water",       name: "Water",        s: 5, kind: "charge", icon: "drop"      },
     { id: "paper",       name: "Paper",        s: 6, kind: "charge", icon: "page"      },

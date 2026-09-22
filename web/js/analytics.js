@@ -154,9 +154,9 @@ window.VL = window.VL || {};
     };
     const key = `${a.factor.cat}:${a.factor.code}`;
     const cause = causes[key] || "a data-entry error or a genuine one-off event";
-    return `${a.factor.label} ran ${pct}% ${dir} its own trailing average `
-         + `(${a.observed.toFixed(0)} vs ${a.expected.toFixed(0)} ${a.factor.unit}, ${Math.abs(a.z).toFixed(1)}σ). `
-         + `Typical causes: ${cause}.`;
+    return `${a.factor.label} was ${pct}% ${dir} its usual level `
+         + `(${Math.round(a.observed).toLocaleString("en-IN")} ${a.factor.unit} instead of about ${Math.round(a.expected).toLocaleString("en-IN")}). `
+         + `Likely cause: ${cause}.`;
   }
 
   /* ═════════════════════ 2 · FORECAST ════════════════════════════════ */

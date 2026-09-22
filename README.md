@@ -1,4 +1,4 @@
-# Verdant Ledger
+# Terrawise
 
 **A digital sustainability ledger for an organisation.**
 

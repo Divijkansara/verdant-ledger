@@ -227,7 +227,7 @@ def seed_demo_org(db, factors: dict[str, EmissionFactor]) -> Organization:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Seed the Verdant Ledger database")
+    parser = argparse.ArgumentParser(description="Seed the Terrawise database")
     parser.add_argument("--reset", action="store_true", help="drop all tables first")
     parser.add_argument("--factors-only", action="store_true", help="skip the demo organisation")
     args = parser.parse_args()

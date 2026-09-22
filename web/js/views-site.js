@@ -27,7 +27,7 @@ window.VL = window.VL || {};
     return `
       <header class="nav${active === "/" ? " nav-overlay at-top" : ""}" id="siteNav">
         <div class="shell nav-in">
-          <a class="brand" href="#/">${GLYPH}<b>Verdant<span> Ledger</span></b></a>
+          <a class="brand" href="#/">${GLYPH}<b>Terra<span>wise</span></b></a>
           <nav class="nav-links">
             ${link("/", "Product")}
             ${link("/methodology", "Methodology")}
@@ -52,7 +52,7 @@ window.VL = window.VL || {};
         <div class="shell">
           <div class="foot-grid">
             <div class="foot-col">
-              <a class="brand" href="#/" style="margin-bottom:14px">${GLYPH}<b>Verdant<span> Ledger</span></b></a>
+              <a class="brand" href="#/" style="margin-bottom:14px">${GLYPH}<b>Terra<span>wise</span></b></a>
               <p style="color:var(--text-3);font-size:var(--fs-small);max-width:34ch;line-height:1.65">
                 Double-entry bookkeeping for what an organisation takes from the planet.
                 Built on the GHG Protocol, sealed with a hash chain.</p>
@@ -123,7 +123,7 @@ window.VL = window.VL || {};
         <div class="shell mast-stage">
           <div class="mast-copy">
             <div class="docket mast-docket">
-              <span><b>Verdant Ledger</b></span><i>/</i>
+              <span><b>Terrawise</b></span><i>/</i>
               <span>Statement of sustainability position</span><i>/</i>
               <span id="mastPeriod">12 months</span>
             </div>

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Serve the Verdant Ledger web application on http://localhost:5500
+"""Serve the Terrawise web application on http://localhost:5500
 
     python serve.py
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     http.server.ThreadingHTTPServer.allow_reuse_address = True
     with http.server.ThreadingHTTPServer(("", PORT), Handler) as httpd:
         url = f"http://localhost:{PORT}/"
-        print(f"Verdant Ledger -> {url}")
+        print(f"Terrawise -> {url}")
         print("Ctrl-C to stop.\n")
         try:
             webbrowser.open(url)
