@@ -16,7 +16,8 @@ window.VL = window.VL || {};
   "use strict";
   const V = window.VL;
 
-  const API_BASE = "http://127.0.0.1:8000";
+  // Set window.VERDANT_API before this script to point at a deployed API.
+  const API_BASE = window.VERDANT_API || "http://127.0.0.1:8000";
   const LS = { ledger: "vl.ledger.v3", session: "vl.session.v1", token: "vl.token.v1" };
 
   const Store = {

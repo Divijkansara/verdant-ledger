@@ -257,3 +257,21 @@ def test_viewer_cannot_post_entries(client, auth):
 
     # ...but reading is fine
     assert client.get("/api/dashboard/summary", headers=headers).status_code == 200
+
+
+# ───────────────────────────── site activity ─────────────────────────
+
+def test_events_are_stored_and_readable_by_admin(client, auth):
+    r = client.post("/api/events", json={"session_id": "test-session", "events": [
+        {"kind": "view", "path": "#/"}, {"kind": "click", "path": "#/", "detail": {"id": "planetAct"}}]})
+    assert r.status_code == 202 and r.json()["stored"] == 2
+    r = client.get("/api/events", headers=auth)
+    assert r.status_code == 200
+    assert r.json()["counts"]["click"] >= 1
+
+
+def test_event_batches_are_bounded(client):
+    r = client.post("/api/events", json={"session_id": "test-session",
+                                         "events": [{"kind": "view"}] * 51})
+    assert r.status_code == 422
+    assert client.get("/api/events").status_code == 401

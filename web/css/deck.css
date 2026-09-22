@@ -191,3 +191,25 @@
 @media (prefers-reduced-motion:reduce){
   .dchip,.dstat{animation:none}
 }
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   spread — once a document is picked, it opens full size on the right
+   and the other four stay visible as a column of tabs on the left, so
+   the section no longer leaves half the page empty.
+   ══════════════════════════════════════════════════════════════════════ */
+@media (min-width:1000px){
+  .deck-section .deck-stage.spread{max-width:none;aspect-ratio:auto;height:430px;perspective:none}
+  .deck-stage.spread .deck{transform:none}
+  .deck-stage.spread .sheet{
+    transition:left .6s var(--ease-out), top .6s var(--ease-out), width .6s var(--ease-out),
+               height .6s var(--ease-out), opacity .45s var(--ease-out), filter .45s var(--ease-out),
+               border-color var(--t-fast);
+    transition-delay:0s;transform:none;opacity:1;
+    inset:auto;left:0;width:34%;
+    top:calc((var(--o) - 1) * 110px);height:98px;overflow:hidden}
+  .deck-stage.spread .sheet.front{left:38%;width:62%;top:0;height:100%}
+  .deck-stage.spread .sheet:not(.front) .rule{display:none}
+  .deck-stage.spread .dchip.c2{right:0}
+  .deck-stage.spread .deck-nav{justify-content:flex-start;left:38%}
+}

@@ -173,7 +173,7 @@ window.VL = window.VL || {};
       dots.forEach((d, i) => d.setAttribute("aria-pressed", String(i === front)));
     };
 
-    const go = i => { front = ((i % n) + n) % n; place(); };
+    const go = i => { front = ((i % n) + n) % n; host.classList.add("spread"); place(); };
     place();
 
     dots.forEach(d => d.addEventListener("click", () => go(+d.dataset.go)));

@@ -19,7 +19,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.database import init_db
-from app.routers import auth, dashboard, entries, factors, reports
+from app.routers import auth, dashboard, entries, events, factors, reports
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("verdant")
@@ -95,3 +95,4 @@ app.include_router(factors.router)
 app.include_router(entries.router)
 app.include_router(dashboard.router)
 app.include_router(reports.router)
+app.include_router(events.router)

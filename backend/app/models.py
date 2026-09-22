@@ -245,3 +245,18 @@ class AuditLog(Base):
     entity_id: Mapped[int | None] = mapped_column(Integer)
     detail: Mapped[dict | None] = mapped_column(JSON)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class SiteEvent(Base):
+    """Everything a visitor does on the website: page views, clicks,
+    scenario runs, sign-ins. Written by the anonymous POST /api/events
+    endpoint, so it never touches the ledger itself."""
+
+    __tablename__ = "site_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    session_id: Mapped[str] = mapped_column(String(40), index=True, nullable=False)
+    kind: Mapped[str] = mapped_column(String(40), index=True, nullable=False)  # view, click, scenario, login ...
+    path: Mapped[str] = mapped_column(String(200), default="")
+    detail: Mapped[dict | None] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
