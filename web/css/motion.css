@@ -32,7 +32,51 @@ a.chip:hover,.chip-accent:hover{transform:translateY(-1px)}
 .ctl{transition:border-color var(--t-fast),background var(--t-fast),box-shadow var(--t-med)}
 .ctl:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
 
-/* ── 2 · the site's chrome ───────────────────────────────────────────── */
+/* ── 2 · the expandable menu ──────────────────────────────────────────
+   Icons at rest. The page you are on keeps its name open; whichever icon
+   you point at opens its own while you are there. The label transitions on
+   max-width rather than width, because a width of auto cannot be animated
+   everywhere, and the easing is the flat-landing curve a spring settles
+   into — no bounce, because this is navigation, not a toy. */
+.etabs{display:flex;align-items:center;gap:4px;margin-left:6px;padding:5px;
+  border:1px solid var(--line-2);border-radius:var(--r-pill);
+  background:color-mix(in srgb,var(--surface-2) 72%,transparent);
+  backdrop-filter:blur(8px)}
+.etab{display:inline-flex;align-items:center;padding:8px;border-radius:var(--r-pill);
+  color:var(--text-3);text-decoration:none;
+  transition:background var(--t-fast),color var(--t-fast),
+    padding .5s cubic-bezier(.22,1,.36,1)}
+.etab svg{flex:0 0 auto}
+.etab-l{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;font-size:var(--fs-small);
+  font-weight:500;letter-spacing:.01em;
+  transition:max-width .5s cubic-bezier(.22,1,.36,1),opacity .32s var(--ease-out),
+    margin-left .5s cubic-bezier(.22,1,.36,1)}
+.etab:hover,.etab:focus-visible{background:var(--surface-3);color:var(--text-1);
+  padding-inline:14px;outline:none}
+.etab:focus-visible{box-shadow:0 0 0 2px var(--accent)}
+.etab.on{background:var(--accent-wash);color:var(--accent);padding-inline:14px}
+.etab:hover .etab-l,.etab:focus-visible .etab-l,.etab.on .etab-l{
+  max-width:14ch;opacity:1;margin-left:8px}
+.etab-sep{width:1.2px;height:22px;background:var(--line-2);margin-inline:3px;flex:0 0 auto}
+
+@media (max-width:760px){
+  .etabs{margin-left:0;gap:2px;padding:4px}
+  .etab{padding:7px}
+  .etab:hover,.etab:focus-visible,.etab.on{padding-inline:11px}
+  .etab:hover .etab-l,.etab:focus-visible .etab-l,.etab.on .etab-l{max-width:10ch}
+}
+.etab-auth{display:contents}
+@media (max-width:520px){
+  .brand b{display:none}                 /* the mark alone carries it here */
+  .etab-sep,.etab-auth{display:none}     /* signing in is one tap further on */
+  .nav-right .btn-primary{padding:7px 11px}
+  .nav-in{gap:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .etab,.etab-l{transition:none}
+}
+
+/* ── 3 · the site's chrome ───────────────────────────────────────────── */
 .nav-links a{position:relative}
 .nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;
   background:var(--accent);transform:scaleX(0);transform-origin:left;
@@ -41,7 +85,7 @@ a.chip:hover,.chip-accent:hover{transform:translateY(-1px)}
 .brand .glyph{transition:transform var(--t-med) var(--ease-out)}
 .brand:hover .glyph,.rail-top:hover .glyph{transform:rotate(-12deg) scale(1.06)}
 
-/* ── 3 · the console arrives in reading order ───────────────────────── */
+/* ── 4 · the console arrives in reading order ───────────────────────── */
 .rail-top{animation:railTop .5s var(--ease-out) both}
 .rail-nav .rail-group{animation:slideIn .45s var(--ease-out) both}
 .rail-nav .nav-item{animation:slideIn .45s var(--ease-out) both}
@@ -73,13 +117,13 @@ tbody tr{transition:background var(--t-fast)}
 .finding{animation:panelIn .5s var(--ease-out) both;
   animation-delay:calc(var(--f,0) * 70ms)}
 
-/* ── 4 · overlays ───────────────────────────────────────────────────── */
+/* ── 5 · overlays ───────────────────────────────────────────────────── */
 #modal.on{backdrop-filter:blur(3px)}
 #modal.on .modal-box{animation:modalIn .32s var(--ease-out) both}
 @keyframes modalIn{from{opacity:0;transform:translateY(14px) scale(.97)}}
 .toast{animation:toastIn .34s var(--ease-out) both}
 
-/* ── 5 · the questions open smoothly ────────────────────────────────── */
+/* ── 6 · the questions open smoothly ────────────────────────────────── */
 .faq details[open] .faq-body{animation:faqIn .42s var(--ease-out) both}
 @keyframes faqIn{from{opacity:0;transform:translateY(-6px)}}
 .faq summary{transition:color var(--t-fast)}
@@ -95,7 +139,7 @@ tbody tr{transition:background var(--t-fast)}
   .faq details[open]::details-content{block-size:auto}
 }
 
-/* ── 6 · signing in ──────────────────────────────────────────────────
+/* ── 7 · signing in ──────────────────────────────────────────────────
    The one deliberately theatrical moment in the product: the mark draws
    itself while the session is established, then the whole curtain lifts
    to reveal the dashboards behind it. It is never load-bearing — the
@@ -128,7 +172,7 @@ tbody tr{transition:background var(--t-fast)}
   animation:afBar 1.25s cubic-bezier(.65,0,.35,1) both}
 @keyframes afBar{from{transform:scaleX(0)}}
 
-/* ── 7 · the settle ──────────────────────────────────────────────────
+/* ── 8 · the settle ──────────────────────────────────────────────────
    Entrance animations hold their first frame until they run. If anything
    ever stops them running — an unusual engine, a power-saving mode — the
    content behind them would never appear. So a moment after each render
@@ -144,7 +188,7 @@ body.motion-settled #canvas .module .kpi,
 body.motion-settled #ledgerBody tr,
 body.motion-settled .finding{animation:none;opacity:1;transform:none}
 
-/* ── 8 · one place to turn it all off ───────────────────────────────── */
+/* ── 9 · one place to turn it all off ───────────────────────────────── */
 @media (prefers-reduced-motion:reduce){
   .btn:hover,.btn:active,.kpi:hover,a.chip:hover{transform:none}
   .rail-top,.rail-nav .rail-group,.rail-nav .nav-item,.rail-foot,.topbar,

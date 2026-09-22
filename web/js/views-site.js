@@ -25,22 +25,30 @@ window.VL = window.VL || {};
 
   /* ═══════════════════════ chrome ════════════════════════════════════ */
 
+  /* The menu is a row of icons; the one you are on — or the one under the
+     pointer — expands to say its name. Same idea as the expandable-tabs
+     component, written against our own icons and tokens so it inherits the
+     palette and needs no framework. The label stays in the DOM while it is
+     collapsed, so a screen reader still announces it. */
   function nav(active) {
-    const link = (href, label) =>
-      `<a href="#${href}" class="${active === href ? "on" : ""}">${label}</a>`;
+    const tab = (href, label, ico) => `
+      <a href="#${href}" class="etab${active === href ? " on" : ""}"
+         ${active === href ? 'aria-current="page"' : ""}>
+        ${icon(ico, 16)}<span class="etab-l">${label}</span>
+      </a>`;
+
     return `
       <header class="nav${active === "/" ? " nav-overlay at-top" : ""}" id="siteNav">
         <div class="shell nav-in">
           <a class="brand" href="#/">${GLYPH}<b>Terra<span>wise</span></b></a>
-          <nav class="nav-links">
-            ${link("/", "Product")}
-            ${link("/methodology", "Methodology")}
-            ${link("/docs", "Developers")}
-            <a href="#/signin" class="signin-row${active === "/signin" ? " on" : ""}">Sign in</a>
+          <nav class="etabs" aria-label="Sections">
+            ${tab("/", "Product", "grid")}
+            ${tab("/methodology", "Methodology", "book")}
+            ${tab("/docs", "Developers", "page")}
+            <span class="etab-sep" aria-hidden="true"></span>
+            <span class="etab-auth">${tab("/signin", "Sign in", "users")}</span>
           </nav>
           <div class="nav-right">
-            <button class="nav-burger" id="navBurger" aria-label="Menu">${icon("menu", 16)}</button>
-            <a class="btn btn-ghost" href="#/signin">Sign in</a>
             <a class="btn btn-primary" href="#/app/overview"><span class="lbl-long">Open the console</span><span class="lbl-short">Console</span> ${icon("arrow", 14)}</a>
           </div>
         </div>
@@ -584,7 +592,7 @@ window.VL = window.VL || {};
       <header class="ref-hero">
         <div class="shell">
           <div class="eyebrow">Developers</div>
-          <h1>Build on <em>the ledger.</em></h1>
+          <h1>Build on <em>Terrawise.</em></h1>
           <p class="lede">Run it in two minutes, read the API, extend the engine.</p>
           <div class="ref-stats">
             <div class="ref-stat"><b>REST</b><span>FastAPI · OpenAPI</span></div>
