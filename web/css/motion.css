@@ -1,0 +1,156 @@
+/* ══════════════════════════════════════════════════════════════════════
+   motion.css — the way the product moves.
+
+   Loaded last, so it refines what the component sheets set rather than
+   competing with them. Three rules held throughout:
+
+     · only transform and opacity are animated, so every frame is on the
+       compositor and nothing reflows mid-motion
+     · nothing moves further than it has to — the eye should be led, not
+       entertained
+     · every animation here is switched off by prefers-reduced-motion at
+       the end of the file, in one place
+
+   Durations come from the tokens in base.css (--t-fast / --t-med), so
+   the whole product speeds up or slows down from one line.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1 · touch and press ──────────────────────────────────────────────
+   A control should answer the finger before it answers the network. */
+.btn{transition:background var(--t-fast),border-color var(--t-fast),color var(--t-fast),
+  transform 180ms var(--ease-out),box-shadow var(--t-med) var(--ease-out)}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0) scale(.985);transition-duration:60ms}
+.btn-primary:hover{box-shadow:0 12px 30px -14px color-mix(in srgb,var(--accent) 70%,transparent)}
+.icon-btn,.menu-btn,.tour-btn,.kbd-hint,.dk,.fx-tab,.seg button,.chip{
+  transition:background var(--t-fast),border-color var(--t-fast),color var(--t-fast),
+  transform 160ms var(--ease-out)}
+.icon-btn:active,.menu-btn:active,.tour-btn:active,.dk:active,.seg button:active{transform:scale(.94)}
+a.chip:hover,.chip-accent:hover{transform:translateY(-1px)}
+
+/* the form controls settle rather than snap */
+.ctl{transition:border-color var(--t-fast),background var(--t-fast),box-shadow var(--t-med)}
+.ctl:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+
+/* ── 2 · the site's chrome ───────────────────────────────────────────── */
+.nav-links a{position:relative}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;
+  background:var(--accent);transform:scaleX(0);transform-origin:left;
+  transition:transform var(--t-med) var(--ease-out)}
+.nav-links a:hover::after,.nav-links a.on::after{transform:scaleX(1)}
+.brand .glyph{transition:transform var(--t-med) var(--ease-out)}
+.brand:hover .glyph,.rail-top:hover .glyph{transform:rotate(-12deg) scale(1.06)}
+
+/* ── 3 · the console arrives in reading order ───────────────────────── */
+.rail-top{animation:railTop .5s var(--ease-out) both}
+.rail-nav .rail-group{animation:slideIn .45s var(--ease-out) both}
+.rail-nav .nav-item{animation:slideIn .45s var(--ease-out) both}
+.rail-nav .nav-item:nth-child(-n+4){animation-delay:.04s}
+.rail-nav .nav-item:nth-child(n+5){animation-delay:.09s}
+.rail-nav .nav-item:nth-child(n+9){animation-delay:.14s}
+.rail-foot{animation:fadeIn .6s var(--ease-out) .18s both}
+.topbar{animation:railTop .45s var(--ease-out) both}
+@keyframes railTop{from{opacity:0;transform:translateY(-8px)}}
+
+/* The module used to fade in as one block; now that its panels arrive in
+   order, the block-level fade would only blur the first frame of that. */
+#canvas .module{animation:none}
+
+/* panels already carry --n from FX.stagger(); this is the motion for it */
+#canvas .module .panel,#canvas .module .kpi{
+  animation:panelIn .55s var(--ease-out) both;
+  animation-delay:calc(var(--n,0) * 45ms)}
+@keyframes panelIn{from{opacity:0;transform:translateY(12px) scale(.995)}}
+.kpi{transition:transform var(--t-med) var(--ease-out),border-color var(--t-fast)}
+.kpi:hover{transform:translateY(-2px)}
+
+/* rows and findings land one after another, not all at once. The delay is
+   capped: the fiftieth row must not wait a second to exist. */
+#ledgerBody tr{animation:rowIn .4s var(--ease-out) both;
+  animation-delay:calc(min(var(--r,0), 14) * 22ms)}
+@keyframes rowIn{from{opacity:0;transform:translateY(6px)}}
+tbody tr{transition:background var(--t-fast)}
+.finding{animation:panelIn .5s var(--ease-out) both;
+  animation-delay:calc(var(--f,0) * 70ms)}
+
+/* ── 4 · overlays ───────────────────────────────────────────────────── */
+#modal.on{backdrop-filter:blur(3px)}
+#modal.on .modal-box{animation:modalIn .32s var(--ease-out) both}
+@keyframes modalIn{from{opacity:0;transform:translateY(14px) scale(.97)}}
+.toast{animation:toastIn .34s var(--ease-out) both}
+
+/* ── 5 · the questions open smoothly ────────────────────────────────── */
+.faq details[open] .faq-body{animation:faqIn .42s var(--ease-out) both}
+@keyframes faqIn{from{opacity:0;transform:translateY(-6px)}}
+.faq summary{transition:color var(--t-fast)}
+.faq summary::after{transition:transform var(--t-med) var(--ease-out)}
+/* An answer's height can only animate to "auto" where the browser can
+   interpolate keywords; asking for it without that support leaves the
+   answer stuck shut, so both halves are gated on the same feature. */
+@supports (interpolate-size: allow-keywords){
+  :root{interpolate-size:allow-keywords}
+  .faq details::details-content{
+    block-size:0;overflow:clip;
+    transition:block-size var(--t-med) var(--ease-out),content-visibility var(--t-med) allow-discrete}
+  .faq details[open]::details-content{block-size:auto}
+}
+
+/* ── 6 · signing in ──────────────────────────────────────────────────
+   The one deliberately theatrical moment in the product: the mark draws
+   itself while the session is established, then the whole curtain lifts
+   to reveal the dashboards behind it. It is never load-bearing — the
+   navigation happens whether or not this plays. */
+.auth-flash{position:fixed;inset:0;z-index:120;display:grid;place-items:center;
+  background:
+    radial-gradient(60% 50% at 50% 45%, color-mix(in srgb,var(--accent) 12%,transparent), transparent 70%),
+    var(--bg);
+  animation:flashIn .3s var(--ease-out) both}
+.auth-flash.out{animation:flashOut .55s var(--ease-out) both}
+@keyframes flashIn{from{opacity:0}}
+@keyframes flashOut{to{opacity:0;transform:scale(1.04);filter:blur(6px)}}
+.af-in{display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
+.af-mark{width:86px;height:86px}
+.af-mark .r{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linecap:round;
+  stroke-dasharray:62 13.4;animation:afRing 1s cubic-bezier(.65,0,.35,1) both}
+.af-mark .l{fill:var(--good);transform-origin:9px 23px;
+  animation:afLeaf .6s cubic-bezier(.34,1.56,.64,1) .45s both}
+.af-mark .v{stroke:var(--bg);stroke-width:1.6;stroke-linecap:round;
+  animation:afLeaf .6s cubic-bezier(.34,1.56,.64,1) .45s both}
+@keyframes afRing{from{stroke-dashoffset:75.4;opacity:.4}to{stroke-dashoffset:0;opacity:1}}
+@keyframes afLeaf{from{transform:scale(0) rotate(-40deg);opacity:0}}
+.af-line{font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.22em;
+  text-transform:uppercase;color:var(--text-3);animation:fadeIn .5s var(--ease-out) .5s both}
+.af-name{font-family:var(--font-display);font-size:clamp(24px,3.4vw,34px);letter-spacing:-.02em;
+  color:var(--text-1);animation:afName .6s var(--ease-out) .62s both}
+@keyframes afName{from{opacity:0;transform:translateY(10px)}}
+.af-bar{width:170px;height:2px;border-radius:2px;background:var(--line-2);overflow:hidden}
+.af-bar i{display:block;height:100%;width:100%;background:var(--accent);transform-origin:left;
+  animation:afBar 1.25s cubic-bezier(.65,0,.35,1) both}
+@keyframes afBar{from{transform:scaleX(0)}}
+
+/* ── 7 · the settle ──────────────────────────────────────────────────
+   Entrance animations hold their first frame until they run. If anything
+   ever stops them running — an unusual engine, a power-saving mode — the
+   content behind them would never appear. So a moment after each render
+   the page is declared settled and everything is forced to its finished
+   state. By then the animations have finished anyway. */
+body.motion-settled .rail-top,
+body.motion-settled .rail-nav .rail-group,
+body.motion-settled .rail-nav .nav-item,
+body.motion-settled .rail-foot,
+body.motion-settled .topbar,
+body.motion-settled #canvas .module .panel,
+body.motion-settled #canvas .module .kpi,
+body.motion-settled #ledgerBody tr,
+body.motion-settled .finding{animation:none;opacity:1;transform:none}
+
+/* ── 8 · one place to turn it all off ───────────────────────────────── */
+@media (prefers-reduced-motion:reduce){
+  .btn:hover,.btn:active,.kpi:hover,a.chip:hover{transform:none}
+  .rail-top,.rail-nav .rail-group,.rail-nav .nav-item,.rail-foot,.topbar,
+  #canvas .module .panel,#canvas .module .kpi,#ledgerBody tr,.finding,
+  #modal.on .modal-box,.toast,.faq details[open] .faq-body,
+  .auth-flash,.auth-flash.out,.af-mark .r,.af-mark .l,.af-mark .v,
+  .af-line,.af-name,.af-bar i{animation:none}
+  .nav-links a::after{transition:none}
+}

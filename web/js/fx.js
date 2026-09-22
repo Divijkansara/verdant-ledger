@@ -563,7 +563,40 @@ window.VL = window.VL || {};
       .forEach((p, i) => p.style.setProperty("--n", Math.min(i, 8)));
   }
 
+  /* ═════════════ 9 · signing in ═════════════
+     A curtain over the whole window while the session is established:
+     the mark draws itself, the name lands, the bar fills, and the
+     curtain lifts onto the dashboards. It resolves no matter what — a
+     failed animation must never strand someone at a sign-in form. */
+  function authFlash(name) {
+    if (still() || !document.body) return Promise.resolve();
+    const el = document.createElement("div");
+    el.className = "auth-flash";
+    el.setAttribute("role", "status");
+    el.innerHTML = `
+      <div class="af-in">
+        <svg class="af-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle class="r" cx="16" cy="16" r="12" transform="rotate(-16 16 16)"/>
+          <path class="l" d="M9 23 C9 13.5 15.5 7 25.5 6.5 C25 16.5 18.5 23 9 23 Z"/>
+          <path class="v" d="M9 23 L19 13" fill="none"/>
+        </svg>
+        <div class="af-line">Signing you in</div>
+        <div class="af-name">${(name || "Welcome").split(" ")[0]}</div>
+        <div class="af-bar"><i></i></div>
+      </div>`;
+    document.body.appendChild(el);
+
+    return new Promise(resolve => {
+      const done = () => { el.remove(); resolve(); };
+      setTimeout(() => {
+        el.classList.add("out");
+        setTimeout(done, 520);
+      }, 1250);
+      setTimeout(done, 2600);          // belt and braces
+    });
+  }
+
   function init() { progress(); }
 
-  V.FX = { init, home, stagger };
+  V.FX = { init, home, stagger, authFlash };
 })();

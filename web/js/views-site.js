@@ -700,14 +700,14 @@ VL.Theme.onChange(fn)                 // subscribe to palette changes</div>
         <aside class="auth-aside">
           <div class="hero-grid"></div>
           <div class="auth-aside-in">
-            <h2>${signup ? "Start a ledger for your organisation." : "Welcome back."}</h2>
+            <h2>${signup ? "Start tracking your carbon." : "Welcome back."}</h2>
             <p>${signup
-              ? "Registering creates the organisation and makes you its administrator. Emission factors are seeded automatically."
-              : "Your console opens with a full year of activity to explore."}</p>
+              ? "Creating an account sets up your first dashboard. You can add more later, one for each office or site."
+              : "Your dashboards open with everything where you left it."}</p>
             <div class="auth-points">
-              ${point("shield", "Tamper-evident by construction", "SHA-256 chained entries with a live verifier.")}
-              ${point("sliders", "Decide, don't just report", "Eight scenario levers that re-run the real engine.")}
-              ${point("pulse", "It tells you what you missed", "Anomaly detection ranked by carbon consequence.")}
+              ${point("shield", "Your records stay trustworthy", "Past entries cannot be quietly edited or deleted.")}
+              ${point("sliders", "See what a change would save", "Try solar or electric cars before you spend anything.")}
+              ${point("pulse", "It spots what you missed", "Unusual months are flagged, with the carbon they cost.")}
             </div>
           </div>
         </aside>
@@ -832,11 +832,12 @@ VL.Theme.onChange(fn)                 // subscribe to palette changes</div>
         btn.textContent = original;
         return;
       }
-      toast(fullName ? "Account created" : `Welcome back, ${V.Store.user.name.split(" ")[0]}`,
-            result.mode === "live" ? "Connected to the Terrawise service" : "Signed in on this device", "ok");
       // Go where the visitor was heading, or to their dashboards.
       const next = new URLSearchParams((location.hash.split("?")[1] || "")).get("next");
+      await V.FX.authFlash(V.Store.user.name);
       location.hash = next && next.startsWith("/app") ? "#" + next : "#/app/dashboards";
+      toast(fullName ? "Account created" : `Welcome back, ${V.Store.user.name.split(" ")[0]}`,
+            result.mode === "live" ? "Connected to the Terrawise service" : "Signed in on this device", "ok");
     });
   }
   signin.mount = mountAuth;

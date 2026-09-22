@@ -163,6 +163,10 @@ window.VL = window.VL || {};
       view.mount();
 
       V.FX.stagger();
+      // New content animates in; a moment later it is pinned visible.
+      document.body.classList.remove("motion-settled");
+      clearTimeout(this._settle);
+      this._settle = setTimeout(() => document.body.classList.add("motion-settled"), 1400);
       this.refreshShell();
       this.current = path;
       if (!this.offered) { this.offered = true; setTimeout(() => V.Tour.offer(), 1600); }

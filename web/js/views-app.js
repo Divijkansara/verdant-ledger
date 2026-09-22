@@ -211,8 +211,8 @@ window.VL = window.VL || {};
       }).join("");
 
       /* insights */
-      $("#insightFeed").innerHTML = buildInsights(agg, score, months).map(i => `
-        <div class="finding">
+      $("#insightFeed").innerHTML = buildInsights(agg, score, months).map((i, fi) => `
+        <div class="finding" style="--f:${fi}">
           <div class="f-sev ${i.sev}">${icon(i.icon, 14)}</div>
           <div>
             <h3>${i.title}</h3><p>${i.body}</p>
@@ -719,9 +719,9 @@ window.VL = window.VL || {};
       L.page = Math.min(L.page, pages);
       const slice = rows.slice((L.page - 1) * L.size, L.page * L.size);
 
-      $("#ledgerBody").innerHTML = slice.length ? slice.map(e => {
+      $("#ledgerBody").innerHTML = slice.length ? slice.map((e, ri) => {
         const f = V.byId[e.factorId], c = V.CAT[f.cat], voided = e.status === "voided";
-        return `<tr class="${voided?"voided":""}">
+        return `<tr class="${voided?"voided":""}" style="--r:${ri}">
           <td class="mono faint" style="white-space:nowrap">${V.dateLabel(e.date)}</td>
           <td><span class="dot-tag"><i style="background:${V.catColor(f.cat)}"></i>${c.name}</span></td>
           <td><span class="${voided?"strike":""}">${escapeHtml(f.label)}</span>
