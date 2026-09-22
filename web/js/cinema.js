@@ -57,13 +57,13 @@
 
     return () => {
       const heroH = mast.offsetHeight || innerHeight;
-      const bandEnd = (deck ? deck.offsetTop : heroH * 2);
+      const reportsTop = (deck ? deck.offsetTop : heroH * 2);
       const y = scrollY;
 
       // Act one: the approach. The planet grows and turns a little.
       const approach = span(y, 0, heroH);
       // Act two: the retreat, across the year and into the reports.
-      const retreat = span(y, heroH * 0.75, bandEnd);
+      const retreat = span(y, heroH * 0.28, heroH * 0.8);
 
       shader.camera({
         zoom: 1 + approach * 0.42 - retreat * 0.95,
@@ -75,7 +75,7 @@
       // The planet is gone by the time the first text section arrives.
       // A lit globe behind a chart looks wonderful in a still and is
       // unreadable in use, and the page has to be usable first.
-      const fade = 1 - span(y, heroH * 0.5, heroH * 1.0);
+      const fade = 1 - span(y, heroH * 0.3, heroH * 0.68);
       planet.style.opacity = String(fade);
       // Once it is gone it must stop drawing, or a fixed canvas would
       // render behind the whole page for nothing.

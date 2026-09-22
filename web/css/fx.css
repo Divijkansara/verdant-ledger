@@ -50,21 +50,6 @@
 .nav-item{transition:background var(--t-fast),color var(--t-fast)}
 
 /* ───────────── the year on the ledger ───────────── */
-.band{border-block:1px solid var(--line-1);background:var(--surface-1);
-  padding-block:26px 20px;overflow:hidden}
-.band-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
-  flex-wrap:wrap;padding-bottom:14px}
-.band-t{font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.16em;
-  text-transform:uppercase;color:var(--text-3)}
-.band-key{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);
-  font-size:var(--fs-micro);letter-spacing:.09em;text-transform:uppercase;color:var(--text-4)}
-.band-key i{width:9px;height:9px;border-radius:2px;margin-left:12px;flex:0 0 auto}
-.band-key i:first-child{margin-left:0}
-.band-key .k-g{background:var(--gross)}
-.band-key .k-a{background:var(--good)}
-.band-key .k-n{background:var(--accent);height:2px;border-radius:0;width:14px}
-.band-plot{width:100%}
-.band-plot svg{display:block}
 .bd-zero{stroke:var(--line-3);stroke-width:1}
 .bd-g{fill:var(--gross)}
 .bd-a{fill:var(--good);opacity:.85}
@@ -79,7 +64,6 @@
 .bd-n.bd-part{stroke-dasharray:3 3;opacity:.7}
 .bd-dot.part{fill:none;stroke:var(--accent);stroke-width:1.5}
 .bd-v.part{fill:var(--text-3);font-weight:500}
-.band-t em{font-style:normal;color:var(--text-4);text-transform:none;letter-spacing:.04em}
 
 /* ───────────── the playground ───────────── */
 .play{border:1px solid var(--line-2);border-radius:var(--r-lg);

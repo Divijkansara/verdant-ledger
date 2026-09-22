@@ -30,7 +30,6 @@
   /* The chapters, in document order. The label is what the rail shows. */
   const CHAPTERS = [
     [".mast", "Top"],
-    [".band", "The year"],
     [".deck-section", "Reports"],
     [".bento", "In numbers"],
     ["#problem", "The problem"],

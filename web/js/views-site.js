@@ -172,8 +172,6 @@ window.VL = window.VL || {};
         </div>
       </header>
 
-      <section class="band" id="band" aria-label="Carbon by month"></section>
-
       <section class="deck-section" aria-label="Automatic reports">
         <div class="shell">
           <div class="ds-hd">
