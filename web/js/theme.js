@@ -393,7 +393,7 @@ window.VL = window.VL || {};
   /* ═══════════════════════ 4 · RUNTIME ═══════════════════════════════ */
 
   const LS_KEY = "vl.theme.v2";
-  const DEFAULT_SEED = { ...PRESETS[0].seed };
+  const DEFAULT_SEED = { ...PRESETS.find(p => p.id === "midnight").seed };  // the brand palette
 
   const Theme = {
     seed: { ...DEFAULT_SEED },

@@ -34,7 +34,7 @@ backend/.venv/Scripts/python.exe -m uvicorn app.main:app --app-dir backend --por
 
 ## 3. Hard rules from the owner (do not break)
 
-1. **Dark theme only.** The palette is "Ledger" lime: accent `#c8f94b` on background `#071e22`. It is `PRESETS[0]` in `web/js/theme.js`, which uses OKLCH tokens with contrast solving. Don't hard-code colours; use the CSS variables (`--accent`, `--surface-2`, `--text-1..4`, `--line-2/3`, etc.).
+1. **Dark theme only.** The palette is "Midnight Teal": accent `#1abba9` on background `#0a131f` (the owner reverted from lime). It is the `midnight` preset, set as `DEFAULT_SEED` in `web/js/theme.js`; there is no colour picker, which uses OKLCH tokens with contrast solving. Don't hard-code colours; use the CSS variables (`--accent`, `--surface-2`, `--text-1..4`, `--line-2/3`, etc.).
 2. **No top nav bar on the landing page when scrolled to the top.** The nav is a fixed overlay on home and appears only after scrolling past 60% of the viewport height (`web/js/app.js` `onScroll`, class `at-top`; CSS in `web/css/site.css` `.nav.nav-overlay` / `.nav.at-top`). The owner complained hard when this was violated.
 3. **"Open the console" must NOT be up front in the hero.** The flow is: the user clicks **"Clean it up"** → the real scenario engine runs → the planet de-pollutes → only then does the `#mastNext` row ("That was the engine, not an animation." + "Open the console") fade in.
 4. **High graphics quality.** The owner has a 32 GB RAM Intel Ultra 7 machine: *"i dont want cheap stuff"*. The shader runs at full `devicePixelRatio` with no cap and no adaptive downscaling. Don't add either back.

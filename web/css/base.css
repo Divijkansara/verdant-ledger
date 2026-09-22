@@ -11,21 +11,21 @@
 
 :root {
   /* ── static fallbacks (immediately replaced by the engine) ──────────
-     These are the "Ledger" preset's generated output, pasted in, so the
+     These are the "Midnight Teal" preset's generated output, pasted in, so the
      pre-script frame already looks like the product rather than flashing
      a different palette. They are never read once theme.js has run.     */
-  --bg:#071e22; --surface-1:#11282c; --surface-2:#183033; --surface-3:#1e383c;
-  --surface-4:#254045; --surface-5:#2c4a4f;
-  --line-1:#203a3e; --line-2:#2d4b4f; --line-3:#426368;
-  --text-1:#d7eef1; --text-2:#7ba0a6; --text-3:#517b82; --text-4:#27585f;
-  --accent:#c8f94b; --accent-hover:#b1e026; --accent-quiet:#415600;
-  --accent-wash:#293609; --on-accent:#0a0e04; --accent-2:#6f81fb;
-  --good:#39ce93; --warn:#edaf31; --bad:#ff6d5f; --info:#c8f94b;
-  --good-wash:#0d2b24; --warn-wash:#2c2410; --bad-wash:#331a16; --info-wash:#293609;
-  --good-line:#1d7a5c; --warn-line:#7a5c1d; --bad-line:#8a3f33; --info-line:#5c7a1d;
-  --series-1:#8dac45; --series-2:#6e9df2; --series-3:#e47e5c; --series-4:#00b89c;
-  --series-5:#c78ce8; --series-6:#bda23a; --series-7:#4aaef0; --series-8:#f0798f;
-  --grid:#20373b; --gross:#5a787c; --gross-hi:#6b8a8e;
+  --bg:#0a131f; --surface-1:#121c29; --surface-2:#192430; --surface-3:#202c3a;
+  --surface-4:#293544; --surface-5:#324050;
+  --line-1:#222d3c; --line-2:#303d4d; --line-3:#455467;
+  --text-1:#d5e0ed; --text-2:#7f91a7; --text-3:#586c84; --text-4:#384d66;
+  --accent:#1abba9; --accent-hover:#43d3c1; --accent-quiet:#005a51;
+  --accent-wash:#0a2e2a; --on-accent:#020f0d; --accent-2:#ad6ba2;
+  --good:#009868; --warn:#b38000; --bad:#ec5448; --info:#009587;
+  --good-wash:#042f1e; --warn-wash:#342301; --bad-wash:#3d1b17; --info-wash:#002e29;
+  --good-line:#055c3e; --warn-line:#664700; --bad-line:#773730; --info-line:#005a51;
+  --series-1:#00b7a6; --series-2:#c481d2; --series-3:#b59e23; --series-4:#30aae6;
+  --series-5:#e57886; --series-6:#57b671; --series-7:#9b8fed; --series-8:#d78b34;
+  --grid:#202b38; --gross:#647386; --gross-hi:#7a8ea8;
   /* Elevation is expressed by rules, not by blur. Only a true overlay
      (a modal, the command palette) is allowed to lift off the page. */
   --shadow-1:none;
