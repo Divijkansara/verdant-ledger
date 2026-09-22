@@ -14,9 +14,13 @@ window.VL = window.VL || {};
   const { icon, escapeHtml, nf, tonnes, toast } = V.UI;
   const $ = s => document.querySelector(s);
 
+  // The mark: a globe (terra) whose inner meridian grows into a leaf (wise:
+  // the good decision). The ring and the leaf draw themselves on load.
   const GLYPH = `<svg class="glyph" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <path d="M5 25 L16 7 L27 25" stroke="var(--accent)" stroke-width="2.8" stroke-linejoin="round"/>
-      <path d="M10 25 h12" stroke="var(--good)" stroke-width="2.8" stroke-linecap="round"/>
+      <circle class="g-ring" cx="16" cy="16" r="12" stroke="var(--accent)" stroke-width="2.4"
+        stroke-dasharray="62 13.4" stroke-linecap="round" transform="rotate(-16 16 16)"/>
+      <path class="g-leaf" d="M9 23 C9 13.5 15.5 7 25.5 6.5 C25 16.5 18.5 23 9 23 Z" fill="var(--good)"/>
+      <path class="g-vein" d="M9 23 L19 13" stroke="var(--bg, #071e22)" stroke-width="1.6" stroke-linecap="round"/>
     </svg>`;
 
   /* ═══════════════════════ chrome ════════════════════════════════════ */

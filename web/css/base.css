@@ -349,3 +349,33 @@ td.r,th.r{text-align:right;font-family:var(--font-mono);font-variant-numeric:tab
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
     transition-duration:.01ms!important;scroll-behavior:auto!important}
 }
+
+
+/* ═══════════════════════ page transitions ═══════════════════════════
+   Every route change animates. With the View Transitions API the old page
+   lifts away while the new one rises in; in the console only the content
+   area moves, so the sidebar stays still. .page-in is the fallback for
+   browsers without the API. */
+@keyframes pageOut{to{opacity:0;transform:translateY(-10px) scale(.992);filter:blur(2px)}}
+@keyframes pageIn{from{opacity:0;transform:translateY(18px) scale(.996);filter:blur(3px)}}
+::view-transition-old(root){animation:pageOut .26s cubic-bezier(.4,0,1,1) both}
+::view-transition-new(root){animation:pageIn .5s cubic-bezier(.16,1,.3,1) both}
+#canvas{view-transition-name:canvas}
+.rail{view-transition-name:rail}
+::view-transition-old(canvas){animation:pageOut .22s cubic-bezier(.4,0,1,1) both}
+::view-transition-new(canvas){animation:pageIn .45s cubic-bezier(.16,1,.3,1) both}
+::view-transition-group(rail){animation:none}
+.page-in{animation:pageIn .5s cubic-bezier(.16,1,.3,1) both}
+
+/* the logo draws itself: the ring sweeps round, then the leaf grows */
+@keyframes ringDraw{from{stroke-dashoffset:75.4}}
+@keyframes leafGrow{from{transform:scale(0) rotate(-40deg);opacity:0}}
+.glyph .g-ring{animation:ringDraw 1.1s cubic-bezier(.65,0,.35,1) both}
+.glyph .g-leaf,.glyph .g-vein{transform-origin:9px 23px;animation:leafGrow .7s cubic-bezier(.34,1.56,.64,1) .55s both}
+.brand:hover .glyph .g-leaf,.rail-top:hover .glyph .g-leaf{animation:leafGrow .6s cubic-bezier(.34,1.56,.64,1) both}
+
+@media (prefers-reduced-motion:reduce){
+  ::view-transition-old(root),::view-transition-new(root),
+  ::view-transition-old(canvas),::view-transition-new(canvas){animation:none}
+  .page-in,.glyph .g-ring,.glyph .g-leaf,.glyph .g-vein{animation:none}
+}

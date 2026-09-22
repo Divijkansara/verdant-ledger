@@ -45,6 +45,25 @@ window.VL = window.VL || {};
 
     /* ═══════════════════ routing ═════════════════════════════════════ */
 
+    /** Swap pages with an animation. Uses the View Transitions API where the
+     *  browser has it (the old page fades out while the new one rises in),
+     *  and a CSS entrance on the new content elsewhere. Reduced-motion users
+     *  get an instant swap. */
+    transition(update) {
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce) return update();
+      if (document.startViewTransition) {
+        document.startViewTransition(update);
+        return;
+      }
+      update();
+      const inConsole = (location.hash || "").startsWith("#/app") && $("#canvas");
+      const el = inConsole ? $("#canvas") : $("#root");
+      el.classList.remove("page-in");
+      void el.offsetWidth;          // restart the animation
+      el.classList.add("page-in");
+    },
+
     route() {
       const raw = (location.hash || "#/").slice(1) || "/";
       const path = raw.split("?")[0];
@@ -351,7 +370,7 @@ window.VL = window.VL || {};
       V.Tour.wire();
       V.FX.init();
 
-      window.addEventListener("hashchange", () => this.route());
+      window.addEventListener("hashchange", () => this.transition(() => this.route()));
       this.route();
 
       // Re-render charts once the webfonts land, so SVG text metrics settle.
