@@ -44,11 +44,11 @@ window.VL = window.VL || {};
 
     /* A — the statement the whole product exists to produce */
     const A = `
-      ${leader("Gross emissions issued", t(agg.gross))}
-      ${leader("Avoided — recycling, renewables", "−" + t(agg.avoided), "", `style="color:var(--good)"`)}
-      ${leader("Net position", t(agg.net), "total")}
+      ${leader("Emitted", t(agg.gross))}
+      ${leader("Saved by recycling and solar", "−" + t(agg.avoided), "", `style="color:var(--good)"`)}
+      ${leader("Overall footprint", t(agg.net), "total")}
       ${leader("Sustainability score", `${nf(score.composite, 1)} · ${score.grade}`)}
-      ${leader("Entries sealed", S.live().length)}`;
+      ${leader("Records", S.live().length)}`;
 
     /* B — where the tonnes actually come from */
     const cats = V.CATEGORIES
@@ -69,9 +69,9 @@ window.VL = window.VL || {};
     const groups = (head.match(/.{1,16}/g) || []).slice(0, 4).join("\n");
     const C = `
       <div class="sh-seal">
-        <div class="sh-big">${S.live().length}<u>blocks sealed</u></div>
+        <div class="sh-big">${S.live().length}<u>records locked</u></div>
         <pre class="sh-hash">${esc(groups)}</pre>
-        <div class="sh-algo">SHA-256 · canonical field order</div>
+        <div class="sh-algo">Each record locked to the one before</div>
         <div class="sh-stamp" aria-hidden="true"><span>verified</span></div>
       </div>`;
 
@@ -86,12 +86,12 @@ window.VL = window.VL || {};
           <i aria-hidden="true">→</i>
           <b style="color:${V.bandVar(r.simScore.composite)}">${r.simScore.grade}</b>
         </div>
-        ${leader("Levers applied", r.active.length)}
+        ${leader("Changes applied", r.active.length)}
         ${leader("Reduction", `−${nf(Math.abs(r.savingPct), 0)}%`)}
-        ${leader("Avoided each year", `${nf(r.annualisedSaving / 1000, 1)} t`)}
+        ${leader("Saved each year", `${nf(r.annualisedSaving / 1000, 1)} t`)}
         ${leader("Score", `${nf(r.baseScore.composite, 1)} → ${nf(r.simScore.composite, 1)}`, "total")}`;
     } catch (_) {
-      D = `<p class="sh-note">The scenario engine is unavailable in this session.</p>`;
+      D = `<p class="sh-note">The planner is not available right now.</p>`;
     }
 
     /* E — the postings themselves, which everything above is built from */
@@ -109,12 +109,12 @@ window.VL = window.VL || {};
     const period = `${V.monthLabel(months[0])} — ${V.monthLabel(months[months.length - 1])}`;
 
     return [
-      { k: "A", title: "Statement of position", foot: period,
-        lead: `<div class="sh-fig">${t(agg.net)}<u>t CO₂e<br>net position</u></div>`, body: A },
-      { k: "B", title: "Emissions by source", foot: "top five of eight categories", body: B },
-      { k: "C", title: "Certificate of integrity", foot: "chain verified at load", body: C },
-      { k: "D", title: "Scenario — 1.5 °C aligned", foot: "computed by the scenario engine", body: D },
-      { k: "E", title: "Extract of postings", foot: "four most recent entries", body: E }
+      { k: "A", title: "Carbon summary", foot: period,
+        lead: `<div class="sh-fig">${t(agg.net)}<u>tonnes CO₂<br>overall</u></div>`, body: A },
+      { k: "B", title: "Where it comes from", foot: "top five of eight categories", body: B },
+      { k: "C", title: "Data check", foot: "checked when the page loaded", body: C },
+      { k: "D", title: "Plan for the 1.5 °C goal", foot: "worked out by the planner", body: D },
+      { k: "E", title: "Latest activity", foot: "four most recent records", body: E }
     ];
   }
 
@@ -129,8 +129,8 @@ window.VL = window.VL || {};
     const sum0 = S0.summary(12);
     const chips = `
       <div class="deck-chips" aria-hidden="true">
-        <span class="dchip c1">${V.UI.icon("shield", 13)}${S0.live().length} blocks sealed</span>
-        <span class="dchip c2">${V.UI.icon("book", 13)}${V.FACTORS.length} cited factors</span>
+        <span class="dchip c1">${V.UI.icon("shield", 13)}${S0.live().length} records locked</span>
+        <span class="dchip c2">${V.UI.icon("book", 13)}${V.FACTORS.length} official factors</span>
         <div class="dstat c3">
           <b>${V.UI.nf(sum0.score.composite, 1)}</b>
           <span>score<br>grade ${sum0.score.grade}</span>

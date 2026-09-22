@@ -144,9 +144,9 @@ window.VL = window.VL || {};
     host.innerHTML = `
       <div class="shell">
         <div class="band-head">
-          <span class="band-t">The year on the ledger<em id="bandOpen"></em></span>
+          <span class="band-t">The sample year, month by month<em id="bandOpen"></em></span>
           <span class="band-key">
-            <i class="k-g"></i>gross<i class="k-a"></i>avoided<i class="k-n"></i>net position
+            <i class="k-g"></i>emitted<i class="k-a"></i>saved<i class="k-n"></i>overall
           </span>
         </div>
         <div class="band-plot"></div>
@@ -183,11 +183,11 @@ window.VL = window.VL || {};
       const open = lastRow.month === V.ymOf(V.todayISO());
       const openNote = $("#bandOpen", host);
       if (openNote) openNote.textContent = open
-        ? ` — ${V.monthLabel(lastRow.month)} is still open` : "";
+        ? ` · ${V.monthLabel(lastRow.month)} still in progress` : "";
 
       const s = node(plot, "svg", {
         viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: "img",
-        "aria-label": `Twelve months to ${V.monthLabel(lastRow.month)}: gross emissions above the line, avoided emissions below it, net position marked across the top. ${open ? `${V.monthLabel(lastRow.month)} is still open and stands at` : "Latest net position"} ${V.UI.nf(lastRow.net, 1)} tonnes.`
+        "aria-label": `Twelve months to ${V.monthLabel(lastRow.month)}: emitted carbon above the line, carbon saved below it, net position marked across the top. ${open ? `${V.monthLabel(lastRow.month)} is still open and stands at` : "Latest net position"} ${V.UI.nf(lastRow.net, 1)} tonnes.`
       });
 
       node(s, "line", { class: "bd-zero", x1: 0, x2: W, y1: zeroY, y2: zeroY });
@@ -296,7 +296,7 @@ window.VL = window.VL || {};
 
       const s = node(host, "svg", {
         viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: "img",
-        "aria-label": `Net position month by month as counted units, one dot per ${DOT_T} tonnes CO2e. Tallest month ${tall * DOT_T} tonnes.`
+        "aria-label": `Carbon month by month as counted units, one dot per ${DOT_T} tonnes CO2e. Tallest month ${tall * DOT_T} tonnes.`
       });
 
       rows.forEach((row, i) => {
@@ -367,7 +367,7 @@ window.VL = window.VL || {};
     const LEV = [
       { id: "ev",     name: "Electrify the fleet", unit: "% of fleet kilometres" },
       { id: "solar",  name: "Add rooftop solar",   unit: "% of grid electricity" },
-      { id: "divert", name: "Divert waste",        unit: "% kept from landfill" }
+      { id: "divert", name: "Recycle more waste",  unit: "% kept from landfill" }
     ];
     const PRE = {
       waste: { divert: 80 },
@@ -379,7 +379,7 @@ window.VL = window.VL || {};
     let last = null, raf = 0;
 
     host.innerHTML = `
-      <div class="play-hd"><span class="seq">B</span>Try it — on the real engine</div>
+      <div class="play-hd"><span class="seq">B</span>Try it yourself</div>
       <div class="play-body">
         <div class="play-ctl">
           ${LEV.map(l => `
@@ -404,7 +404,7 @@ window.VL = window.VL || {};
           <div class="pl-stats" aria-live="polite">
             <div class="leader"><span class="l-k">Reduction</span>
               <span class="l-dots"></span><span class="l-v" id="plSave">—</span></div>
-            <div class="leader"><span class="l-k">Avoided each year</span>
+            <div class="leader"><span class="l-k">Saved each year</span>
               <span class="l-dots"></span><span class="l-v" id="plTons">—</span></div>
             <div class="leader total"><span class="l-k">Grade</span>
               <span class="l-dots"></span><span class="l-v" id="plMove">—</span></div>
@@ -507,7 +507,7 @@ window.VL = window.VL || {};
       roll = requestAnimationFrame(step);
     };
 
-    paint(base, "The haze is this organisation's real score.");
+    paint(base, "The smog shows how this sample organisation is doing.");
     if (sh) sh.jump(V.Shader.fromScore(base.composite));
 
     if (!btn) return;
@@ -519,8 +519,8 @@ window.VL = window.VL || {};
       const next = $("#mastNext");
       if (cleaned) {
         paint(target.score, e =>
-          `Eight levers, <b>−${V.UI.nf(target.cut * e, 0)}%</b>, ` +
-          `<b>${V.UI.nf(target.tonnes * e, 1)} t</b> avoided a year.`, true);
+          `Eight changes cut carbon by <b>${V.UI.nf(target.cut * e, 0)}%</b>, ` +
+          `saving <b>${V.UI.nf(target.tonnes * e, 1)} tonnes</b> a year.`, true);
         btn.querySelector("span").textContent = "Put it back";
         // the way on only opens once the point has been made
         if (next) {
@@ -533,7 +533,7 @@ window.VL = window.VL || {};
           }, 1500);
         }
       } else {
-        paint(base, "The haze is this organisation's real score.", true);
+        paint(base, "The smog shows how this sample organisation is doing.", true);
         btn.querySelector("span").textContent = "Clean it up";
         clearTimeout(planet._t);
         if (next) next.classList.remove("in");

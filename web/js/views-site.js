@@ -58,16 +58,16 @@ window.VL = window.VL || {};
             <div class="foot-col">
               <a class="brand" href="#/" style="margin-bottom:14px">${GLYPH}<b>Terra<span>wise</span></b></a>
               <p style="color:var(--text-3);font-size:var(--fs-small);max-width:34ch;line-height:1.65">
-                Double-entry bookkeeping for what an organisation takes from the planet.
-                Built on the GHG Protocol, sealed with a hash chain.</p>
+                Carbon tracking for organisations: see where your emissions come from,
+                trust the numbers, and plan how to cut them.</p>
             </div>
-            ${col("Product", [["Overview", "/app/overview"], ["Simulator", "/app/simulate"],
-              ["Ledger", "/app/ledger"], ["Insights", "/app/insights"], ["Targets", "/app/targets"]])}
+            ${col("Product", [["Overview", "/app/overview"], ["What-if planner", "/app/simulate"],
+              ["Activity log", "/app/ledger"], ["Insights", "/app/insights"], ["Goals", "/app/targets"]])}
             ${col("Reference", [["Methodology", "/methodology"], ["Emission factors", "/app/methodology"],
               ["API documentation", "/docs"]])}
           </div>
           <div class="foot-bottom">
-            <span>© ${new Date().getFullYear()} VERDANT LEDGER</span>
+            <span>© ${new Date().getFullYear()} TERRAWISE</span>
             <span>GHG PROTOCOL · DEFRA 2024 · CEA V20 · SBTI</span>
           </div>
         </div>
@@ -128,17 +128,16 @@ window.VL = window.VL || {};
           <div class="mast-copy">
             <div class="docket mast-docket">
               <span><b>Terrawise</b></span><i>/</i>
-              <span>Statement of sustainability position</span><i>/</i>
+              <span>Sample organisation</span><i>/</i>
               <span id="mastPeriod">12 months</span>
             </div>
             <div class="mast-rule"></div>
 
-            <h1>Stop reporting<br>carbon. Start<br><em>deciding</em> with it.</h1>
+            <h1>Know your carbon.<br>Then <em>cut</em> it.</h1>
             <p class="lede">
-              Electricity, water, waste, transport, paper, procurement, recycling and
-              renewables, posted as dated and sourced entries against published emission
-              factors — and sealed so that last year's figure can still be reproduced
-              next year.
+              Terrawise turns your organisation's electricity, travel, waste, water and
+              purchases into one carbon footprint, using official emission factors. Then it
+              shows which changes would cut the most, before you spend a rupee.
             </p>
             <div class="mast-cta">
               <button class="btn btn-primary btn-lg planet-act" id="planetAct">
@@ -149,15 +148,15 @@ window.VL = window.VL || {};
 
             <div class="planet-ui">
               <div class="pl-state">
-                <span class="pl-k">Atmosphere reflects</span>
+                <span class="pl-k">Sample score</span>
                 <b id="plScoreV">—</b>
                 <span class="pl-g" id="plGradeV">—</span>
               </div>
-              <p class="pl-note" id="plNote">The haze is this organisation's real score.</p>
+              <p class="pl-note" id="plNote">The smog shows how this sample organisation is doing.</p>
             </div>
 
             <div class="mast-next" id="mastNext">
-              <p><b>That was the engine, not an animation.</b></p>
+              <p><b>That was a real calculation on a year of data, not an animation.</b></p>
               <a class="btn btn-primary btn-lg" href="#/app/overview">
                 Open the console ${icon("arrow", 15)}</a>
             </div>
@@ -165,13 +164,13 @@ window.VL = window.VL || {};
         </div>
       </header>
 
-      <section class="band" id="band" aria-label="Net position by month"></section>
+      <section class="band" id="band" aria-label="Carbon by month"></section>
 
-      <section class="deck-section" aria-label="Ledger documents">
+      <section class="deck-section" aria-label="Automatic reports">
         <div class="shell">
           <div class="ds-hd">
-            <span class="eyebrow">[ The record ]</span>
-            <h2>Five documents, one ledger.</h2>
+            <span class="eyebrow">[ Reports ]</span>
+            <h2>Five reports, written for you.</h2>
           </div>
           <div class="deck-stage" id="deck"></div>
         </div>
@@ -180,42 +179,42 @@ window.VL = window.VL || {};
       <section class="bento" aria-labelledby="bentoH">
         <div class="shell">
           <header class="bento-hd">
-            <span class="eyebrow">[ The position ]</span>
-            <h2 id="bentoH">A year, counted.</h2>
-            <p class="lede">Every figure below is computed from the ledger as this page loads.
-               Nothing here is written into the page.</p>
+            <span class="eyebrow">[ The sample year ]</span>
+            <h2 id="bentoH">A year of data, at a glance.</h2>
+            <p class="lede">Every number below is calculated live from the sample organisation's
+               records as the page loads. None of it is typed in by hand.</p>
           </header>
 
           <div class="bento-grid">
             <article class="bcard b-matrix">
-              <div class="bc-hd"><span class="seq">01</span>Net position, month by month</div>
+              <div class="bc-hd"><span class="seq">01</span>Carbon, month by month</div>
               <div class="mx" id="matrix"></div>
-              <p class="bc-ft">One dot is two tonnes of CO₂e. The shape is the shape of the year.</p>
+              <p class="bc-ft">Each dot is two tonnes of CO₂. Taller columns are heavier months.</p>
             </article>
 
             <article class="bcard b-accent">
-              <span class="bc-k">Sustainability score</span>
+              <span class="bc-k">Carbon score</span>
               <b id="bScore">—</b>
               <span class="bc-grade" id="bGrade">—</span>
-              <p>Five weighted intensities and ratios — never an absolute tonnage, so a
-                 large organisation and a small one are judged on the same terms.</p>
+              <p>Measured per person and by share, not by total tonnes, so a small office
+                 and a large campus are judged fairly.</p>
             </article>
 
             <article class="bcard b-stat">
-              <b id="bFactors">—</b><span>Cited emission factors</span>
-              <p>DEFRA 2024 · CEA v20 · spend-based EEIO</p>
+              <b id="bFactors">—</b><span>Official emission factors</span>
+              <p>From the UK government (DEFRA 2024) and India's Central Electricity Authority</p>
             </article>
             <article class="bcard b-stat">
-              <b id="bEntries">—</b><span>Entries sealed</span>
-              <p>SHA-256 chained and append-only — there is no delete</p>
+              <b id="bEntries">—</b><span>Records locked</span>
+              <p>Past records cannot be quietly edited or deleted</p>
             </article>
             <article class="bcard b-stat">
-              <b id="bAvoided">—</b><span>Tonnes avoided</span>
-              <p>Posted as credits from recycling and on-site solar</p>
+              <b id="bAvoided">—</b><span>Tonnes saved</span>
+              <p>From recycling and rooftop solar</p>
             </article>
             <article class="bcard b-stat">
-              <b id="bCut">—</b><span>Reduction available</span>
-              <p>On the 1.5 °C playbook · <span id="bCutTo">—</span></p>
+              <b id="bCut">—</b><span>Possible reduction</span>
+              <p>With the full plan · grade <span id="bCutTo">—</span></p>
             </article>
           </div>
         </div>
@@ -223,65 +222,63 @@ window.VL = window.VL || {};
 
       <div class="shell">
       ${clause("01", "The problem", `
-        <h2>Most organisations cannot answer a simple question: where does it come from?</h2>
-        <p class="lede">Sustainability data lives in a dozen spreadsheets owned by a dozen
-           people, gets assembled once a year under deadline, and cannot be traced back to a
-           meter reading. By the time a figure is published, nobody can reproduce it.</p>
+        <h2>Most organisations can't say where their carbon comes from.</h2>
+        <p class="lede">The numbers sit in spreadsheets, electricity bills and fuel receipts
+           spread across different people. They get added up once a year, too late to change
+           anything, and nobody can say which change would help most.</p>
         <div class="notes">
-          ${note("70", "%+", "of a typical Indian company's footprint sits in Scope 3 — the part that lives in other people's invoices.")}
-          ${note("0.716", "kg/kWh", "on the Indian grid. Electricity dominates almost every office footprint, and almost nobody meters it by department.")}
-          ${note("1 in 3", "", "disclosures cannot be reproduced from source data a year later, because the factors changed underneath them.")}
-          ${note("−42", "%", "the reduction an SBTi 1.5 °C pathway requires by 2030. Annual reporting cannot steer a target that tight.")}
+          ${note("0.716", "kg", "of CO₂ for every unit (kWh) of electricity from India's grid. In most offices, electricity is the biggest source.")}
+          ${note("8", "", "kinds of activity add up to most of an office's footprint: electricity, fuel, travel, waste, water, paper, purchases and commuting.")}
+          ${note("1×", "a year", "is how often many organisations add up their carbon. Terrawise updates the moment you add a record.")}
+          ${note("−42", "%", "by 2030 is the cut the 1.5 °C climate goal asks of companies. Hitting it needs a plan, not a yearly report.")}
         </div>`, "problem")}
 
       ${clause("02", "How it works", `
-        <h2>A ledger, not a calculator</h2>
-        <p class="lede">Consumption posts as a charge. Recycling and on-site generation post as
-           credits, because they avoid emissions that would otherwise have occurred. The
-           position is the net of the two — not one number that only ever grows.</p>
+        <h2>Add it. Trust it. Cut it.</h2>
+        <p class="lede">Everything you use adds carbon; recycling and solar power take some
+           away. Terrawise counts both, so your footprint can go down as well as up.</p>
         <div class="entries">
-          ${step("01", "Post the activity", `A meter reading, a waste pickup, a fuel log, an
-            invoice. Pick the activity from a catalogue of 39 cited factors; the impact is
-            computed live, before anything is saved, by the same engine that will store it.`)}
-          ${step("02", "The ledger seals itself", `Each entry is hashed together with the hash of
-            the entry before it. Altering any historical row breaks the chain at exactly that
-            row — and the verifier will name it.`)}
-          ${step("03", "Decide, then act", `The simulator rewrites a copy of the ledger to model
-            an intervention and re-runs the real scoring engine. Anomaly detection flags the
-            month that broke its own pattern before anyone notices the bill.`)}
+          ${step("01", "Add your activity", `An electricity bill, a fuel receipt, a waste
+            pickup or a supplier invoice. Choose what it was from 39 official emission factors
+            and the carbon is worked out instantly, before you save.`)}
+          ${step("02", "Records lock themselves", `Each record is locked to the one before it.
+            If anyone changes past data later, the data check catches it and shows exactly
+            which record was changed.`)}
+          ${step("03", "Plan the cuts", `Try changes like rooftop solar or electric cars in
+            the what-if planner and see your score move before spending anything. Unusual
+            months, like a sudden jump in electricity, are flagged automatically.`)}
         </div>`, "how")}
 
-      ${clause("03", "Scenario simulator", `
-        <h2>Move a slider. Watch the grade move.</h2>
+      ${clause("03", "What-if planner", `
+        <h2>Try a change. See what it saves.</h2>
         <div class="two">
           <div>
-            <p class="lede">Eight levers, each a real intervention with a real mechanism.
-              "Electrify 60% of the fleet" literally moves 60% of the petrol-car kilometres onto
-              the EV factor and recomputes. There is no fudge factor anywhere in the model.</p>
+            <p class="lede">Eight changes an organisation can actually make, from rooftop solar
+              to electric company cars. Each one recalculates the whole year of data, so the
+              savings you see come from real numbers, not guesses.</p>
             <ul class="marks">
-              <li>Per-lever attribution, with the overlap between overlapping levers shown
-                  rather than hidden.</li>
-              <li>Indicative capital cost and payback for every intervention.</li>
-              <li>Three saved playbooks, including one tuned to the SBTi 1.5 °C pathway.</li>
+              <li>How much each change saves on its own, and how much two changes overlap.</li>
+              <li>A rough cost and payback time for every change.</li>
+              <li>Three ready-made plans, including one that meets the 1.5 °C climate goal.</li>
             </ul>
-            <a class="mast-link" href="#/app/simulate">Try the simulator ${icon("arrow", 14)}</a>
+            <a class="mast-link" href="#/app/simulate">Open the planner ${icon("arrow", 14)}</a>
           </div>
           <div class="play" id="play"></div>
         </div>`, "simulate")}
 
       ${clause("04", "Questions", `
-        <h2>The things you would ask</h2>
+        <h2>Common questions</h2>
         <div class="faq">
-          ${faqItem("Why is there no delete on the ledger?",
-            "Because a ledger you can silently delete from is not an audit trail. The API returns <code>405 Method Not Allowed</code> for <code>DELETE /api/entries/{id}</code> deliberately, and a test asserts it. A mistake is corrected by voiding with a reason, which keeps the row, removes it from every total and writes an audit record.")}
+          ${faqItem("Why can't I delete a record?",
+            "So the history stays trustworthy. If records could be deleted, anyone could make the numbers look better. A mistake is fixed by cancelling the record with a reason: it stops counting towards your totals, but it stays on file so an auditor can see what happened.")}
           ${faqItem("Where do the emission factors come from?",
-            "DEFRA/BEIS 2024 for water, waste, transport, paper and materials recycling; the Central Electricity Authority CO₂ Baseline Database v20 for Indian grid electricity at 0.716 kg CO₂e/kWh; and spend-based EEIO screening factors for procurement, which are labelled as screening-grade in the interface. Every factor carries its citation in the database row, not in a comment.")}
-          ${faqItem("What stops a revised factor from changing last year's report?",
-            "Each entry stores the factor value, unit and scope it was priced with. Revising a factor changes future postings only. This is the accounting principle of restatement control — a report you can no longer reproduce is not evidence.")}
-          ${faqItem("Is the hash chain actually doing anything?",
-            "Yes. Each entry's hash is SHA-256 over the previous hash concatenated with a canonical serialisation of the entry. The Integrity screen has a button that deliberately alters a historical quantity so you can watch the verifier find it. The SHA-256 implementation was checked byte-for-byte against Node's crypto module.")}
-          ${faqItem("How is the sustainability score calculated?",
-            "Five sub-scores, each an intensity or a ratio — never an absolute total, because a 500-person company emitting 200 t is doing better than a 50-person company emitting 150 t. Each is normalised between a good-practice target and a poor-practice ceiling, then weighted 30/20/20/15/15. The formula is printed in full on the Methodology screen.")}
+            "Official, published sources. Electricity uses India's Central Electricity Authority figure of 0.716 kg of CO₂ per kWh. Water, waste, travel and paper use the UK government's DEFRA 2024 factors. Purchases use spending-based estimates, which are marked as rough in the app. Every factor shows its source.")}
+          ${faqItem("If an emission factor is updated, does last year's report change?",
+            "No. Each record keeps the factor it was calculated with. An update only affects records added afterwards, so a report you published last year still adds up to the same number today.")}
+          ${faqItem("How do I know the data hasn't been tampered with?",
+            "Every record carries a digital fingerprint (SHA-256) that also covers the record before it, so changing any old record breaks every fingerprint after it. The Data check screen has a button that secretly edits an old record, so you can watch the check find it.")}
+          ${faqItem("How is the score worked out?",
+            "From five measures: carbon per person, share of clean electricity, share of waste recycled, use of water and paper, and share of low-carbon travel. They are compared per person or as a share, never as total tonnes, because a 500-person company emitting 200 tonnes is doing better than a 50-person company emitting 150. The full formula is on the How we calculate page.")}
         </div>`, "questions")}
       </div>
 
@@ -291,10 +288,10 @@ window.VL = window.VL || {};
           <div class="rule-accent"></div>
           <div class="closing-in">
             <div>
-              <div class="docket"><span>Ready</span></div>
-              <h2>See your footprint<br>the way an auditor would.</h2>
-              <p>Explore a full year of activity, run a scenario, and verify the ledger.
-                 Nothing to install.</p>
+              <div class="docket"><span>Get started</span></div>
+              <h2>Find out where your<br>carbon comes from.</h2>
+              <p>Sign in with the demo account to explore a year of sample data, or create an
+                 account and set up your own dashboard. Nothing to install.</p>
             </div>
             <a class="btn btn-primary btn-lg" href="#/app/overview">
               Open the console ${icon("arrow", 15)}</a>
