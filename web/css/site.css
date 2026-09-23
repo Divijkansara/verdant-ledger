@@ -75,8 +75,16 @@
 .mast::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
   background:linear-gradient(90deg,color-mix(in srgb,#03050a 82%,transparent) 0%,
     color-mix(in srgb,#03050a 45%,transparent) 34%,transparent 58%)}
-.mast::after{content:"";position:absolute;left:0;right:0;bottom:0;height:18%;z-index:1;
-  pointer-events:none;background:linear-gradient(to bottom,transparent,var(--bg))}
+/* The hero's ground is near-black space and the page's is lighter, so the
+   join has to be a long ramp rather than a line. Three stops: nothing for
+   the first third, half way by the middle, the page's own ground at the
+   foot — a two-stop ramp of this length bands visibly on a dark screen. */
+.mast::after{content:"";position:absolute;left:0;right:0;bottom:0;height:38%;z-index:1;
+  pointer-events:none;background:linear-gradient(to bottom,
+    transparent 0%,
+    color-mix(in srgb,var(--bg) 42%,transparent) 46%,
+    color-mix(in srgb,var(--bg) 88%,transparent) 78%,
+    var(--bg) 100%)}
 .mast-stage{position:relative;z-index:2;width:100%;padding-block:clamp(48px,8vh,110px)}
 .mast-copy{max-width:min(600px,46%)}
 .mast-docket{padding-bottom:0;width:max-content;max-width:min(92vw,900px)}

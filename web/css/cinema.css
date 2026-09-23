@@ -10,8 +10,27 @@
 .planet.cine{position:fixed;inset:0;height:auto;z-index:0;
   transition:opacity .5s var(--ease-out)}
 
-/* The masthead's own scrim would sit over a fixed globe and mute it. */
-.cinema-on .mast::after{opacity:.5}
+/* ── no seam where the masthead ends ─────────────────────────────────
+   The globe is fixed, so it carries on past the masthead's bottom edge.
+   The masthead's foot scrim stops at that edge, which drew a line across
+   the planet and a step in the ground: two different blacks meeting.
+
+   So in this mode the scrim goes, and the ramp to the page's ground is
+   baked into the masthead's own background instead. A background paints
+   behind its children, so it darkens the ground without touching the
+   canvas, and the globe crosses the boundary at one brightness. The side
+   scrim is masked away over the same distance for the same reason. */
+.cinema-on .mast::after{display:none}
+.cinema-on .mast{background:
+  linear-gradient(to bottom, transparent 44%,
+    color-mix(in srgb,var(--bg) 55%,transparent) 74%,
+    color-mix(in srgb,var(--bg) 92%,transparent) 92%,
+    var(--bg) 100%),
+  radial-gradient(70% 90% at 64% 50%, color-mix(in srgb,var(--bg) 35%,#0a1220) 0%, transparent 70%),
+  color-mix(in srgb,var(--bg) 22%,#03050a)}
+.cinema-on .mast::before{
+  -webkit-mask-image:linear-gradient(to bottom,#000 52%,transparent 90%);
+  mask-image:linear-gradient(to bottom,#000 52%,transparent 90%)}
 
 /* The year keeps its own surface; it only needs to sit above the canvas.
    Nothing else is painted over: the globe hides itself once it has faded,
