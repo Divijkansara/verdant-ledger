@@ -20,7 +20,7 @@ window.VL = window.VL || {};
   const API_BASE = window.VERDANT_API || "http://127.0.0.1:8000";
   const LS = { ledger: "vl.ledger.v3", session: "vl.session.v1", token: "vl.token.v1",
                accounts: "vl.accounts.v1", dashes: "vl.dashes.v1:" };
-  const DEMO = { email: "admin@suryanagar.example", password: "password123", name: "Divij Rao" };
+  const DEMO = { email: "admin@suryanagar.example", password: "password123", name: "JETT REVIVE ME >.<" };
   const read = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || "null") ?? d; } catch (_) { return d; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} };
   const blankOrg = () => ({ name: "", legal: "", sector: "", country: "India", headcount: 50,
@@ -42,7 +42,7 @@ window.VL = window.VL || {};
       targetYear: 2030,
       reductionPct: 42
     },
-    user: { name: "Divij Rao", email: "admin@suryanagar.example", role: "admin" },
+    user: { name: "JETT REVIVE ME >.<", email: "admin@suryanagar.example", role: "admin" },
 
     entries: [],
     head: null,             // chain head hash — fingerprints the whole ledger

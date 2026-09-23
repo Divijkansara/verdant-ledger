@@ -160,9 +160,20 @@ def add_months(d: date, delta: int) -> date:
     return date(year, month, min(d.day, monthrange(year, month)[1]))
 
 
+DEMO_ADMIN_NAME = "JETT REVIVE ME >.<"
+
+
 def seed_demo_org(db, factors: dict[str, EmissionFactor]) -> Organization:
     org = db.execute(select(Organization).where(Organization.name == "Suryanagar Technologies Pvt Ltd")).scalar_one_or_none()
     if org:
+        # The demo account is already there. Its display name is the one
+        # thing worth keeping in step, since a deployment seeded once and
+        # never again would otherwise show whatever it was seeded with.
+        admin = db.execute(
+            select(User).where(User.email == "admin@suryanagar.example")).scalar_one_or_none()
+        if admin and admin.name != DEMO_ADMIN_NAME:
+            admin.name = DEMO_ADMIN_NAME
+            db.commit()
         print("  demo organisation already exists — skipping")
         return org
 
@@ -176,7 +187,7 @@ def seed_demo_org(db, factors: dict[str, EmissionFactor]) -> Organization:
     db.flush()
 
     users = [
-        ("Divij Rao", "admin@suryanagar.example", Role.ADMIN),
+        (DEMO_ADMIN_NAME, "admin@suryanagar.example", Role.ADMIN),
         ("Meera Iyer", "facilities@suryanagar.example", Role.CONTRIBUTOR),
         ("Auditor", "auditor@suryanagar.example", Role.VIEWER),
     ]
