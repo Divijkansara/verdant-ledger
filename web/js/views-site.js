@@ -165,8 +165,9 @@ window.VL = window.VL || {};
 
             <div class="mast-next" id="mastNext">
               <p><b>That was a real calculation on a year of data, not an animation.</b></p>
-              <a class="btn btn-primary btn-lg" href="#/app/overview">
-                Open the console ${icon("arrow", 15)}</a>
+              <a class="btn btn-primary btn-lg" href="#/app/overview" id="seeHow">
+                See how it was done ${icon("arrow", 15)}</a>
+              <span class="mast-note">Sign in to explore this sample year in full</span>
             </div>
           </div>
         </div>
@@ -299,8 +300,8 @@ window.VL = window.VL || {};
               <p>Sign in with the demo account to explore a year of sample data, or create an
                  account and set up your own dashboard. Nothing to install.</p>
             </div>
-            <a class="btn btn-primary btn-lg" href="#/app/overview">
-              Open the console ${icon("arrow", 15)}</a>
+            <a class="btn btn-primary btn-lg" href="#/app/overview" id="seeHowEnd">
+              Explore the sample year ${icon("arrow", 15)}</a>
           </div>
         </div>
       </section>`);
@@ -695,57 +696,79 @@ VL.Theme.onChange(fn)                 // subscribe to palette changes</div>
 
   /* ═══════════════════════ auth ══════════════════════════════════════ */
 
+  /* The way in. The left half is the product's own weather — drifting
+     aurora over a star grid, with three plain promises and the figures
+     that back them. The right half is a single glass card: one column,
+     large targets, and nothing to read that is not a field. */
   function authShell(mode) {
     const signup = mode === "signup";
     const point = (ico, title, body) => `
-      <div class="auth-point"><div class="ap-ico">${icon(ico, 14)}</div>
+      <div class="auth-point"><div class="ap-ico">${icon(ico, 15)}</div>
         <div><b>${title}</b><span>${body}</span></div></div>`;
+    const stat = (v, l) => `<div class="as-stat"><b>${v}</b><span>${l}</span></div>`;
 
     return page(signup ? "/signup" : "/signin", `
       <div class="auth">
         <aside class="auth-aside">
+          <div class="aa-sky" aria-hidden="true"><i></i><i></i><i></i></div>
           <div class="hero-grid"></div>
           <div class="auth-aside-in">
+            <a class="brand" href="#/">${GLYPH}<b>Terra<span>wise</span></b></a>
             <h2>${signup ? "Start tracking your carbon." : "Welcome back."}</h2>
             <p>${signup
-              ? "Creating an account sets up your first dashboard. You can add more later, one for each office or site."
+              ? "Creating an account sets up your first dashboard. Add one for every office or site, and share them with the people who run them."
               : "Your dashboards open with everything where you left it."}</p>
             <div class="auth-points">
               ${point("shield", "Your records stay trustworthy", "Past entries cannot be quietly edited or deleted.")}
               ${point("sliders", "See what a change would save", "Try solar or electric cars before you spend anything.")}
-              ${point("pulse", "It spots what you missed", "Unusual months are flagged, with the carbon they cost.")}
+              ${point("users", "Work on it together", "Share a dashboard with colleagues in your organisation.")}
+            </div>
+            <div class="as-stats">
+              ${stat(V.FACTORS.length, "official factors")}
+              ${stat("8", "activity types")}
+              ${stat("SHA-256", "record checks")}
             </div>
           </div>
         </aside>
 
         <div class="auth-form">
           <div class="auth-form-in">
-            <h1>${signup ? "Create an account" : "Sign in"}</h1>
-            <p>${signup ? "Your account and dashboards are saved on this device." : "Sign in to open your dashboards."}</p>
+            <div class="af-card">
+              <div class="af-head">
+                <span class="af-mark">${GLYPH}</span>
+                <div>
+                  <h1>${signup ? "Create an account" : "Sign in"}</h1>
+                  <p>${signup ? "It takes a moment, and no email is sent."
+                              : "Sign in to open your dashboards."}</p>
+                </div>
+              </div>
 
-            <form id="authForm" class="auth-fields" autocomplete="on">
-              ${signup ? `
-                <div class="field"><label for="orgName">Organisation</label>
-                  <input id="orgName" class="ctl" placeholder="Your organisation" required></div>
-                <div class="field"><label for="fullName">Your name</label>
-                  <input id="fullName" class="ctl" placeholder="Full name" required></div>` : ""}
-              <div class="field"><label for="email">Email</label>
-                <input id="email" class="ctl" type="email" placeholder="you@company.com"
-                  autocomplete="username" required></div>
-              <div class="field"><label for="password">Password</label>
-                <input id="password" class="ctl" type="password" placeholder="${signup ? "At least 8 characters" : "Password"}" minlength="${signup ? 8 : 1}"
-                  autocomplete="${signup ? "new-password" : "current-password"}" required></div>
-              <div class="auth-err" id="authErr" role="alert" aria-live="polite"></div>
-              <button class="btn btn-primary" id="authBtn" type="submit" style="width:100%">
-                ${signup ? "Create account" : "Sign in"}</button>
-            </form>
+              <form id="authForm" class="auth-fields" autocomplete="on">
+                ${signup ? `
+                  <div class="field"><label for="orgName">Organisation</label>
+                    <input id="orgName" class="ctl" placeholder="Your organisation" required></div>
+                  <div class="field"><label for="fullName">Your name</label>
+                    <input id="fullName" class="ctl" placeholder="Full name" required></div>` : ""}
+                <div class="field"><label for="email">Email</label>
+                  <input id="email" class="ctl" type="email" placeholder="you@company.com"
+                    autocomplete="username" required></div>
+                <div class="field"><label for="password">Password</label>
+                  <input id="password" class="ctl" type="password" placeholder="${signup ? "At least 8 characters" : "Password"}" minlength="${signup ? 8 : 1}"
+                    autocomplete="${signup ? "new-password" : "current-password"}" required></div>
+                <div class="auth-err" id="authErr" role="alert" aria-live="polite"></div>
+                <button class="btn btn-primary btn-lg" id="authBtn" type="submit" style="width:100%">
+                  ${signup ? "Create account" : "Sign in"} ${icon("arrow", 15)}</button>
+              </form>
 
-            ${signup ? "" : `<button class="btn btn-ghost" id="demoFill" type="button" style="width:100%;margin-top:10px">
-              ${icon("play", 13)} Use the demo account</button>`}
+              ${signup ? "" : `
+                <div class="af-or"><span>or</span></div>
+                <button class="btn btn-ghost" id="demoFill" type="button" style="width:100%">
+                  ${icon("play", 13)} Use the demo account</button>`}
 
-            <div class="auth-alt">
-              ${signup ? `Already have an account? <a href="#/signin">Sign in</a>`
-                       : `No account yet? <a href="#/signup">Create one</a>`}
+              <div class="auth-alt">
+                ${signup ? `Already have an account? <a href="#/signin">Sign in</a>`
+                         : `No account yet? <a href="#/signup">Create one</a>`}
+              </div>
             </div>
           </div>
         </div>

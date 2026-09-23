@@ -224,6 +224,8 @@ body.cleaning .planet-act{background:transparent;border-color:var(--line-3);
 .mast-next{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;max-width:none}
 .mast-next p{margin:0;font-size:var(--fs-small);line-height:1.5;color:var(--text-2)}
 .mast-next p b{color:var(--text-1);font-weight:600}
+.mast-note{font-size:var(--fs-micro);font-family:var(--font-mono);letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-4)}
 
 @media (prefers-reduced-motion:reduce){
   .mast-next,.mast-next.in{transition:none;transform:none}

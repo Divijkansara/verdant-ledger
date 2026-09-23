@@ -310,14 +310,59 @@
 .endpoint .path{font-family:var(--font-mono);font-size:var(--fs-small);color:var(--text-1)}
 .endpoint .desc{grid-column:2;font-size:var(--fs-small);color:var(--text-3);margin-top:3px}
 
+/* ── the way in ───────────────────────────────────────────────────────
+   The aside is weather: three slow aurora bands over the star grid, all
+   on one compositor layer. The form is one glass card, so the eye has a
+   single place to go on a page whose only job is two fields. */
+.aa-sky{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.aa-sky i{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;
+  animation:aaDrift 26s ease-in-out infinite alternate}
+.aa-sky i:nth-child(1){width:54%;height:60%;left:-10%;top:-12%;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 55%,transparent),transparent)}
+.aa-sky i:nth-child(2){width:46%;height:52%;right:-8%;top:24%;animation-delay:-9s;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--series-7) 42%,transparent),transparent)}
+.aa-sky i:nth-child(3){width:60%;height:44%;left:6%;bottom:-16%;animation-delay:-17s;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--good) 38%,transparent),transparent)}
+@keyframes aaDrift{
+  from{transform:translate3d(0,0,0) scale(1)}
+  to{transform:translate3d(6%,-5%,0) scale(1.16)}}
+
+.auth-aside-in .brand{margin-bottom:34px}
+.as-stats{display:flex;gap:26px;margin-top:38px;padding-top:22px;
+  border-top:1px solid var(--line-1)}
+.as-stat b{display:block;font-family:var(--font-mono);font-size:19px;color:var(--text-1);
+  letter-spacing:-.02em}
+.as-stat span{display:block;margin-top:3px;font-family:var(--font-mono);font-size:var(--fs-micro);
+  letter-spacing:.11em;text-transform:uppercase;color:var(--text-4)}
+
+.af-card{padding:30px;border-radius:var(--r-lg);border:1px solid var(--line-2);
+  background:color-mix(in srgb,var(--surface-1) 86%,transparent);
+  backdrop-filter:blur(14px);box-shadow:0 40px 80px -50px rgba(0,0,0,.95)}
+.af-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:24px}
+.af-head .af-mark{flex:0 0 auto;width:42px;height:42px;border-radius:var(--r-md);display:grid;
+  place-items:center;background:var(--accent-wash);border:1px solid var(--line-2)}
+.af-head .af-mark .glyph{width:24px;height:24px}
+.af-head h1{font-size:24px;letter-spacing:-.03em}
+.af-head p{margin-top:5px;color:var(--text-3);font-size:var(--fs-small)}
+.af-or{display:flex;align-items:center;gap:12px;margin:18px 0 14px;
+  font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text-4)}
+.af-or::before,.af-or::after{content:"";flex:1;height:1px;background:var(--line-1)}
+
+@media (prefers-reduced-motion:reduce){.aa-sky i{animation:none}}
+
 /* ═══════════════════════ responsive ════════════════════════════════ */
 @media (max-width:1080px){
   .two,.specs{grid-template-columns:minmax(0,1fr);gap:40px}
   .clause{grid-template-columns:minmax(0,1fr);gap:20px;padding-block:58px}
   .clause-n{position:static;flex-direction:row;align-items:baseline;gap:14px}
-  .auth{grid-template-columns:minmax(0,1fr);min-height:auto}
+  .auth{grid-template-columns:minmax(0,1fr);min-height:auto;position:relative;overflow:hidden}
   .auth-aside{display:none}
-  .auth-form{padding:40px 20px 64px;justify-content:flex-start}
+  .auth-form{padding:40px 20px 64px;justify-content:flex-start;position:relative;z-index:1}
+  /* the card would float on nothing without the aside behind it */
+  .auth::before{content:"";position:absolute;inset:-20% -30% auto -30%;height:70%;
+    pointer-events:none;filter:blur(70px);opacity:.4;
+    background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 50%,transparent),transparent)}
   .doc{grid-template-columns:minmax(0,1fr);gap:26px}
   .doc-toc{position:static;max-height:none;display:flex;gap:6px;overflow-x:auto;
     border-bottom:1px solid var(--line-1);padding-bottom:12px}
