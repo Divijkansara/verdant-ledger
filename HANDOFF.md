@@ -75,6 +75,30 @@ backend/.venv/Scripts/python.exe -m uvicorn app.main:app --app-dir backend --por
 
 **Landing page order:** full-screen space hero (Earth on the right on desktop, stacked above the copy on narrow screens) → "[ The record ] Five documents, one ledger." (the deck) → "[ The position ] A year, counted." (band/bento) → the rest.
 
+## 4b. RESTORE POINTS — read this before undoing anything
+
+`classic-v1` (tag) and `classic` (branch), both on GitHub, mark commit
+`c6d13f4`: the site as it was **before the 3D "cinema" work** of 2026-09-23
+(scroll-driven camera on the globe, aurora, cursor light, card tilt,
+magnetic buttons).
+
+That version already includes the Terrawise name and logo, the Midnight Teal
+palette, the plain-English copy, the phone fixes, the motion layer, the
+sign-in curtain and the expandable-tabs menu.
+
+Undo everything after it:
+
+```bash
+cd "D:/FSD MINI" && git reset --hard classic-v1 && git push --force origin master
+```
+
+Vercel redeploys `master` by itself, so the live site follows within a minute.
+To undo only part, revert single commits instead: `931f0b1` (camera and the
+cinema layer), `7cf482b` (arrival and section depth), `c7aa522` (removal of
+the month-by-month bar strip).
+
+Take a new tag like this before any other large visual change.
+
 ## 5. Recent history (newest first)
 
 ```
