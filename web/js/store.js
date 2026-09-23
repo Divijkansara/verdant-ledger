@@ -55,13 +55,22 @@ window.VL = window.VL || {};
 
     async boot() {
       this.restoreSession();
-      if (this.signedIn) this.loadDashboards();
-      else this.loadShowcase();
+      if (this.signedIn) {
+        this.loadDashboards();
+        if (!this.dashboards.length && !this.token) this.ensureStarter();
+      } else {
+        this.loadShowcase();
+      }
       this.reseal();
       // Probe the API without blocking first paint — the app is already
       // usable by the time this resolves.
       this.probe().then(reachable => {
-        if (reachable && this.token) this.mode = "live";
+        if (!reachable || !this.token) { if (this.signedIn) this.ensureStarter(); return; }
+        this.mode = "live";
+        this.syncDashboards().then(() => {
+          this.ensureStarter();
+          if (V.App && (V.App.current || "").startsWith("/app")) V.App.route();
+        });
       });
       return this;
     },
@@ -90,18 +99,110 @@ window.VL = window.VL || {};
         this.dashboards = saved.list;
         this.dashId = saved.list.some(d => d.id === saved.active) ? saved.active : saved.list[0].id;
       } else {
-        // First visit: one dashboard with sample data. The demo account gets
-        // the ledger an earlier version of the app saved, if there is one.
-        const legacy = read(LS.ledger, null);
         this.dashboards = [];
-        const d = this.createDashboard({ name: this.org.name || "My organisation", sector: this.org.sector,
-                                         headcount: this.org.headcount, sample: true }, true);
-        if (legacy && Array.isArray(legacy.entries) && legacy.entries.length &&
-            this.user.email === DEMO.email) {
-          write(this.ledgerKey(d.id), legacy);
-        }
+        this.dashId = null;
       }
       this.loadLedger();
+    },
+
+    /** A first dashboard, but only once the account has had its say: on a
+     *  new device the service's list arrives a moment after sign-in, and
+     *  creating a starter before then would invent one that is not real. */
+    ensureStarter() {
+      if (this.dashboards.length) return null;
+      const legacy = read(LS.ledger, null);
+      // The name they typed when signing up. Loading an empty ledger resets
+      // org, so the name has to survive that on its own.
+      const name = this.pendingOrg || this.org.name || "My organisation";
+      this.pendingOrg = null;
+      const d = this.createDashboard({ name, sector: this.org.sector,
+                                       headcount: this.org.headcount, sample: true }, true);
+      if (legacy && Array.isArray(legacy.entries) && legacy.entries.length &&
+          this.user.email === DEMO.email) {
+        write(this.ledgerKey(d.id), legacy);
+      }
+      this.loadLedger();
+      return d;
+    },
+
+    /** Signed in against the running service, rather than this device.
+     *  (Not to be confused with live(), which is the unvoided entries.) */
+    isLive() { return this.mode === "live" && !!this.token; },
+
+    /* ══════════════════ sync ══════════════════════════════════════════
+       Local first: every change lands on this device immediately and is
+       pushed to the service a moment later, so the app stays quick and
+       survives a dropped connection. Pulling is the other half — another
+       device's dashboard appears here when the list is fetched, which
+       happens on sign-in, on load, and whenever the tab is focused. */
+
+    async syncDashboards() {
+      if (!this.isLive()) return { synced: false };
+      let rows;
+      try {
+        rows = (await this.apiGet("/api/dashboards")).dashboards || [];
+      } catch (_) {
+        return { synced: false };          // offline: the device's copy stands
+      }
+
+      const seen = new Set();
+      rows.forEach(r => {
+        seen.add(r.id);
+        if (r.payload) write(this.ledgerKey(r.id), r.payload);
+        const local = this.dashboards.find(d => d.id === r.id);
+        const meta = { id: r.id, name: r.name, sector: r.sector, sample: r.sample,
+                       role: r.role, owner: r.owner, sharedWith: r.shared_with,
+                       created: local ? local.created : V.todayISO() };
+        if (local) Object.assign(local, meta);
+        else this.dashboards.push(meta);
+      });
+
+      // Anything made on this device while signed out is pushed up, and
+      // anything the service has dropped goes from here too.
+      const mine = this.dashboards.filter(d => !seen.has(d.id));
+      for (const d of mine) {
+        if (d.role && d.role !== "owner") continue;
+        try {
+          await this.apiPost("/api/dashboards", {
+            id: d.id, name: d.name, sector: d.sector || "", sample: !!d.sample,
+            payload: read(this.ledgerKey(d.id), { org: this.org, entries: [] })
+          });
+          seen.add(d.id);
+        } catch (_) { /* keep it locally and try again next time */ }
+      }
+      this.dashboards = this.dashboards.filter(d => seen.has(d.id));
+
+      if (!this.dashboards.some(d => d.id === this.dashId)) {
+        this.dashId = this.dashboards.length ? this.dashboards[0].id : null;
+      }
+      this.saveDashboards();
+      this.loadLedger();
+      return { synced: true, count: this.dashboards.length };
+    },
+
+    /** The payload is large, so a burst of edits becomes one write. */
+    push(id = this.dashId) {
+      if (!this.isLive() || !id) return;
+      const dash = this.dashboards.find(d => d.id === id);
+      if (dash && dash.role && dash.role === "viewer") return;   // not ours to change
+      clearTimeout(this._push);
+      this._push = setTimeout(() => {
+        const body = { name: dash ? dash.name : this.org.name,
+                       sector: dash ? dash.sector : this.org.sector,
+                       payload: read(this.ledgerKey(id), null) };
+        if (!body.payload) return;
+        this.apiPut(`/api/dashboards/${id}`, body).catch(() => {});
+      }, 1200);
+    },
+
+    /* ══════════════════ sharing ═══════════════════════════════════════ */
+
+    shareDashboard(id, email, role) {
+      return this.apiPost(`/api/dashboards/${id}/share`, { email, role });
+    },
+    dashboardMembers(id) { return this.apiGet(`/api/dashboards/${id}/members`); },
+    unshareDashboard(id, userId) {
+      return this.apiDelete(`/api/dashboards/${id}/members/${userId}`);
     },
 
     saveDashboards() {
@@ -116,10 +217,14 @@ window.VL = window.VL || {};
       const seed = [...name].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 20260920);
       const entries = sample ? V.generateLedger(new Date(), seed) : [];
       write(this.ledgerKey(id), { org, entries });
-      this.dashboards.push({ id, name, sector, created: V.todayISO(), sample });
+      this.dashboards.push({ id, name, sector, created: V.todayISO(), sample, role: "owner" });
       this.dashId = id;
       this.saveDashboards();
       if (!silent) this.loadLedger();
+      if (this.isLive()) {
+        this.apiPost("/api/dashboards", { id, name, sector, sample, payload: { org, entries } })
+          .catch(() => {});
+      }
       return this.dashboard;
     },
 
@@ -133,8 +238,16 @@ window.VL = window.VL || {};
 
     deleteDashboard(id) {
       if (this.dashboards.length <= 1) return false;     // always keep one
+      const gone = this.dashboards.find(d => d.id === id);
       this.dashboards = this.dashboards.filter(d => d.id !== id);
       try { localStorage.removeItem(this.ledgerKey(id)); } catch (_) {}
+      if (this.isLive()) {
+        // Someone else's dashboard is only removed from your list.
+        const path = gone && gone.role && gone.role !== "owner"
+          ? `/api/dashboards/${id}/members/${this.userId || 0}`
+          : `/api/dashboards/${id}`;
+        this.apiDelete(path).catch(() => {});
+      }
       if (this.dashId === id) this.dashId = this.dashboards[0].id;
       this.saveDashboards();
       this.loadLedger();
@@ -173,6 +286,7 @@ window.VL = window.VL || {};
     persist() {
       if (!this.dashId) return;
       write(this.ledgerKey(this.dashId), { org: this.org, entries: this.entries });
+      this.push();
       const d = this.dashboard;
       if (d && (d.name !== this.org.name || d.sector !== this.org.sector)) {
         d.name = this.org.name; d.sector = this.org.sector; this.saveDashboards();
@@ -230,7 +344,9 @@ window.VL = window.VL || {};
             this.token = body.access_token; this.mode = "live";
             try { localStorage.setItem(LS.token, this.token); } catch (_) {}
             this.user = { name, email, role: "admin" };
+            this.userId = body.user && body.user.id;
             this.org = { ...blankOrg(), name: org || name };
+            this.pendingOrg = org || name;
             this.finishSignIn();
             return { mode: "live" };
           }
@@ -246,6 +362,7 @@ window.VL = window.VL || {};
       this.mode = "demo";
       this.user = { name, email, role: "admin" };
       this.org = { ...blankOrg(), name: org || name };
+      this.pendingOrg = org || name;
       this.finishSignIn();
       return { mode: "demo" };
     },
@@ -267,6 +384,7 @@ window.VL = window.VL || {};
             this.token = body.access_token;
             this.mode = "live";
             this.user = { name: body.user.name, email: body.user.email, role: body.user.role };
+            this.userId = body.user.id;
             try { localStorage.setItem(LS.token, this.token); } catch (_) {}
             this.finishSignIn();
             return { mode: "live" };
@@ -291,6 +409,16 @@ window.VL = window.VL || {};
         localStorage.setItem(LS.session, JSON.stringify({ signedIn: true, user: this.user }));
       } catch (_) {}
       this.loadDashboards();
+      if (this.isLive()) {
+        // Whatever this account has elsewhere arrives a moment later, and
+        // only then is it clear whether a first dashboard is needed.
+        this.syncDashboards().then(() => {
+          this.ensureStarter();
+          if (V.App) V.App.route();
+        });
+      } else {
+        this.ensureStarter();
+      }
     },
 
     signOut() {
@@ -415,6 +543,24 @@ window.VL = window.VL || {};
       const res = await fetch(API_BASE + path, { headers: { Authorization: `Bearer ${this.token}` } });
       if (!res.ok) throw new Error(`Request failed (${res.status})`);
       return res.json();
+    },
+
+    async apiPut(path, body) {
+      const res = await fetch(API_BASE + path, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.token}` },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      return res.json();
+    },
+
+    async apiDelete(path) {
+      const res = await fetch(API_BASE + path, {
+        method: "DELETE", headers: { Authorization: `Bearer ${this.token}` }
+      });
+      if (!res.ok && res.status !== 404) throw new Error(`Request failed (${res.status})`);
+      return true;
     },
 
     async apiPost(path, body) {

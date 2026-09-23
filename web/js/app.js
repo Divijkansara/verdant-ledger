@@ -417,6 +417,15 @@ window.VL = window.VL || {};
       V.FX.init();
 
       window.addEventListener("hashchange", () => this.transition(() => this.route()));
+
+      /* Another device may have added or changed a dashboard while this
+         tab sat idle. Coming back to it is the natural moment to ask. */
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden || !V.Store.isLive()) return;
+        V.Store.syncDashboards().then(r => {
+          if (r.synced && (this.current || "").startsWith("/app")) this.route();
+        });
+      });
       this.route();
 
       // Re-render charts once the webfonts land, so SVG text metrics settle.

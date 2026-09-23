@@ -15,6 +15,7 @@
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const S = () => V.Store;
+  const icon = (n, s) => V.UI.icon(n, s);
 
   /** A tiny inline trend line, from twelve monthly totals. */
   function spark(values) {
@@ -38,6 +39,9 @@
             <h3>${esc(d.name || "Untitled")}</h3>
             <span class="dc-sub">${esc(d.sector || "No sector set")}${on ? " · last opened" : ""}</span>
             ${d.sample ? `<span class="dc-tag">Sample data</span>` : ""}
+            ${d.role && d.role !== "owner"
+              ? `<span class="dc-tag dc-shared">${icon("users", 11)} Shared by ${esc(d.owner || "a colleague")} · ${esc(d.role)}</span>`
+              : d.sharedWith ? `<span class="dc-tag">${icon("users", 11)} Shared with ${d.sharedWith}</span>` : ""}
           </div>
           ${empty ? `<span class="dc-grade faint">—</span>`
                   : `<span class="dc-grade" style="color:${V.bandVar(p.score.composite)}">${p.score.grade}</span>`}
@@ -49,8 +53,10 @@
         <div class="dc-foot">
           <span>${p.count} ${p.count === 1 ? "entry" : "entries"}</span>
           <span class="dc-actions">
+            ${(!d.role || d.role === "owner") && S().isLive()
+              ? `<button class="dc-act" data-share="${d.id}">Share</button>` : ""}
             ${S().dashboards.length > 1
-              ? `<button class="dc-del" data-del="${d.id}" aria-label="Delete ${esc(d.name)}">Delete</button>` : ""}
+              ? `<button class="dc-del" data-del="${d.id}" aria-label="${d.role && d.role !== "owner" ? "Leave" : "Delete"} ${esc(d.name)}">${d.role && d.role !== "owner" ? "Leave" : "Delete"}</button>` : ""}
             <span class="dc-open">Open →</span>
           </span>
         </div>
@@ -74,6 +80,7 @@
             <h1>Hello, ${esc((u.name || "there").split(" ")[0])}.</h1>
             <p class="lede">Each dashboard tracks one organisation or site. Pick one to open it,
               or start a new one.</p>
+            <p class="dash-sync" id="dashSync"></p>
             <div class="dash-grid" id="dashGrid">
               ${S().dashboards.map(card).join("")}
               <button class="dcard dcard-new" id="newDash" style="--i:${S().dashboards.length}">
@@ -103,8 +110,88 @@
         V.UI.toast("Dashboard deleted", d.name, "info");
         V.App.route();
       }));
+      $$("[data-share]").forEach(b => b.addEventListener("click", e => {
+        e.stopPropagation();
+        Dashboards.share(b.dataset.share);
+      }));
+
+      const sync = $("#dashSync");
+      if (sync) {
+        sync.textContent = S().isLive()
+          ? "Saved to your account — the same dashboards open on any device you sign in on."
+          : "Saved on this device. Sign in while the service is running to use them elsewhere.";
+      }
+
       $("#newDash").addEventListener("click", () => Dashboards.create());
       $("#dashSignOut").addEventListener("click", () => { S().signOut(); location.hash = "#/"; });
+    },
+
+    /** Share with a colleague, and see who already has it. */
+    async share(id) {
+      const dash = S().dashboards.find(x => x.id === id);
+      let members = { members: [] };
+      try { members = await S().dashboardMembers(id); } catch (_) {}
+
+      const rows = members.members.length
+        ? members.members.map(m => `
+            <div class="sh-row" data-uid="${m.user_id}">
+              <div><b>${esc(m.name)}</b><span>${esc(m.email)}</span></div>
+              <span class="sh-role">${esc(m.role)}</span>
+              <button class="dc-act sh-remove" data-remove="${m.user_id}">Remove</button>
+            </div>`).join("")
+        : `<p class="sh-empty">Not shared with anyone yet.</p>`;
+
+      const body = `
+        <div class="nd-form">
+          <p class="sh-note">Colleagues need a Terrawise account with the email you enter.
+             A <b>viewer</b> can read the numbers and the reports; an <b>editor</b> can also
+             add activity and change settings. Only you can delete it.</p>
+          <div class="form-row c2">
+            <div class="field"><label for="shEmail">Their email</label>
+              <input id="shEmail" class="ctl" type="email" placeholder="colleague@company.com"></div>
+            <div class="field"><label for="shRole">They can</label>
+              <select id="shRole" class="ctl">
+                <option value="viewer">View</option>
+                <option value="editor">View and edit</option>
+              </select></div>
+          </div>
+          <div class="auth-err" id="shErr" role="alert"></div>
+          <div class="sh-list">${rows}</div>
+        </div>`;
+
+      setTimeout(() => {
+        const first = $("#shEmail");
+        if (first) first.focus();
+        $$(".sh-remove").forEach(b => b.addEventListener("click", async e => {
+          e.preventDefault();
+          await S().unshareDashboard(id, +b.dataset.remove).catch(() => {});
+          const row = b.closest(".sh-row");
+          if (row) row.remove();
+        }));
+      }, 60);
+
+      const ok = await V.UI.dialog({
+        title: `Share “${esc(dash ? dash.name : "dashboard")}”`,
+        body, confirmLabel: "Share",
+        validate: () => {
+          const email = $("#shEmail").value.trim();
+          if (!email) { $("#shErr").textContent = "Enter the email they signed up with"; return false; }
+          Dashboards._share = { email, role: $("#shRole").value };
+          return true;
+        }
+      });
+      if (!ok || !Dashboards._share) return;
+
+      const { email, role } = Dashboards._share;
+      Dashboards._share = null;
+      try {
+        const r = await S().shareDashboard(id, email, role);
+        V.UI.toast("Dashboard shared", `${r.name || email} can now ${role === "editor" ? "edit" : "view"} it`, "ok");
+        await S().syncDashboards();
+        V.App.route();
+      } catch (err) {
+        V.UI.toast("Could not share", String(err.message || err).slice(0, 90), "err");
+      }
     },
 
     /** The new-dashboard form, in a dialog. */
