@@ -276,3 +276,97 @@ def test_event_batches_are_bounded(client):
                                          "events": [{"kind": "view"}] * 51})
     assert r.status_code == 422
     assert client.get("/api/events").status_code == 401
+
+
+# ───────────────────────── dashboards and sharing ────────────────────
+
+@pytest.fixture(scope="module")
+def mate(client):
+    """A second account, to share with."""
+    r = client.post("/api/auth/register", json={
+        "org_name": "Mate Corp", "headcount": 10, "sector": "Testing",
+        "name": "Mate Tester", "email": "mate@test.example", "password": "supersecret1",
+    })
+    assert r.status_code == 201, r.text
+    return {"Authorization": f"Bearer {r.json()['access_token']}"}
+
+
+PAYLOAD = {"org": {"name": "Pune office", "headcount": 40}, "entries": [{"id": "e1", "co2": 12}]}
+
+
+def test_dashboard_round_trips_and_syncs(client, auth):
+    r = client.post("/api/dashboards", headers=auth, json={
+        "id": "d-test-1", "name": "Pune office", "sector": "Manufacturing", "payload": PAYLOAD})
+    assert r.status_code == 201 and r.json()["role"] == "owner"
+
+    # A second device sees it in the list, with its contents.
+    rows = client.get("/api/dashboards", headers=auth).json()["dashboards"]
+    mine = [d for d in rows if d["id"] == "d-test-1"][0]
+    assert mine["payload"]["org"]["name"] == "Pune office"
+
+    # Writing from one device is visible to the other.
+    payload2 = {"org": {"name": "Pune office", "headcount": 41}, "entries": []}
+    assert client.put("/api/dashboards/d-test-1", headers=auth,
+                      json={"payload": payload2}).status_code == 200
+    assert client.get("/api/dashboards/d-test-1", headers=auth
+                      ).json()["payload"]["org"]["headcount"] == 41
+
+    # The same id posted again is the same dashboard, not a duplicate.
+    client.post("/api/dashboards", headers=auth, json={
+        "id": "d-test-1", "name": "Pune office", "payload": payload2})
+    assert len([d for d in client.get("/api/dashboards", headers=auth).json()["dashboards"]
+                if d["id"] == "d-test-1"]) == 1
+
+
+def test_a_dashboard_is_private_until_it_is_shared(client, auth, mate):
+    client.post("/api/dashboards", headers=auth, json={
+        "id": "d-test-2", "name": "Private", "payload": PAYLOAD})
+
+    # Not shared: it must not even admit to existing.
+    assert client.get("/api/dashboards/d-test-2", headers=mate).status_code == 404
+    assert [d for d in client.get("/api/dashboards", headers=mate).json()["dashboards"]] == []
+
+    r = client.post("/api/dashboards/d-test-2/share", headers=auth,
+                    json={"email": "mate@test.example", "role": "viewer"})
+    assert r.status_code == 201
+
+    rows = client.get("/api/dashboards", headers=mate).json()["dashboards"]
+    assert [d["id"] for d in rows] == ["d-test-2"] and rows[0]["role"] == "viewer"
+
+    # A viewer may read and may not write, and may not delete.
+    assert client.get("/api/dashboards/d-test-2", headers=mate).status_code == 200
+    assert client.put("/api/dashboards/d-test-2", headers=mate,
+                      json={"name": "Hijacked"}).status_code == 403
+    assert client.delete("/api/dashboards/d-test-2", headers=mate).status_code == 403
+
+    # Promoted to editor, the same person may write but still not delete.
+    client.post("/api/dashboards/d-test-2/share", headers=auth,
+                json={"email": "mate@test.example", "role": "editor"})
+    assert client.put("/api/dashboards/d-test-2", headers=mate,
+                      json={"name": "Shared office"}).status_code == 200
+    assert client.delete("/api/dashboards/d-test-2", headers=mate).status_code == 403
+
+
+def test_sharing_needs_a_real_account_and_can_be_undone(client, auth, mate):
+    client.post("/api/dashboards", headers=auth, json={
+        "id": "d-test-3", "name": "Third", "payload": PAYLOAD})
+
+    r = client.post("/api/dashboards/d-test-3/share", headers=auth,
+                    json={"email": "nobody@test.example", "role": "viewer"})
+    assert r.status_code == 404 and "sign up" in r.json()["detail"]
+
+    client.post("/api/dashboards/d-test-3/share", headers=auth,
+                json={"email": "mate@test.example", "role": "viewer"})
+    members = client.get("/api/dashboards/d-test-3/members", headers=auth).json()
+    assert members["members"][0]["email"] == "mate@test.example"
+    uid = members["members"][0]["user_id"]
+
+    assert client.delete(f"/api/dashboards/d-test-3/members/{uid}", headers=auth).status_code == 204
+    assert client.get("/api/dashboards/d-test-3", headers=mate).status_code == 404
+
+
+def test_only_the_owner_deletes(client, auth, mate):
+    client.post("/api/dashboards", headers=auth, json={
+        "id": "d-test-4", "name": "Fourth", "payload": PAYLOAD})
+    assert client.delete("/api/dashboards/d-test-4", headers=auth).status_code == 204
+    assert client.get("/api/dashboards/d-test-4", headers=auth).status_code == 404

@@ -260,3 +260,53 @@ class SiteEvent(Base):
     path: Mapped[str] = mapped_column(String(200), default="")
     detail: Mapped[dict | None] = mapped_column(JSON)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+
+class DashboardRole(str, enum.Enum):
+    """What a person may do with a dashboard that is not theirs."""
+
+    EDITOR = "editor"       # add activity, change settings
+    VIEWER = "viewer"       # read the numbers and the reports
+
+
+class Dashboard(Base):
+    """One organisation or site, with its activity, belonging to a user.
+
+    The whole dashboard travels as one JSON payload: the engine that
+    computes every figure runs in the browser, so the server's job is to
+    keep the record safe, hand it to the devices that may see it, and say
+    who those are. That is also why the id is the one the client
+    generated — the same dashboard keeps its identity offline and on.
+    """
+
+    __tablename__ = "dashboards"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    sector: Mapped[str] = mapped_column(String(80), default="")
+    sample: Mapped[bool] = mapped_column(Boolean, default=False)
+    payload: Mapped[dict] = mapped_column(JSON, nullable=False)     # { org, entries }
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, onupdate=utcnow)
+
+    owner: Mapped[User] = relationship()
+    members: Mapped[list["DashboardMember"]] = relationship(
+        back_populates="dashboard", cascade="all, delete-orphan")
+
+
+class DashboardMember(Base):
+    """A colleague this dashboard is shared with."""
+
+    __tablename__ = "dashboard_members"
+    __table_args__ = (UniqueConstraint("dashboard_id", "user_id", name="uq_member_once"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    dashboard_id: Mapped[str] = mapped_column(
+        ForeignKey("dashboards.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    role: Mapped[DashboardRole] = mapped_column(SAEnum(DashboardRole), default=DashboardRole.VIEWER)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+    dashboard: Mapped[Dashboard] = relationship(back_populates="members")
+    user: Mapped[User] = relationship()
