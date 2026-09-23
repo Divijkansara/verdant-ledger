@@ -71,7 +71,7 @@
           <header class="dash-hd shell">
             <a class="brand" href="#/">${V.SiteViews.GLYPH}<b>Terra<span>wise</span></b></a>
             <div class="dash-user">
-              <span>${esc(u.name)}</span>
+              <span title="${esc(u.name)}">${esc(u.name)}</span>
               <button class="btn btn-ghost btn-sm" id="dashSignOut">Sign out</button>
             </div>
           </header>
