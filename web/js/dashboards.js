@@ -16,6 +16,9 @@
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const S = () => V.Store;
   const icon = (n, s) => V.UI.icon(n, s);
+  /** Two letters for the avatar, from however many words the name has. */
+  const initials = name => (name || "U").trim().split(/\s+/)
+    .map(w => w[0]).filter(c => /[a-z0-9]/i.test(c)).slice(0, 2).join("").toUpperCase() || "U";
 
   /** A tiny inline trend line, from twelve monthly totals. */
   function spark(values) {
@@ -71,7 +74,10 @@
           <header class="dash-hd shell">
             <a class="brand" href="#/">${V.SiteViews.GLYPH}<b>Terra<span>wise</span></b></a>
             <div class="dash-user">
-              <span title="${esc(u.name)}">${esc(u.name)}</span>
+              <span class="du-who" title="${esc(u.name)}">
+                <span class="avatar">${esc(initials(u.name))}</span>
+                <span class="du-name">${esc(u.name)}</span>
+              </span>
               <button class="btn btn-ghost btn-sm" id="dashSignOut">Sign out</button>
             </div>
           </header>

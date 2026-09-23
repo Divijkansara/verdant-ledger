@@ -506,10 +506,21 @@ details.more-wall[open]>summary{border-style:solid}
   min-height:64px;padding-block:22px}
 /* A long name must not wrap and push the button off its line: it keeps one
    line and ends in an ellipsis, and the button never shrinks. */
-.dash-user{display:flex;align-items:center;gap:16px;color:var(--text-3);font-size:var(--fs-small)}
-.dash-user > span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  max-width:min(42vw,340px)}
-.dash-user > .btn{flex:0 0 auto}
+/* Who you are, then the way out. As a group with its own edge, so a long
+   name reads as a labelled account rather than text drifting beside a
+   button — and the button keeps its distance whatever the name does. */
+.dash-user{display:flex;align-items:center;gap:8px;color:var(--text-3);font-size:var(--fs-small)}
+.du-who{display:flex;align-items:center;gap:10px;min-width:0;padding:6px 14px 6px 6px;
+  border:1px solid var(--line-2);border-radius:var(--r-pill);
+  background:color-mix(in srgb,var(--surface-1) 70%,transparent)}
+.du-who .avatar{width:26px;height:26px;font-size:var(--fs-micro)}
+.du-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:min(38vw,300px);color:var(--text-2)}
+.dash-user > .btn{flex:0 0 auto;margin-left:6px}
+@media (max-width:560px){
+  .du-name{max-width:34vw}
+  .du-who{padding-right:10px}
+}
 .dash-main{padding-block:40px 90px}
 .dash-main h1{font-family:var(--font-display);font-size:clamp(34px,5vw,56px);letter-spacing:-.03em;margin:14px 0 10px}
 .dash-main .lede{max-width:560px}
