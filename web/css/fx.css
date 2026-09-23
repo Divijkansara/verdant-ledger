@@ -237,6 +237,30 @@ body.cleaning .planet-act{background:transparent;border-color:var(--line-3);
 .ds-hd h2{font-size:var(--fs-h2);margin-top:14px}
 /* the chips hang 54px above the stage and the score pill 62px below it;
    reserve that margin so neither covers the heading or the next section */
+/* The stack on the left, what the five reports are on the right. Below
+   1080px the list follows the stack instead of sitting beside it. */
+.ds-grid{display:grid;grid-template-columns:minmax(0,392px) minmax(0,1fr);
+  gap:clamp(40px,7vw,110px);align-items:center}
+.ds-list{display:flex;flex-direction:column;gap:2px;max-width:min(760px,100%)}
+.dl-item{display:grid;grid-template-columns:26px 1fr;gap:14px;align-items:baseline;
+  width:100%;text-align:left;padding:15px 16px;border:0;border-radius:var(--r-md);
+  background:none;color:inherit;cursor:pointer;font:inherit;
+  transition:background var(--t-fast),transform var(--t-fast)}
+.dl-item + .dl-item{border-top:1px solid var(--line-1)}
+.dl-item:hover{background:var(--surface-1)}
+.dl-item.on{background:var(--surface-1)}
+.dl-k{font-family:var(--font-mono);font-size:var(--fs-micro);letter-spacing:.14em;
+  color:var(--text-4)}
+.dl-item.on .dl-k{color:var(--accent)}
+.dl-t b{display:block;font-size:var(--fs-lead);font-weight:600;letter-spacing:-.01em}
+.dl-t em{display:block;margin-top:5px;font-style:normal;font-size:var(--fs-small);
+  color:var(--text-3);line-height:1.55;max-width:66ch}
+.dl-item.on .dl-t b{color:var(--accent)}
+@media (max-width:1080px){
+  .ds-grid{grid-template-columns:minmax(0,1fr);gap:0}
+  .ds-list{max-width:none;margin-top:8px}
+}
+
 .deck-section .deck-stage{margin-inline:0;margin-block:72px 104px}
 /* the tilted sheets dip ~25px below the stage; keep the selector clear of them */
 .deck-section .deck-nav{bottom:-78px}

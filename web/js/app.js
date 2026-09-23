@@ -86,6 +86,11 @@ window.VL = window.VL || {};
       }
       this.shellMounted = false;
 
+      // Every public page reads the sample organisation, never the
+      // visitor's own dashboard: the marketing page is an advertisement,
+      // not a view of their data.
+      if (V.Store.signedIn) V.Store.previewSample();
+
       const factory = PUBLIC[path];
       const view = factory ? factory() : null;
       const root = $("#root");
@@ -135,6 +140,7 @@ window.VL = window.VL || {};
 
     renderDashboards() {
       this.shellMounted = false;
+      if (V.Store.signedIn && V.Store.dashId) V.Store.loadLedger();
       $("#root").innerHTML = V.Dashboards.render();
       window.scrollTo(0, 0);
       V.Dashboards.mount();
@@ -145,6 +151,9 @@ window.VL = window.VL || {};
       // Re-renders (fonts landing, a period change) can arrive while the
       // dashboards page is showing; it is not a console module.
       if (path === "/app/dashboards") return this.renderDashboards();
+      // Coming back from a public page, the store may be holding the
+      // sample year; the console must show the dashboard that is open.
+      if (V.Store.signedIn && V.Store.dashId) V.Store.loadLedger();
       const entry = MODULES.find(m => m.path === path) || MODULES[0];
       const view = V.AppViews[entry.id];
 

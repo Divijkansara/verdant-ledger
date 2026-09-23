@@ -269,6 +269,16 @@ window.VL = window.VL || {};
     /** Signed-out visitors: the sample organisation, so the landing page
      *  (the planet, the documents, the charts) has real numbers to show.
      *  Never persisted; the console itself needs a sign-in. */
+    /** The sample organisation, for the landing page only. It never
+     *  touches the account's own dashboards, so a signed-in visitor can
+     *  read the marketing page without their empty dashboard showing
+     *  through it — and their data is one loadLedger() away. */
+    previewSample() {
+      this.org = { ...SHOWCASE_ORG };
+      this.entries = V.generateLedger();
+      this.reseal();
+    },
+
     loadShowcase() {
       this.org = { ...SHOWCASE_ORG };
       this.entries = V.generateLedger();

@@ -110,11 +110,16 @@ window.VL = window.VL || {};
 
     return [
       { k: "A", title: "Carbon summary", foot: period,
+        note: "What you emitted, what recycling and solar saved, and the footprint left over.",
         lead: `<div class="sh-fig">${t(agg.net)}<u>tonnes CO₂<br>overall</u></div>`, body: A },
-      { k: "B", title: "Where it comes from", foot: "top five of eight categories", body: B },
-      { k: "C", title: "Data check", foot: "checked when the page loaded", body: C },
-      { k: "D", title: "Plan for the 1.5 °C goal", foot: "worked out by the planner", body: D },
-      { k: "E", title: "Latest activity", foot: "four most recent records", body: E }
+      { k: "B", title: "Where it comes from", foot: "top five of eight categories",
+        note: "Electricity, travel, purchases, waste — ranked, so you know what to fix first.", body: B },
+      { k: "C", title: "Data check", foot: "checked when the page loaded",
+        note: "Every record is locked to the one before it. Change an old one and the check fails.", body: C },
+      { k: "D", title: "Plan for the 1.5 °C goal", foot: "worked out by the planner",
+        note: "Eight changes, the carbon each one saves, and the grade they add up to.", body: D },
+      { k: "E", title: "Latest activity", foot: "four most recent records",
+        note: "The newest entries, with the factor each was priced at.", body: E }
     ];
   }
 
@@ -154,6 +159,18 @@ window.VL = window.VL || {};
             title="${c.title}"><span>${c.k}</span></button>`).join("")}
       </div>`;
 
+    /* The stack is one report at a time; the list says what the other four
+       are. Same selection, two ways in — and it gives the section its
+       right-hand half back on a wide screen. */
+    const listHost = document.querySelector("#deckList");
+    if (listHost) {
+      listHost.innerHTML = cards.map((c, i) => `
+        <button class="dl-item${i === 0 ? " on" : ""}" data-go="${i}">
+          <span class="dl-k">${c.k}</span>
+          <span class="dl-t"><b>${c.title}</b><em>${c.note || ""}</em></span>
+        </button>`).join("");
+    }
+
     const inner = $("#deckInner", host);
     const sheetEls = $$(".sheet", host);
     const dots = $$(".dk", host);
@@ -171,12 +188,18 @@ window.VL = window.VL || {};
         el.style.zIndex = n - o;
       });
       dots.forEach((d, i) => d.setAttribute("aria-pressed", String(i === front)));
+      if (listHost) {
+        $$(".dl-item", listHost).forEach((b, i) => b.classList.toggle("on", i === front));
+      }
     };
 
     const go = i => { front = ((i % n) + n) % n; host.classList.add("spread"); place(); };
     place();
 
     dots.forEach(d => d.addEventListener("click", () => go(+d.dataset.go)));
+    if (listHost) {
+      $$(".dl-item", listHost).forEach(b => b.addEventListener("click", () => go(+b.dataset.go)));
+    }
     sheetEls.forEach(el => el.addEventListener("click", () => {
       if (!el.classList.contains("front")) go(+el.dataset.i);
     }));

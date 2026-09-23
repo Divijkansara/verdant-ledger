@@ -6,6 +6,11 @@
 /* ═══════════════════════ shell ═════════════════════════════════════ */
 .site{min-height:100vh;display:flex;flex-direction:column}
 .shell{max-width:1220px;margin:0 auto;width:100%;padding-inline:24px}
+/* On a very wide window — a large monitor, or a browser zoomed out — a
+   fixed column reads as a small box adrift in the middle, so it grows
+   with the screen rather than staying put. */
+@media (min-width:1800px){.shell{max-width:min(1480px,80vw)}}
+@media (min-width:2400px){.shell{max-width:min(1760px,74vw)}}
 
 /* ── top navigation ─────────────────────────────────────────────────── */
 /* At the top of the landing page the bar would sit across the hero, so

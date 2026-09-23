@@ -179,7 +179,10 @@ window.VL = window.VL || {};
             <span class="eyebrow">[ Reports ]</span>
             <h2>Five reports, written for you.</h2>
           </div>
-          <div class="deck-stage" id="deck"></div>
+          <div class="ds-grid">
+            <div class="deck-stage" id="deck"></div>
+            <div class="ds-list" id="deckList"></div>
+          </div>
         </div>
       </section>
 
