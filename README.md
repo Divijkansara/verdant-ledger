@@ -146,5 +146,39 @@ implemented from the spec. Runs from a double-click or a static server.
 password hashing, role-based access control, pytest.
 
 ```bash
-cd backend && pytest -q        # 47 tests
+cd backend && pytest -q        # 53 tests
 ```
+
+**Deployed** — the site and the API run as two Vercel projects against a
+Supabase PostgreSQL database. Dashboards live on the server, so the same
+account opens them on any device, and each can be shared with colleagues as
+a viewer or an editor.
+
+---
+
+## Running it
+
+From VS Code: **Ctrl+Shift+B**, or *Tasks: Run Task* → **Terrawise: everything**.
+Or by hand:
+
+```bash
+python web/serve.py                                   # site  → localhost:5500
+cd backend && .venv/Scripts/python -m uvicorn app.main:app --reload   # API → :8000
+```
+
+Set `window.VERDANT_API = ""` in `web/js/config.js` to use the local API
+instead of the deployed one.
+
+---
+
+## Restore points
+
+`classic-v1` (tag) and `classic` (branch), both on GitHub, mark the site as it
+was before the scroll-driven camera work of 23 September 2026 — same name,
+palette and copy, without the camera, aurora, cursor light or card tilt.
+
+```bash
+git reset --hard classic-v1 && git push --force origin master
+```
+
+Vercel redeploys `master` by itself, so the live site follows within a minute.
